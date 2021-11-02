@@ -10,4 +10,4 @@ RUN chmod +x /wait
 ADD . /var/www/logger-service
 RUN npm install
 
-CMD /wait && npm run build && npm run start:prod
+CMD /wait && npm run build && npm run start:dev
