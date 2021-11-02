@@ -12,6 +12,114 @@ services:
     networks:
         - rabbitmq_go_net
 
+  gateway:
+    build: ./backend/gateway
+    hostname: gateway
+    ports:
+      - 3000:3000
+    volumes:
+      - ./backend/gateway:/var/www/gateway
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+      WAIT_TIMEOUT: 120
+      WAIT_SLEEP_INTERVAL: 5
+    networks:
+      - rabbitmq_go_net
+
+  download-service:
+    build: ./backend/download-service
+    hostname: download-service
+    volumes:
+      - ./backend/download-service:/var/www/download-service
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+      WAIT_TIMEOUT: 120
+      WAIT_SLEEP_INTERVAL: 5
+    networks:
+      - rabbitmq_go_net
+
+  dropbox-service:
+    build: ./backend/dropbox-service
+    hostname: dropbox-service
+    volumes:
+      - ./backend/dropbox-service:/var/www/dropbox-service
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+      WAIT_TIMEOUT: 120
+      WAIT_SLEEP_INTERVAL: 5
+    networks:
+      - rabbitmq_go_net
+
+  logger-service:
+    build: ./backend/logger-service
+    hostname: logger-service
+    volumes:
+      - ./backend/logger-service:/var/www/logger-service
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+      WAIT_TIMEOUT: 120
+      WAIT_SLEEP_INTERVAL: 5
+    networks:
+      - rabbitmq_go_net
+
+  minio-service:
+    build: ./backend/minio-service
+    hostname: minio-service
+    volumes:
+      - ./backend/minio-service:/var/www/minio-service
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+      WAIT_TIMEOUT: 120
+      WAIT_SLEEP_INTERVAL: 5
+    networks:
+      - rabbitmq_go_net
+
+  mongodb-service:
+    build: ./backend/mongodb-service
+    hostname: mongodb-service
+    volumes:
+      - ./backend/mongodb-service:/var/www/mongodb-service
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+      WAIT_TIMEOUT: 120
+      WAIT_SLEEP_INTERVAL: 5
+    networks:
+      - rabbitmq_go_net
+
+  upload-service:
+    build: ./backend/upload-service
+    hostname: upload-service
+    volumes:
+      - ./backend/upload-service:/var/www/upload-service
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+      WAIT_TIMEOUT: 120
+      WAIT_SLEEP_INTERVAL: 5
+    networks:
+      - rabbitmq_go_net
+  
+  # This is currently not working
+  # webclient:
+  #   build: ./frontend
+  #   volumes:
+  #       - ./frontend:/var/www/frontend
+  #   ports:
+  #       - 4200:4200
+
 networks:
   rabbitmq_go_net:
     driver: bridge
