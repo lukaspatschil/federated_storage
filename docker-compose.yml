@@ -19,6 +19,7 @@ services:
       - 3000:3000
     volumes:
       - ./backend/gateway:/var/www/gateway
+      - /var/www/gateway/node_modules
     depends_on:
       - rabbitmq
     environment:
@@ -33,6 +34,7 @@ services:
     hostname: download-service
     volumes:
       - ./backend/download-service:/var/www/download-service
+      - /var/www/download-service/node_modules
     depends_on:
       - rabbitmq
     environment:
@@ -47,6 +49,7 @@ services:
     hostname: dropbox-service
     volumes:
       - ./backend/dropbox-service:/var/www/dropbox-service
+      - /var/www/dropbox-service/node_modules
     depends_on:
       - rabbitmq
     environment:
@@ -61,6 +64,7 @@ services:
     hostname: logger-service
     volumes:
       - ./backend/logger-service:/var/www/logger-service
+      - /var/www/logger-service/node_modules
     depends_on:
       - rabbitmq
     environment:
@@ -75,6 +79,7 @@ services:
     hostname: minio-service
     volumes:
       - ./backend/minio-service:/var/www/minio-service
+      - /var/www/minio-service/node_modules
     depends_on:
       - rabbitmq
     environment:
@@ -89,6 +94,7 @@ services:
     hostname: mongodb-service
     volumes:
       - ./backend/mongodb-service:/var/www/mongodb-service
+      - /var/www/mongodb-service/node_modules
     depends_on:
       - rabbitmq
     environment:
@@ -103,6 +109,7 @@ services:
     hostname: upload-service
     volumes:
       - ./backend/upload-service:/var/www/upload-service
+      - /var/www/upload-service/node_modules
     depends_on:
       - rabbitmq
     environment:
