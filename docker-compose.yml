@@ -2,7 +2,6 @@ version: "3.2"
 services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
     ports:
         - 5672:5672
         - 15672:15672
@@ -10,7 +9,7 @@ services:
         - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
-        - rabbitmq_go_net
+        - backend
 
   gateway:
     build: ./backend/gateway
@@ -27,7 +26,8 @@ services:
       WAIT_TIMEOUT: 120
       WAIT_SLEEP_INTERVAL: 5
     networks:
-      - rabbitmq_go_net
+      - backend
+      - frontend
 
   download-service:
     build: ./backend/download-service
@@ -42,7 +42,7 @@ services:
       WAIT_TIMEOUT: 120
       WAIT_SLEEP_INTERVAL: 5
     networks:
-      - rabbitmq_go_net
+      - backend
 
   dropbox-service:
     build: ./backend/dropbox-service
@@ -57,7 +57,7 @@ services:
       WAIT_TIMEOUT: 120
       WAIT_SLEEP_INTERVAL: 5
     networks:
-      - rabbitmq_go_net
+      - backend
 
   logger-service:
     build: ./backend/logger-service
@@ -72,7 +72,7 @@ services:
       WAIT_TIMEOUT: 120
       WAIT_SLEEP_INTERVAL: 5
     networks:
-      - rabbitmq_go_net
+      - backend
 
   minio-service:
     build: ./backend/minio-service
@@ -87,7 +87,7 @@ services:
       WAIT_TIMEOUT: 120
       WAIT_SLEEP_INTERVAL: 5
     networks:
-      - rabbitmq_go_net
+      - backend
 
   mongodb-service:
     build: ./backend/mongodb-service
@@ -102,7 +102,7 @@ services:
       WAIT_TIMEOUT: 120
       WAIT_SLEEP_INTERVAL: 5
     networks:
-      - rabbitmq_go_net
+      - backend
 
   upload-service:
     build: ./backend/upload-service
@@ -117,16 +117,20 @@ services:
       WAIT_TIMEOUT: 120
       WAIT_SLEEP_INTERVAL: 5
     networks:
-      - rabbitmq_go_net
+      - backend
   
-  # This is currently not working
-  # webclient:
-  #   build: ./frontend
-  #   volumes:
-  #       - ./frontend:/var/www/frontend
-  #   ports:
-  #       - 4200:4200
+  webclient:
+    build: ./frontend
+    volumes:
+        - ./frontend:/var/www/frontend
+        - /var/www/frontend/node_modules
+    ports:
+        - 4200:4200
+    networks:
+      - frontend
 
 networks:
-  rabbitmq_go_net:
+  backend:
+    driver: bridge
+  frontend:
     driver: bridge
