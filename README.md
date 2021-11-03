@@ -26,11 +26,53 @@ TODO
 
 ## Components
 
+### Frontend app
+
+TODO
+
+### Middleware
+
+TODO
+
+#### Gateway
+
+TODO
+
+#### Picture service
+
+TODO
+
+#### Logger service
+
+TODO
+
+#### RabbitMQ
+
+TODO
+
+### Storage
+
+#### Dropbox service
+
+TODO
+
+#### MongoDB service
+
+TODO
+
+#### MinIO service
+
 TODO
 
 ## How to run
 
-In order to start all services run `docker-compose up`.
+### Development
+
+In order to start all services run `docker-compose up` in order to start the application in development mode.
+
+### Production
+
+TODO
 
 ## How to debug
 

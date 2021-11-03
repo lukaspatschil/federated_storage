@@ -1,14 +1,23 @@
-import { Controller, Get, Post, Put, Delete, Param } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Inject, Post, Put, Delete, Param } from '@nestjs/common';
+import { ClientGrpc } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
+import { PictureServiceClient } from './interfaces/picture.interface';
 
 @Controller('api/v1/picture')
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  private pictureService: PictureServiceClient;
 
-  /*@Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }*/
+  constructor(@Inject('PICTURE_PACKAGE') private client: ClientGrpc) {}
+
+  onModuleInit() {
+    this.pictureService =
+      this.client.getService<PictureServiceClient>('PictureService');
+  }
+
+  @Get()
+  getPicture(): Observable<{ id: number; name: string }> {
+    return this.pictureService.findOne({ id: 1 });
+  }
 
   @Post()
   createOnePicture() {
@@ -58,5 +67,4 @@ export class AppController {
     console.log(functionname);
     return functionname;
   }
-
 }
