@@ -1,0 +1,6 @@
+{
+  "rules": {
+      "camelcase": "error",
+      "no-var": "error"
+  }
+}

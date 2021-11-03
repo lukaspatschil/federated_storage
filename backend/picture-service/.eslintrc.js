@@ -1,11 +1,12 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: 'backend/download-service/tsconfig.json',
+    project: 'backend/picture-service/tsconfig.json',
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
+    '../backend.eslintrc',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],
