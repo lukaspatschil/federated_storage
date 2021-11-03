@@ -68,6 +68,9 @@ TODO
 
 ### Development
 
+In order to develop on the application make sure you have `npm 7` or higher installed.
+Then run `npm install` in the main directory. This will automatically install all node modules.
+
 In order to start all services run `docker-compose up` in order to start the application in development mode.
 
 ### Production

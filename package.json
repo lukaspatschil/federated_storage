@@ -1,0 +1,25 @@
+{
+  "name": "g4t2",
+  "version": "1.0.0",
+  "description": "",
+  "workspaces": [
+    "backend/*",
+    "frontend"
+  ],
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@hyde.infosys.tuwien.ac.at:aic21/G4T2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "npm": ">=7.0.0"
+  }
+}
