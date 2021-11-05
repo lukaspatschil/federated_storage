@@ -1,15 +1,15 @@
 version: "3.2"
 services:
-  # rabbitmq:
-  #   image: rabbitmq:3-management-alpine
-  #   ports:
-  #       - 5672:5672
-  #       - 15672:15672
-  #   volumes:
-  #       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-  #       - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-  #   networks:
-  #       - backend
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - backend
 
   gateway:
     build: ./backend/gateway
@@ -44,20 +44,20 @@ services:
     networks:
       - backend
 
-  # logger-service:
-  #   build: ./backend/logger-service
-  #   hostname: logger-service
-  #   volumes:
-  #     - ./backend/logger-service:/var/www/logger-service
-  #     - /var/www/logger-service/node_modules
-  #   depends_on:
-  #     - rabbitmq
-  #   environment:
-  #     WAIT_HOSTS: rabbitmq:5672
-  #     WAIT_TIMEOUT: 120
-  #     WAIT_SLEEP_INTERVAL: 5
-  #   networks:
-  #     - backend
+  logger-service:
+    build: ./backend/logger-service
+    hostname: logger-service
+    volumes:
+      - ./backend/logger-service:/var/www/logger-service
+      - /var/www/logger-service/node_modules
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+      WAIT_TIMEOUT: 120
+      WAIT_SLEEP_INTERVAL: 5
+    networks:
+      - backend
 
   minio-service:
     build: ./backend/minio-service

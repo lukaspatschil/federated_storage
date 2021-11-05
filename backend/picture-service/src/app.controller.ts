@@ -48,7 +48,7 @@ export class AppController {
       .findOne(data)
       .subscribe(({ id }) => console.log(`The dropbox gets image with ${id}`));
 
-    this.dropboxService
+    this.mongodbService
       .findOne(data)
       .subscribe(({ id }) => console.log(`The mongo says ${id}`));
 
