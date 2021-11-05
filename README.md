@@ -26,11 +26,66 @@ TODO
 
 ## Components
 
+### Frontend app
+
+TODO
+
+### Middleware
+
+TODO
+
+#### Gateway
+
+TODO
+
+#### Picture service
+
+TODO
+
+#### Logger service
+
+TODO
+
+#### RabbitMQ
+
+TODO
+
+### Storage
+
+#### Dropbox service
+
+TODO
+
+#### MongoDB service
+
+TODO
+
+#### MinIO service
+
 TODO
 
 ## How to run
 
-In order to start all services run `docker-compose up`.
+### Development
+
+#### Installing dependencies
+
+In order to develop on the application make sure you have `npm 7` or higher installed.
+Then run `npm install` in the main directory. This will automatically install all node modules.
+
+When installing a new dependency use the command `npm install dependency -w service`.
+
+#### Docker
+
+In order to start all services run `docker-compose up` in order to start the application in development mode.
+
+To stop the containers run `docker-compose stop` or delete them by running `docker-compose down`.
+
+When installing a new dependency you will need to rebuild the docker container with `docker-compose build container-name`.
+
+### Production
+
+TODO
 
 ## How to debug
 
