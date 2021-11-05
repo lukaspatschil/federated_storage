@@ -11,14 +11,14 @@ services:
     networks:
         - backend
 
-  gateway:
-    build: ./backend/gateway
-    hostname: gateway
+  gateway-service:
+    build: ./backend/gateway-service
+    hostname: gateway-service
     ports:
       - 3000:3000
     volumes:
-      - ./backend/gateway:/var/www/gateway
-      - /var/www/gateway/node_modules
+      - ./backend/gateway-service:/var/www/gateway-service
+      - /var/www/gateway-service/node_modules
     # depends_on:
     #   - rabbitmq
     # environment:

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package mongodb;
+
+service MongoDBService {
+  rpc FindOne (PictureById) returns (Picture) {}
+}
+
+message PictureById {
+  int32 id = 1;
+}
+
+message Picture {
+  int32 id = 1;
+  string name = 2;
+}
