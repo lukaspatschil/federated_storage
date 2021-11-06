@@ -9,7 +9,8 @@ async function bootstrap() {
       .setTitle('Federated Storage Infrastructure for IoT Sensor Data')
       .setDescription('The federated Storage Infrastructure for IoT Sensor Data API description')
       .setVersion('1.0')
-      .addTag('storage')
+      .addTag('Storage')
+      .addTag('Utility')
       .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
