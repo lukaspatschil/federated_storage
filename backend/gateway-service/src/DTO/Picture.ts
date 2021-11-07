@@ -1,10 +1,9 @@
-import {ApiProperty} from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
-export class Picture{
+export class Picture {
+  @ApiProperty()
+  id: string;
 
-    @ApiProperty()
-    id: string;
-
-    @ApiProperty()
-    image: String;
+  @ApiProperty()
+  image: string;
 }

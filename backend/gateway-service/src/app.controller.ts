@@ -5,20 +5,23 @@ import {
   Post,
   Put,
   Delete,
-  Param, Body,
+  Param,
+  Body,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
 import { PictureServiceClient } from './interfaces/picture.interface';
 import {
-  ApiBadRequestResponse, ApiBody,
+  ApiBadRequestResponse,
+  ApiBody,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiOperation, ApiParam, ApiTags
-} from "@nestjs/swagger";
-import {Metadata} from "./DTO/Metadata";
-import {Picture} from "./DTO/Picture";
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Metadata } from './DTO/Metadata';
+import { Picture } from './DTO/Picture';
 
 @Controller('api/v1/picture')
 export class AppController {
@@ -33,16 +36,16 @@ export class AppController {
 
   @Post()
   @ApiTags('Storage')
-  @ApiOperation({summary: 'create one picture entry'})
+  @ApiOperation({ summary: 'create one picture entry' })
   @ApiCreatedResponse({
     description: 'Created',
-    type: Picture
+    type: Picture,
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
-    type: String
+    type: String,
   })
-  createOnePicture(@Body() imageStream: String) {
+  createOnePicture(@Body() imageStream: string) {
     const functionname = 'Create one Picture';
     console.log(functionname);
     return functionname;
@@ -54,22 +57,22 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: String
+    type: String,
   })
   @ApiOperation({
-    summary: 'get metadata of one picture by ID'
+    summary: 'get metadata of one picture by ID',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: Metadata
+    type: Metadata,
   })
   @ApiBadRequestResponse({
-    description:'Bad Request',
-    type: String
+    description: 'Bad Request',
+    type: String,
   })
   @ApiNotFoundResponse({
-    description: "ID not found",
-    type: String
+    description: 'ID not found',
+    type: String,
   })
   readOnePictureMetadataById(@Param() params) {
     const functionname = 'read one picture metadata by id';
@@ -83,22 +86,22 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: String
+    type: String,
   })
   @ApiOperation({
-    summary: 'get picture by id'
+    summary: 'get picture by id',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: Picture
+    type: Picture,
   })
   @ApiBadRequestResponse({
-    description:'Bad Request',
-    type: String
+    description: 'Bad Request',
+    type: String,
   })
   @ApiNotFoundResponse({
-    description: "ID not found",
-    type: String
+    description: 'ID not found',
+    type: String,
   })
   readPictureEndpointById(@Param() params) {
     const functionname = 'read picture endpoint by id';
@@ -112,23 +115,23 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: String
+    type: String,
   })
-  @ApiBody({type: Metadata})
+  @ApiBody({ type: Metadata })
   @ApiOperation({
-    summary: 'update metadata of picture by id'
+    summary: 'update metadata of picture by id',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: Metadata
+    type: Metadata,
   })
   @ApiBadRequestResponse({
-    description:'Bad Request',
-    type: String
+    description: 'Bad Request',
+    type: String,
   })
   @ApiNotFoundResponse({
-    description: "ID not found",
-    type: String
+    description: 'ID not found',
+    type: String,
   })
   updatePictureMetadataById(@Param() params, @Body() metadata: Metadata) {
     const functionname = 'update picture metadata by id';
@@ -142,25 +145,25 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: String
+    type: String,
   })
   @ApiOperation({
-    summary: 'update picture by id'
+    summary: 'update picture by id',
   })
-  @ApiBody({type: Picture})
+  @ApiBody({ type: Picture })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: Picture
+    type: Picture,
   })
   @ApiBadRequestResponse({
-    description:'Bad Request',
-    type: String
+    description: 'Bad Request',
+    type: String,
   })
   @ApiNotFoundResponse({
-    description: "ID not found",
-    type: String
+    description: 'ID not found',
+    type: String,
   })
-  updateOnePictureById(@Param() params, @Body() imageStream: String) {
+  updateOnePictureById(@Param() params, @Body() imageStream: string) {
     const functionname = 'update one picture by id';
     console.log(functionname + ' ' + params.id);
     return functionname;
@@ -172,21 +175,21 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: String
+    type: String,
   })
   @ApiOperation({
-    summary: 'delete one picture by id'
+    summary: 'delete one picture by id',
   })
   @ApiOkResponse({
-    description: 'Successful Operation'
+    description: 'Successful Operation',
   })
   @ApiBadRequestResponse({
-    description:'Bad Request',
-    type: String
+    description: 'Bad Request',
+    type: String,
   })
   @ApiNotFoundResponse({
-    description: "ID not found",
-    type: String
+    description: 'ID not found',
+    type: String,
   })
   deleteOnePictureById(@Param() params) {
     const functionname = 'delete one picture by id';
@@ -197,17 +200,16 @@ export class AppController {
   @Get('/ids')
   @ApiTags('Utility')
   @ApiOperation({
-    summary: 'get ids of all pictures'
+    summary: 'get ids of all pictures',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
     type: String,
     isArray: true,
-
   })
   @ApiBadRequestResponse({
-    description:'Bad Request',
-    type: String
+    description: 'Bad Request',
+    type: String,
   })
   getAllIds() {
     const functionname = 'get all ids';

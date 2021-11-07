@@ -13,7 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npm-run-all lint:*",
     "lint:dropbox-service": "cd backend/dropbox-service && npm run lint",
-    "lint:gateway": "cd backend/gateway && npm run lint",
+    "lint:gateway": "cd backend/gateway-service && npm run lint",
     "lint:logger-service": "cd backend/logger-service && npm run lint",
     "lint:minio-service": "cd backend/minio-service && npm run lint",
     "lint:mongodb-service": "cd backend/mongodb-service && npm run lint",
