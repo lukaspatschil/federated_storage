@@ -3,7 +3,7 @@ import {ApiProperty} from "@nestjs/swagger";
 export class Picture{
 
     @ApiProperty()
-    id: number;
+    id: string;
 
     @ApiProperty()
     image: String;

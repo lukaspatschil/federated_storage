@@ -5,7 +5,7 @@ import {
   Post,
   Put,
   Delete,
-  Param,
+  Param, Body,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
@@ -17,8 +17,8 @@ import {
   ApiOkResponse,
   ApiOperation, ApiParam, ApiTags
 } from "@nestjs/swagger";
-import {Metadata} from "./interfaces/metadata";
-import {Picture} from "./interfaces/Picture";
+import {Metadata} from "./DTO/Metadata";
+import {Picture} from "./DTO/Picture";
 
 @Controller('api/v1/picture')
 export class AppController {
@@ -31,23 +31,6 @@ export class AppController {
       this.client.getService<PictureServiceClient>('PictureService');
   }
 
-  /*@Get()
-  @ApiTags('Storage')
-  @ApiOperation({
-    summary: 'get picture from storage'
-  })
-  @ApiOkResponse({
-    description: 'successful operation',
-    type: String,
-  })
-  @ApiBadRequestResponse({
-    description: 'Bad Request',
-    type: String
-  })
-  getPicture(): Observable<{ id: number; name: string }> {
-    return this.pictureService.findOne({ id: 1 });
-  }*/
-
   @Post()
   @ApiTags('Storage')
   @ApiOperation({summary: 'create one picture entry'})
@@ -59,7 +42,7 @@ export class AppController {
     description: 'Bad Request',
     type: String
   })
-  createOnePicture() {
+  createOnePicture(@Body() imageStream: String) {
     const functionname = 'Create one Picture';
     console.log(functionname);
     return functionname;
@@ -71,13 +54,13 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: Number
+    type: String
   })
   @ApiOperation({
     summary: 'get metadata of one picture by ID'
   })
   @ApiOkResponse({
-    description: 'successful operation',
+    description: 'Successful Operation',
     type: Metadata
   })
   @ApiBadRequestResponse({
@@ -100,13 +83,13 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: Number
+    type: String
   })
   @ApiOperation({
     summary: 'get picture by id'
   })
   @ApiOkResponse({
-    description: 'successful operation',
+    description: 'Successful Operation',
     type: Picture
   })
   @ApiBadRequestResponse({
@@ -129,14 +112,14 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: Number
+    type: String
   })
   @ApiBody({type: Metadata})
   @ApiOperation({
     summary: 'update metadata of picture by id'
   })
   @ApiOkResponse({
-    description: 'successful operation',
+    description: 'Successful Operation',
     type: Metadata
   })
   @ApiBadRequestResponse({
@@ -147,7 +130,7 @@ export class AppController {
     description: "ID not found",
     type: String
   })
-  updatePictureMetadataById(@Param() params) {
+  updatePictureMetadataById(@Param() params, @Body() metadata: Metadata) {
     const functionname = 'update picture metadata by id';
     console.log(functionname + ' ' + params.id);
     return functionname;
@@ -159,14 +142,14 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: Number
+    type: String
   })
   @ApiOperation({
     summary: 'update picture by id'
   })
   @ApiBody({type: Picture})
   @ApiOkResponse({
-    description: 'successful operation',
+    description: 'Successful Operation',
     type: Picture
   })
   @ApiBadRequestResponse({
@@ -177,7 +160,7 @@ export class AppController {
     description: "ID not found",
     type: String
   })
-  updateOnePictureById(@Param() params) {
+  updateOnePictureById(@Param() params, @Body() imageStream: String) {
     const functionname = 'update one picture by id';
     console.log(functionname + ' ' + params.id);
     return functionname;
@@ -189,13 +172,13 @@ export class AppController {
     name: 'id',
     required: true,
     description: 'integer for the image id',
-    type: Number
+    type: String
   })
   @ApiOperation({
     summary: 'delete one picture by id'
   })
   @ApiOkResponse({
-    description: 'successful operation'
+    description: 'Successful Operation'
   })
   @ApiBadRequestResponse({
     description:'Bad Request',
@@ -217,8 +200,10 @@ export class AppController {
     summary: 'get ids of all pictures'
   })
   @ApiOkResponse({
-    description: 'successful operation',
-    type: [Number]
+    description: 'Successful Operation',
+    type: String,
+    isArray: true,
+
   })
   @ApiBadRequestResponse({
     description:'Bad Request',

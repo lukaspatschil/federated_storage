@@ -1,10 +1,11 @@
 import {ApiProperty} from "@nestjs/swagger";
 import {GeoPoint} from "ts-geopoint";
+import {Location} from "./Location";
 
 export class Metadata {
 
     @ApiProperty()
-    id: number;
+    id: string;
 
     @ApiProperty()
     place_ident: string;
@@ -31,7 +32,7 @@ export class Metadata {
     device_id: string;
 
     @ApiProperty()
-    location: GeoPoint;
+    location: Location;
 
     @ApiProperty()
     tags: string[];
