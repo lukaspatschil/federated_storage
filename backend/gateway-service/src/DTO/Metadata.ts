@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { GeoPoint } from 'ts-geopoint';
 import { Location } from './Location';
 
 export class Metadata {
