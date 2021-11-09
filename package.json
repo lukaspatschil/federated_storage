@@ -31,8 +31,7 @@
     "start:dev:logger-service": "npm run start:dev -w logger-service",
     "start:dev:minio-service": "npm run start:dev -w minio-service",
     "start:dev:mongodb-service": "npm run start:dev -w mongodb-service",
-    "start:dev:picture-service": "npm run start:dev -w picture-service",
-    "proto": "node ./scripts/distributeProto.js"
+    "start:dev:picture-service": "npm run start:dev -w picture-service"
   },
   "repository": {
     "type": "git",
