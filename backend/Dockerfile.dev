@@ -1,0 +1,23 @@
+FROM node:14.18.1-alpine as build
+ARG BUILD_CONTEXT
+ENV BUILD_CONTEXT ${BUILD_CONTEXT}
+
+RUN npm install -g npm@7.24.2
+
+WORKDIR /base
+COPY package*.json .
+COPY ./backend/$BUILD_CONTEXT/package.json backend/$BUILD_CONTEXT/
+
+# Add local packages
+COPY ./backend/service-types/ backend/service-types/
+COPY ./backend/proto/ backend/proto/
+
+RUN npm install
+
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
+RUN chmod +x /wait
+
+COPY ./backend/$BUILD_CONTEXT backend/$BUILD_CONTEXT
+RUN npm run build:$BUILD_CONTEXT
+
+CMD /wait && npm run start:dev:${BUILD_CONTEXT}

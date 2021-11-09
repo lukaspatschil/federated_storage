@@ -12,13 +12,14 @@ services:
         - backend
 
   gateway-service:
-    build: ./backend/gateway-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=gateway-service
     hostname: gateway-service
     ports:
       - 3000:3000
-    volumes:
-      - ./backend/gateway-service:/var/www/gateway-service
-      - /var/www/gateway-service/node_modules
     # depends_on:
     #   - rabbitmq
     # environment:
@@ -30,11 +31,12 @@ services:
       - frontend
 
   dropbox-service:
-    build: ./backend/dropbox-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=dropbox-service
     hostname: dropbox-service
-    volumes:
-      - ./backend/dropbox-service:/var/www/dropbox-service
-      - /var/www/dropbox-service/node_modules
     # depends_on:
     #   - rabbitmq
     # environment:
@@ -45,11 +47,12 @@ services:
       - backend
 
   logger-service:
-    build: ./backend/logger-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=logger-service
     hostname: logger-service
-    volumes:
-      - ./backend/logger-service:/var/www/logger-service
-      - /var/www/logger-service/node_modules
     depends_on:
       - rabbitmq
     environment:
@@ -60,11 +63,12 @@ services:
       - backend
 
   minio-service:
-    build: ./backend/minio-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=minio-service
     hostname: minio-service
-    volumes:
-      - ./backend/minio-service:/var/www/minio-service
-      - /var/www/minio-service/node_modules
     # depends_on:
     #   - rabbitmq
     # environment:
@@ -75,11 +79,12 @@ services:
       - backend
 
   mongodb-service:
-    build: ./backend/mongodb-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=mongodb-service
     hostname: mongodb-service
-    volumes:
-      - ./backend/mongodb-service:/var/www/mongodb-service
-      - /var/www/mongodb-service/node_modules
     # depends_on:
     #   - rabbitmq
     # environment:
@@ -90,11 +95,12 @@ services:
       - backend
 
   picture-service:
-    build: ./backend/picture-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=picture-service
     hostname: picture-service
-    volumes:
-      - ./backend/picture-service:/var/www/picture-service
-      - /var/www/picture-service/node_modules
     # depends_on:
     #   - rabbitmq
     # environment:
