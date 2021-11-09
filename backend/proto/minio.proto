@@ -4,13 +4,15 @@ package minio;
 
 service MinIOService {
   rpc FindOne (PictureById) returns (Picture) {}
+  rpc CreateOne(Picture) returns (Picture) {}
 }
 
 message PictureById {
-  int32 id = 1;
+  string id = 1;
 }
 
 message Picture {
-  int32 id = 1;
+  string id = 1;
   string name = 2;
+  string data = 3;
 }
