@@ -10,7 +10,7 @@ async function bootstrap() {
       transport: Transport.GRPC,
       options: {
         package: 'mongodb',
-        protoPath: join(__dirname, '../proto/mongodb.proto'),
+        protoPath: join(__dirname, '../../proto/mongodb.proto'),
         url: 'mongodb-service:5000',
       },
     },

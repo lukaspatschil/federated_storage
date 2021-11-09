@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { PictureServiceClient } from './interfaces/picture.interface';
+import { PictureServiceClient } from 'service-types';
 
 @Controller('api/v1/picture')
 export class AppController {
@@ -24,6 +24,7 @@ export class AppController {
 
   @Get()
   getPicture(): Observable<{ id: number; name: string }> {
+    console.log('test');
     return this.pictureService.findOne({ id: 1 });
   }
 

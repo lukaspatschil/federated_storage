@@ -12,7 +12,7 @@ import { AppService } from './app.service';
         transport: Transport.GRPC,
         options: {
           package: 'picture',
-          protoPath: join(__dirname, '../proto/picture.proto'),
+          protoPath: join(__dirname, '../../proto/picture.proto'),
           url: 'picture-service:5000',
         },
       },

@@ -2,18 +2,13 @@ import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 import { Controller, Inject } from '@nestjs/common';
 import { ClientGrpc, GrpcMethod } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { DropboxServiceClient } from './interfaces/dropbox.interface';
-import { MinIOServiceClient } from './interfaces/minio.interface';
-import { MongoDBServiceClient } from './interfaces/mongodb.interface';
-
-type PictureById = {
-  id: number;
-};
-
-type Picture = {
-  id: number;
-  name: string;
-};
+import {
+  DropboxServiceClient,
+  MinIOServiceClient,
+  MongoDBServiceClient,
+  Picture,
+  PictureById,
+} from 'service-types';
 
 @Controller()
 export class AppController {
