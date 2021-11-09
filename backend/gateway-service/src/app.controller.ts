@@ -14,6 +14,7 @@ import {
   ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -22,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { Metadata } from './DTO/Metadata';
 import { Picture } from './DTO/Picture';
+import { PictureEntry } from './DTO/PictureEntry';
 
 @Controller('api/v1/picture')
 export class AppController {
@@ -36,16 +38,20 @@ export class AppController {
 
   @Post()
   @ApiTags('Storage')
-  @ApiOperation({ summary: 'create one picture entry' })
+  @ApiOperation({ summary: 'create one picture and one metadata entry' })
   @ApiCreatedResponse({
     description: 'Created',
-    type: Picture,
+    type: PictureEntry,
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     type: String,
   })
-  createOnePicture(@Body() imageStream: string) {
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: String,
+  })
+  createOnePicture(@Body() imageStream: PictureEntry) {
     const functionname = 'Create one Picture';
     console.log(functionname);
     return functionname;
@@ -72,6 +78,10 @@ export class AppController {
   })
   @ApiNotFoundResponse({
     description: 'ID not found',
+    type: String,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
     type: String,
   })
   readOnePictureMetadataById(@Param() params) {
@@ -101,6 +111,10 @@ export class AppController {
   })
   @ApiNotFoundResponse({
     description: 'ID not found',
+    type: String,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
     type: String,
   })
   readPictureEndpointById(@Param() params) {
@@ -133,6 +147,10 @@ export class AppController {
     description: 'ID not found',
     type: String,
   })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: String,
+  })
   updatePictureMetadataById(@Param() params, @Body() metadata: Metadata) {
     const functionname = 'update picture metadata by id';
     console.log(functionname + ' ' + params.id);
@@ -163,6 +181,10 @@ export class AppController {
     description: 'ID not found',
     type: String,
   })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: String,
+  })
   updateOnePictureById(@Param() params, @Body() imageStream: string) {
     const functionname = 'update one picture by id';
     console.log(functionname + ' ' + params.id);
@@ -178,7 +200,7 @@ export class AppController {
     type: String,
   })
   @ApiOperation({
-    summary: 'delete one picture by id',
+    summary: 'delete one picture and one metadata entry by id',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
@@ -191,8 +213,12 @@ export class AppController {
     description: 'ID not found',
     type: String,
   })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
+    type: String,
+  })
   deleteOnePictureById(@Param() params) {
-    const functionname = 'delete one picture by id';
+    const functionname = 'delete one picture entry by id';
     console.log(functionname + ' ' + params.id);
     return functionname;
   }
@@ -200,7 +226,7 @@ export class AppController {
   @Get('/ids')
   @ApiTags('Utility')
   @ApiOperation({
-    summary: 'get ids of all pictures',
+    summary: 'get all ids',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
@@ -209,6 +235,10 @@ export class AppController {
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
+    type: String,
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal Server Error',
     type: String,
   })
   getAllIds() {

@@ -2,36 +2,52 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Location } from './Location';
 
 export class Metadata {
-  @ApiProperty()
+  @ApiProperty({ description: 'id of the entry', example: '1' })
   id: string;
 
-  @ApiProperty()
-  placeIdent: string;
-
-  @ApiProperty()
+  @ApiProperty({ description: 'name of the file', example: 'GRASMERE 1' })
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Place Identity', example: '031909GRAS01' })
+  placeIdent: string;
+
+  @ApiProperty({
+    description: 'id of the image sequence',
+    example: '6ea10ab8-2e32-11e9-b03f-dca9047ef277',
+  })
   seqID: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'datetime of the captured image',
+    example: '22-Apr-2019 (00:53:00.000000)',
+  })
   datetime: Date;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'frame number', example: 1 })
   frameNum: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'number of image in the sequence', example: 1 })
   seqNumFrames: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'filename',
+    example: '0a914caf-2bfa-11e9-bcad-06f10d5896c4.jpg',
+  })
   filename: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Id of the device',
+    example: 'b3f129b8-59f2-458f-bf2f-f0c1af0032d3',
+  })
   deviceID: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'location of the picture' })
   location: Location;
 
-  @ApiProperty()
-  tags: string[];
+  @ApiProperty({
+    description: 'tags of the picture',
+    isArray: true,
+    example: ['deer', 'grass', 'wood', 'duck'],
+  })
+  tags: string;
 }
