@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { PictureServiceClient } from 'service-types';
+import { PictureServiceClient } from './lib';
 
 @Controller('api/v1/picture')
 export class AppController {

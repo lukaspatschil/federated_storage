@@ -8,7 +8,7 @@ import {
   MongoDBServiceClient,
   Picture,
   PictureById,
-} from 'service-types';
+} from './lib';
 
 @Controller()
 export class AppController {
