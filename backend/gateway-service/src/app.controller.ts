@@ -7,7 +7,7 @@ import {
   Delete,
   Param,
 } from '@nestjs/common';
-import { ClientGrpc } from '@nestjs/microservices';
+import { ClientGrpc, ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { PictureServiceClient } from './lib';
 
@@ -15,7 +15,10 @@ import { PictureServiceClient } from './lib';
 export class AppController {
   private pictureService: PictureServiceClient;
 
-  constructor(@Inject('PICTURE_PACKAGE') private client: ClientGrpc) {}
+  constructor(
+    @Inject('PICTURE_PACKAGE') private client: ClientGrpc,
+    @Inject('LOGGER_SERVICE') private logger: ClientProxy,
+  ) {}
 
   onModuleInit() {
     this.pictureService =
@@ -25,6 +28,13 @@ export class AppController {
   @Get()
   getPicture(): Observable<{ id: number; name: string }> {
     console.log('test');
+    const logMessage = {
+      message: 'This is a log message!',
+      date: new Date().toISOString(),
+      level: 'LOG',
+    };
+    this.logger.send({ cmd: 'log' }, logMessage);
+
     return this.pictureService.findOne({ id: 1 });
   }
 
