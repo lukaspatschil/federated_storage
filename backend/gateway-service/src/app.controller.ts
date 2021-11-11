@@ -23,17 +23,20 @@ export class AppController {
   onModuleInit() {
     this.pictureService =
       this.client.getService<PictureServiceClient>('PictureService');
+
+    this.logger.connect();
   }
 
   @Get()
   getPicture(): Observable<{ id: number; name: string }> {
     console.log('test');
     const logMessage = {
-      message: 'This is a log message!',
+      message: 'This is a log message1111!',
       date: new Date().toISOString(),
       level: 'LOG',
     };
-    this.logger.send({ cmd: 'log' }, logMessage);
+
+    this.logger.emit({ cmd: 'log' }, logMessage);
 
     return this.pictureService.findOne({ id: 1 });
   }
