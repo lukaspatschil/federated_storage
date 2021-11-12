@@ -20,13 +20,16 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MetadataDto } from './dto/metadata/Metadata.dto';
 import { ShortPictureDto } from './dto/picture/ShortPicture.dto';
 import { SensorDataDto } from './dto/sensordata/sensorData.dto';
 import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
+import { PictureDto } from './dto/picture/Picture.dto';
+import { UpdateSensorDataDto } from './dto/sensordata/updateSensorData.dto';
 
-@Controller('api/v1/picture')
+@Controller('api/v1/sensordata')
 export class AppController {
   private pictureService: PictureServiceClient;
 
@@ -39,59 +42,79 @@ export class AppController {
 
   @Post()
   @ApiTags('Storage')
-  @ApiOperation({ summary: 'create one picture and one metadata entry' })
+  @ApiOperation({ summary: 'create one sensordata entry' })
   @ApiCreatedResponse({
     description: 'Created',
-    type: SensorDataDto,
+    type: null,
   })
   @ApiBadRequestResponse({
-    description: 'Bad Request',
+    description: 'Validation Error',
     type: String,
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
     type: String,
   })
-  createOnePicture(@Body() imageStream: CreateSensorDataDto) {
-    const functionname = 'Create one ShortPictureDto';
-    console.log(functionname);
+  CreateOneSensorData(@Body() sensordata: CreateSensorDataDto) {
+    const functionname = 'CreateOneSensorData';
+    console.log(functionname + ': ' + sensordata);
     return functionname;
   }
 
-  @Get('/metadata/:id')
+  @Get('/:id')
   @ApiTags('Storage')
   @ApiParam({
     name: 'id',
     required: true,
-    description: 'integer for the image id',
+    description: 'id of the sensordata',
     type: String,
   })
   @ApiOperation({
-    summary: 'get metadata of one picture by ID',
+    summary: 'get sensordata by ID',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: MetadataDto,
+    type: SensorDataDto,
   })
   @ApiBadRequestResponse({
-    description: 'Bad Request',
+    description: 'Validation Error',
+    type: String,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
     type: String,
   })
   @ApiNotFoundResponse({
     description: 'ID not found',
     type: String,
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
-    type: String,
-  })
-  readOnePictureMetadataById(@Param() params) {
-    const functionname = 'read one picture metadata by id';
+  readOneSensorDataById(@Param() params) {
+    const functionname = 'readOneSensorDataById';
     console.log(functionname + ' ' + params.id);
     return functionname;
   }
 
-  @Get('/file/:id')
+  @Get()
+  @ApiTags('Storage')
+  @ApiOperation({
+    summary: 'get all sensordata',
+  })
+  @ApiOkResponse({
+    description: 'get all sensorData',
+    type: SensorDataDto,
+    isArray: true,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
+    type: String,
+  })
+  readAllSensorData() {
+    const functionname = 'readAllSensorData';
+    console.log(functionname);
+    return functionname;
+  }
+
+  @Get('/picture/:id')
   @ApiTags('Storage')
   @ApiParam({
     name: 'id',
@@ -104,90 +127,22 @@ export class AppController {
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: ShortPictureDto,
+    type: PictureDto,
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     type: String,
   })
-  @ApiNotFoundResponse({
-    description: 'ID not found',
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
     type: String,
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
+  @ApiNotFoundResponse({
+    description: 'ID not found',
     type: String,
   })
   readPictureEndpointById(@Param() params) {
     const functionname = 'read picture endpoint by id';
-    console.log(functionname + ' ' + params.id);
-    return functionname;
-  }
-
-  @Put('/metadata/:id')
-  @ApiTags('Storage')
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'integer for the image id',
-    type: String,
-  })
-  @ApiBody({ type: MetadataDto })
-  @ApiOperation({
-    summary: 'update metadata of picture by id',
-  })
-  @ApiOkResponse({
-    description: 'Successful Operation',
-    type: MetadataDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'Bad Request',
-    type: String,
-  })
-  @ApiNotFoundResponse({
-    description: 'ID not found',
-    type: String,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
-    type: String,
-  })
-  updatePictureMetadataById(@Param() params, @Body() metadata: MetadataDto) {
-    const functionname = 'update picture metadata by id';
-    console.log(functionname + ' ' + params.id);
-    return functionname;
-  }
-
-  @Put('/file/:id')
-  @ApiTags('Storage')
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'integer for the image id',
-    type: String,
-  })
-  @ApiOperation({
-    summary: 'update picture by id',
-  })
-  @ApiBody({ type: ShortPictureDto })
-  @ApiOkResponse({
-    description: 'Successful Operation',
-    type: ShortPictureDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'Bad Request',
-    type: String,
-  })
-  @ApiNotFoundResponse({
-    description: 'ID not found',
-    type: String,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
-    type: String,
-  })
-  updateOnePictureById(@Param() params, @Body() imageStream: string) {
-    const functionname = 'update one picture by id';
     console.log(functionname + ' ' + params.id);
     return functionname;
   }
@@ -201,21 +156,22 @@ export class AppController {
     type: String,
   })
   @ApiOperation({
-    summary: 'delete one picture and one metadata entry by id',
+    summary: 'delete one sensorData by id',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
+    type: null,
   })
   @ApiBadRequestResponse({
-    description: 'Bad Request',
+    description: 'Validation Error',
+    type: String,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
     type: String,
   })
   @ApiNotFoundResponse({
     description: 'ID not found',
-    type: String,
-  })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
     type: String,
   })
   deleteOnePictureById(@Param() params) {
@@ -224,27 +180,37 @@ export class AppController {
     return functionname;
   }
 
-  @Get('/ids')
-  @ApiTags('Utility')
+  @Put('/:id')
+  @ApiTags('Storage')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'id of sensordata',
+    type: String,
+  })
+  @ApiBody({ type: UpdateSensorDataDto })
   @ApiOperation({
-    summary: 'get all ids',
+    summary: 'update sensordata by id',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: String,
-    isArray: true,
+    type: null,
   })
   @ApiBadRequestResponse({
-    description: 'Bad Request',
+    description: 'Validation Error',
     type: String,
   })
-  @ApiInternalServerErrorResponse({
-    description: 'Internal Server Error',
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
     type: String,
   })
-  getAllIds() {
-    const functionname = 'get all ids';
-    console.log(functionname);
+  @ApiNotFoundResponse({
+    description: 'ID not found',
+    type: String,
+  })
+  updateSensorDataById(@Param() params, @Body() metadata: MetadataDto) {
+    const functionname = 'update picture metadata by id';
+    console.log(functionname + ' ' + params.id);
     return functionname;
   }
 }

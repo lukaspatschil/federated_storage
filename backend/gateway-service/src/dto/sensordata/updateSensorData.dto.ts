@@ -3,7 +3,9 @@ import { CreatePictureDto } from '../picture/CreatePicture.dto';
 import { UpdateMetadata } from '../metadata/UpdateMetadata.dto';
 
 export class UpdateSensorDataDto {
-  @ApiProperty()
+  @ApiProperty({
+    required: false,
+  })
   picture: CreatePictureDto;
 
   @ApiProperty()
