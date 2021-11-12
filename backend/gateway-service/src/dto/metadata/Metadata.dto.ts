@@ -1,10 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Location } from './Location';
+import { LocationDto } from '../Location.dto';
 
-export class Metadata {
-  @ApiProperty({ description: 'id of the entry', example: '1' })
-  id: string;
-
+export class MetadataDto {
   @ApiProperty({ description: 'name of the file', example: 'GRASMERE 1' })
   name: string;
 
@@ -19,9 +16,8 @@ export class Metadata {
 
   @ApiProperty({
     description: 'datetime of the captured image',
-    example: '22-Apr-2019 (00:53:00.000000)',
   })
-  datetime: Date;
+  datetime: string;
 
   @ApiProperty({ description: 'frame number', example: 1 })
   frameNum: number;
@@ -42,12 +38,11 @@ export class Metadata {
   deviceID: string;
 
   @ApiProperty({ description: 'location of the picture' })
-  location: Location;
+  location: LocationDto;
 
   @ApiProperty({
     description: 'tags of the picture',
-    isArray: true,
     example: ['deer', 'grass', 'wood', 'duck'],
   })
-  tags: string;
+  tags: string[];
 }

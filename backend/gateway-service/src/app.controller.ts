@@ -21,9 +21,10 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { Metadata } from './DTO/Metadata';
-import { Picture } from './DTO/Picture';
-import { PictureEntry } from './DTO/PictureEntry';
+import { MetadataDto } from './dto/metadata/Metadata.dto';
+import { ShortPictureDto } from './dto/picture/ShortPicture.dto';
+import { SensorDataDto } from './dto/sensordata/sensorData.dto';
+import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
 
 @Controller('api/v1/picture')
 export class AppController {
@@ -41,7 +42,7 @@ export class AppController {
   @ApiOperation({ summary: 'create one picture and one metadata entry' })
   @ApiCreatedResponse({
     description: 'Created',
-    type: PictureEntry,
+    type: SensorDataDto,
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
@@ -51,8 +52,8 @@ export class AppController {
     description: 'Internal Server Error',
     type: String,
   })
-  createOnePicture(@Body() imageStream: PictureEntry) {
-    const functionname = 'Create one Picture';
+  createOnePicture(@Body() imageStream: CreateSensorDataDto) {
+    const functionname = 'Create one ShortPictureDto';
     console.log(functionname);
     return functionname;
   }
@@ -70,7 +71,7 @@ export class AppController {
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: Metadata,
+    type: MetadataDto,
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
@@ -103,7 +104,7 @@ export class AppController {
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: Picture,
+    type: ShortPictureDto,
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
@@ -131,13 +132,13 @@ export class AppController {
     description: 'integer for the image id',
     type: String,
   })
-  @ApiBody({ type: Metadata })
+  @ApiBody({ type: MetadataDto })
   @ApiOperation({
     summary: 'update metadata of picture by id',
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: Metadata,
+    type: MetadataDto,
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
@@ -151,7 +152,7 @@ export class AppController {
     description: 'Internal Server Error',
     type: String,
   })
-  updatePictureMetadataById(@Param() params, @Body() metadata: Metadata) {
+  updatePictureMetadataById(@Param() params, @Body() metadata: MetadataDto) {
     const functionname = 'update picture metadata by id';
     console.log(functionname + ' ' + params.id);
     return functionname;
@@ -168,10 +169,10 @@ export class AppController {
   @ApiOperation({
     summary: 'update picture by id',
   })
-  @ApiBody({ type: Picture })
+  @ApiBody({ type: ShortPictureDto })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: Picture,
+    type: ShortPictureDto,
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
