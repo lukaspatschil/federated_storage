@@ -30,6 +30,8 @@
     "@nestjs/swagger": "^5.1.4",
     "amqp-connection-manager": "^3.7.0",
     "amqplib": "^0.8.0",
+    "class-transformer": "^0.4.0",
+    "class-validator": "^0.13.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.4.0",
