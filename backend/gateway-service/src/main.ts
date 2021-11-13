@@ -14,7 +14,12 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('Storage')
     .build();
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      enableDebugMessages: true,
+      disableErrorMessages: false,
+    }),
+  );
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

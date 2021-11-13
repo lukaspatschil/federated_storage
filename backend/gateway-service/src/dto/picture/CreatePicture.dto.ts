@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBase64,
-  IsDate,
-  IsMimeType,
-  IsNotEmpty,
-  IsNotEmptyObject,
-  IsNotIn,
-} from 'class-validator';
+import { IsBase64, IsMimeType, IsNotEmpty } from 'class-validator';
 
 export class CreatePictureDto {
   @ApiProperty({

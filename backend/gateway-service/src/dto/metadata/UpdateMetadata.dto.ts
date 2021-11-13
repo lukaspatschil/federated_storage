@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
+import { ArrayNotEmpty } from 'class-validator';
 
 export class UpdateMetadata {
   @ApiProperty({
@@ -7,6 +7,6 @@ export class UpdateMetadata {
     isArray: true,
     example: ['deer', 'grass', 'wood', 'duck'],
   })
-  @IsNotEmpty()
+  @ArrayNotEmpty()
   tags: string[];
 }
