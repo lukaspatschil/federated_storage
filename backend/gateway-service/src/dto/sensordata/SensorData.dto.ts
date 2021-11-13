@@ -1,16 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ShortPictureDto } from '../picture/ShortPicture.dto';
 import { MetadataDto } from '../metadata/Metadata.dto';
+import { IsNotEmpty, IsNotEmptyObject, IsString } from 'class-validator';
 
 export class SensorDataDto {
   @ApiProperty({ description: 'id of the entry', example: '1' })
+  @IsString()
+  @IsNotEmpty()
   id: string;
 
   @ApiProperty({ description: 'picture data', isArray: true })
+  @IsNotEmptyObject()
   picture: ShortPictureDto[];
 
   @ApiProperty({
     description: 'metadata',
   })
+  @IsNotEmptyObject()
   metadata: MetadataDto;
 }

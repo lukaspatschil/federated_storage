@@ -14,7 +14,6 @@ import {
   ApiBadRequestResponse,
   ApiBody,
   ApiCreatedResponse,
-  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -23,11 +22,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MetadataDto } from './dto/metadata/Metadata.dto';
-import { ShortPictureDto } from './dto/picture/ShortPicture.dto';
-import { SensorDataDto } from './dto/sensordata/sensorData.dto';
+import { SensorDataDto } from './dto/sensordata/SensorData.dto';
 import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
 import { PictureDto } from './dto/picture/Picture.dto';
-import { UpdateSensorDataDto } from './dto/sensordata/updateSensorData.dto';
+import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
 
 @Controller('api/v1/sensordata')
 export class AppController {
@@ -57,7 +55,7 @@ export class AppController {
   })
   CreateOneSensorData(@Body() sensordata: CreateSensorDataDto) {
     const functionname = 'CreateOneSensorData';
-    console.log(functionname + ': ' + sensordata);
+    console.log(functionname + ': ' + JSON.stringify(sensordata));
     return functionname;
   }
 
