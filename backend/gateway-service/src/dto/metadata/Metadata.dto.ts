@@ -6,6 +6,7 @@ import {
   IsNotEmptyObject,
   IsNumber,
   IsString,
+  ValidateNested,
 } from 'class-validator';
 
 export class MetadataDto {
@@ -63,6 +64,7 @@ export class MetadataDto {
 
   @ApiProperty({ description: 'location of the picture' })
   @IsNotEmptyObject()
+  @ValidateNested()
   location: LocationDto;
 
   @ApiProperty({
