@@ -23,6 +23,5 @@ export class CreatePictureDto {
   })
   @IsBase64()
   @IsNotEmpty()
-  @IsNotEmptyObject()
   data: string;
 }
