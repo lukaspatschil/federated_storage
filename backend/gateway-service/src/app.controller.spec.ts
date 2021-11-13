@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppController } from './app.controller';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 describe('AppController', () => {
@@ -13,6 +13,12 @@ describe('AppController', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        enableDebugMessages: true,
+        disableErrorMessages: false,
+      }),
+    );
     await app.init();
   });
 
@@ -65,20 +71,150 @@ describe('AppController', () => {
         });
     });
 
-    it(`no picture should return 400`, () => {
-      const tempJsonBody = JsonBody;
-      tempJsonBody.picture = null;
+    it(`empty body should return 400`, () => {
+      return request(app.getHttpServer())
+        .post('/api/v1/sensordata')
+        .send({})
+        .expect(400)
+        .expect({
+          statusCode: 400,
+          message: [
+            'picture must be a non-empty object',
+            'metadata must be a non-empty object',
+          ],
+          error: 'Bad Request',
+        });
+    });
+
+    it(`no metadata and no picture should return 400`, () => {
+      const tempJsonBody = JSON.parse(JSON.stringify(JsonBody));
+      tempJsonBody.metadata = '';
+      tempJsonBody.picture = '';
       return request(app.getHttpServer())
         .post('/api/v1/sensordata')
         .send(tempJsonBody)
         .expect(400)
         .expect({
           statusCode: 400,
-          message: ['picture must be a non-empty object'],
+          message: [
+            'picture.nested property picture must be either object or array',
+            'metadata.nested property metadata must be either object or array',
+          ],
+          error: 'Bad Request',
+        });
+    });
+
+    it(`empty data should return 400`, () => {
+      const tempJsonBody = {
+        picture: {
+          mimetype: '',
+          data: '',
+        },
+        metadata: {
+          name: '',
+          placeIdent: '',
+          seqID: '',
+          datetime: '',
+          frameNum: '',
+          seqNumFrames: '',
+          filename: '',
+          deviceID: '',
+          location: {
+            longitude: '',
+            latitude: '',
+          },
+        },
+      };
+      return request(app.getHttpServer())
+        .post('/api/v1/sensordata')
+        .send(tempJsonBody)
+        .expect(400)
+        .expect({
+          statusCode: 400,
+          message: [
+            'picture.mimetype must be MIME type format',
+            'picture.mimetype should not be empty',
+            'picture.data should not be empty',
+            'metadata.name should not be empty',
+            'metadata.placeIdent should not be empty',
+            'metadata.seqID should not be empty',
+            'metadata.datetime must be a Date instance',
+            'metadata.frameNum should not be empty',
+            'metadata.frameNum must not be less than 0',
+            'metadata.frameNum must be a positive number',
+            'metadata.frameNum must be a number conforming to the specified constraints',
+            'metadata.seqNumFrames should not be empty',
+            'metadata.seqNumFrames must not be less than 0',
+            'metadata.seqNumFrames must be a positive number',
+            'metadata.seqNumFrames must be a number conforming to the specified constraints',
+            'metadata.filename should not be empty',
+            'metadata.deviceID should not be empty',
+            'metadata.location.longitude must be a longitude string or number',
+            'metadata.location.longitude should not be empty',
+            'metadata.location.latitude must be a latitude string or number',
+            'metadata.location.latitude should not be empty',
+          ],
+          error: 'Bad Request',
+        });
+    });
+
+    it(`wrong data types should return 400`, () => {
+      const tempJsonBody = {
+        picture: {
+          mimetype: 1234,
+          data: 1234,
+        },
+        metadata: {
+          name: 1234,
+          placeIdent: 1234,
+          seqID: 'asdf',
+          datetime: 1234,
+          frameNum: 'asdf',
+          seqNumFrames: 'asdf',
+          filename: 1234,
+          deviceID: 1234,
+          location: {
+            longitude: 'asdf',
+            latitude: 'asdf',
+          },
+        },
+      };
+      return request(app.getHttpServer())
+        .post('/api/v1/sensordata')
+        .send(tempJsonBody)
+        .expect(400)
+        .expect({
+          statusCode: 400,
+          message: [
+            'picture.mimetype must be MIME type format',
+            'picture.data must be base64 encoded',
+            'metadata.name must be a string',
+            'metadata.placeIdent must be a string',
+            'metadata.frameNum must not be less than 0',
+            'metadata.frameNum must be a positive number',
+            'metadata.frameNum must be a number conforming to the specified constraints',
+            'metadata.seqNumFrames must not be less than 0',
+            'metadata.seqNumFrames must be a positive number',
+            'metadata.seqNumFrames must be a number conforming to the specified constraints',
+            'metadata.filename must be a string',
+            'metadata.deviceID must be a string',
+            'metadata.location.longitude must be a longitude string or number',
+            'metadata.location.latitude must be a latitude string or number',
+          ],
           error: 'Bad Request',
         });
     });
   });
+
+  describe('/GET api/v1/sensordata/{id}', () => {});
+
+  describe('/GET api/v1/sensordata', () => {});
+
+  describe('/GET api/v1/sensordata/picture/{id}', () => {});
+
+  describe('/DEL api/v1/sensordata/{id}', () => {});
+
+  describe('/PUT api/v1/sensordata/{id}', () => {});
 
   afterAll(async () => {
     await app.close();
