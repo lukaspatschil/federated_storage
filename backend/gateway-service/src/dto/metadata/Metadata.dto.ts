@@ -8,6 +8,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class MetadataDto {
   @ApiProperty({ description: 'name of the file', example: 'GRASMERE 1' })
@@ -32,9 +33,10 @@ export class MetadataDto {
     description: 'datetime of the captured image',
     example: '2009-06-30T18:30:00+02:00',
   })
+  @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
-  datetime: string;
+  datetime: Date;
 
   @ApiProperty({ description: 'frame number', example: 1 })
   @IsNumber()
@@ -65,6 +67,7 @@ export class MetadataDto {
   @ApiProperty({ description: 'location of the picture' })
   @IsNotEmptyObject()
   @ValidateNested()
+  @Type(() => LocationDto)
   location: LocationDto;
 
   @ApiProperty({

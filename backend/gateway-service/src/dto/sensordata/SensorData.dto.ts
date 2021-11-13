@@ -7,6 +7,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class SensorDataDto {
   @ApiProperty({ description: 'id of the entry', example: '1' })
@@ -16,7 +17,8 @@ export class SensorDataDto {
 
   @ApiProperty({ description: 'picture data', isArray: true })
   @IsNotEmptyObject()
-  @ValidateNested()
+  @ValidateNested({ each: true })
+  @Type(() => ShortPictureDto)
   picture: ShortPictureDto[];
 
   @ApiProperty({
@@ -24,5 +26,6 @@ export class SensorDataDto {
   })
   @IsNotEmptyObject()
   @ValidateNested()
+  @Type(() => MetadataDto)
   metadata: MetadataDto;
 }
