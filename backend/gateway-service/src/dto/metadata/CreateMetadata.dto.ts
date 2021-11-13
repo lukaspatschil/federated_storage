@@ -5,14 +5,16 @@ import {
   IsNotEmpty,
   IsNotEmptyObject,
   IsNumber,
+  IsPositive,
   IsString,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateMetadataDto {
   @ApiProperty({ description: 'name of the file', example: 'GRASMERE 1' })
-  @IsString()
+  @IsString({ message: 'name must be a string' })
   @IsNotEmpty()
   name: string;
 
@@ -40,11 +42,15 @@ export class CreateMetadataDto {
 
   @ApiProperty({ description: 'frame number', example: 1 })
   @IsNumber()
+  @IsPositive()
+  @Min(0)
   @IsNotEmpty()
   frameNum: number;
 
   @ApiProperty({ description: 'sequence number frames', example: 1 })
   @IsNumber()
+  @IsPositive()
+  @Min(0)
   @IsNotEmpty()
   seqNumFrames: number;
 
@@ -60,7 +66,7 @@ export class CreateMetadataDto {
     description: 'Id of the device',
     example: 'b3f129b8-59f2-458f-bf2f-f0c1af0032d3',
   })
-  @IsString()
+  @IsString({ message: '' })
   @IsNotEmpty()
   deviceID: string;
 

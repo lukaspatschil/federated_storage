@@ -11,9 +11,7 @@ export class CreateSensorDataDto {
   @Type(() => CreatePictureDto)
   picture: CreatePictureDto;
 
-  @ApiProperty({
-    description: 'metadata',
-  })
+  @ApiProperty({ description: 'metadata' })
   @IsNotEmptyObject()
   @ValidateNested()
   @Type(() => CreateMetadataDto)

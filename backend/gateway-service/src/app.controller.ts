@@ -38,12 +38,6 @@ export class AppController {
       this.client.getService<PictureServiceClient>('PictureService');
   }
 
-  @Get()
-  getPicture(): Observable<{ id: number; name: string }> {
-    console.log('test');
-    return this.pictureService.findOne({ id: 1 });
-  }
-
   @Post()
   @ApiTags('Storage')
   @ApiOperation({ summary: 'create one sensordata entry' })
@@ -60,9 +54,10 @@ export class AppController {
     type: String,
   })
   CreateOneSensorData(@Body() sensordata: CreateSensorDataDto) {
-    const functionname = 'CreateOneSensorData';
-    console.log(functionname + ': ' + JSON.stringify(sensordata));
-    return functionname;
+    //const functionname = 'CreateOneSensorData';
+    //console.log(functionname + ': ' + JSON.stringify(sensordata));
+    //return functionname;
+    return null;
   }
 
   @Get('/:id')
