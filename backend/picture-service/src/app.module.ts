@@ -12,7 +12,7 @@ import { AppService } from './app.service';
         transport: Transport.GRPC,
         options: {
           package: 'minio',
-          protoPath: join(__dirname, '../proto/minio.proto'),
+          protoPath: join(__dirname, '../../proto/minio.proto'),
           url: 'minio-service:5000',
         },
       },
@@ -23,7 +23,7 @@ import { AppService } from './app.service';
         transport: Transport.GRPC,
         options: {
           package: 'dropbox',
-          protoPath: join(__dirname, '../proto/dropbox.proto'),
+          protoPath: join(__dirname, '../../proto/dropbox.proto'),
           url: 'dropbox-service:5000',
         },
       },
@@ -34,7 +34,7 @@ import { AppService } from './app.service';
         transport: Transport.GRPC,
         options: {
           package: 'mongodb',
-          protoPath: join(__dirname, '../proto/mongodb.proto'),
+          protoPath: join(__dirname, '../../proto/mongodb.proto'),
           url: 'mongodb-service:5000',
         },
       },

@@ -1,0 +1,18 @@
+{
+  "name": "service-types",
+  "type": "module",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Shared types used in all services",
+  "main": "lib/index.ts",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@hyde.infosys.tuwien.ac.at:aic21/G4T2.git"
+  },
+  "author": "",
+  "license": "ISC"
+}

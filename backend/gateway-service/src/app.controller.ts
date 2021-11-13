@@ -9,7 +9,7 @@ import {
   Body,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { PictureServiceClient } from './interfaces/picture.interface';
+import { PictureServiceClient } from './lib';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -36,6 +36,12 @@ export class AppController {
   onModuleInit() {
     this.pictureService =
       this.client.getService<PictureServiceClient>('PictureService');
+  }
+
+  @Get()
+  getPicture(): Observable<{ id: number; name: string }> {
+    console.log('test');
+    return this.pictureService.findOne({ id: 1 });
   }
 
   @Post()
