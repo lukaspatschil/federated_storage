@@ -6,12 +6,28 @@ import {
   Put,
   Delete,
   Param,
+  Body,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
 import { PictureServiceClient } from './lib';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { MetadataDto } from './dto/metadata/Metadata.dto';
+import { SensorDataDto } from './dto/sensordata/SensorData.dto';
+import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
+import { PictureDto } from './dto/picture/Picture.dto';
+import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
 
-@Controller('api/v1/picture')
+@Controller('api/v1/sensordata')
 export class AppController {
   private pictureService: PictureServiceClient;
 
@@ -22,58 +38,175 @@ export class AppController {
       this.client.getService<PictureServiceClient>('PictureService');
   }
 
-  @Get()
-  getPicture(): Observable<{ id: number; name: string }> {
-    console.log('test');
-    return this.pictureService.findOne({ id: 1 });
+  @Post()
+  @ApiTags('Storage')
+  @ApiOperation({ summary: 'create one sensordata entry' })
+  @ApiCreatedResponse({
+    description: 'Created',
+    type: null,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: String,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
+    type: String,
+  })
+  CreateOneSensorData(@Body() sensordata: CreateSensorDataDto) {
+    //const functionname = 'CreateOneSensorData';
+    //console.log(functionname + ': ' + JSON.stringify(sensordata));
+    //return functionname;
+    return null;
   }
 
-  @Post()
-  createOnePicture() {
-    const functionname = 'Create one Picture';
+  @Get('/:id')
+  @ApiTags('Storage')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'id of the sensordata',
+    type: String,
+  })
+  @ApiOperation({
+    summary: 'get sensordata by ID',
+  })
+  @ApiOkResponse({
+    description: 'Successful Operation',
+    type: SensorDataDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: String,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
+    type: String,
+  })
+  @ApiNotFoundResponse({
+    description: 'ID not found',
+    type: String,
+  })
+  readOneSensorDataById(@Param() params) {
+    const functionname = 'readOneSensorDataById';
+    console.log(functionname + ' ' + params.id);
+  }
+
+  @Get()
+  @ApiTags('Storage')
+  @ApiOperation({
+    summary: 'get all sensordata',
+  })
+  @ApiOkResponse({
+    description: 'get all sensorData',
+    type: SensorDataDto,
+    isArray: true,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
+    type: String,
+  })
+  readAllSensorData() {
+    const functionname = 'readAllSensorData';
     console.log(functionname);
     return functionname;
   }
 
-  @Get('/metadata/:id')
-  readOnePictureMetadataById(@Param() params) {
-    const functionname = 'read one picture metadata by id';
-    console.log(functionname + ' ' + params.id);
-    return functionname;
-  }
-
-  @Get('/file/:id')
+  @Get('/picture/:id')
+  @ApiTags('Storage')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'integer for the image id',
+    type: String,
+  })
+  @ApiOperation({
+    summary: 'get picture by id',
+  })
+  @ApiOkResponse({
+    description: 'Successful Operation',
+    type: PictureDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Bad Request',
+    type: String,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
+    type: String,
+  })
+  @ApiNotFoundResponse({
+    description: 'ID not found',
+    type: String,
+  })
   readPictureEndpointById(@Param() params) {
     const functionname = 'read picture endpoint by id';
     console.log(functionname + ' ' + params.id);
-    return functionname;
-  }
-
-  @Put('/metadata/:id')
-  updatePictureMetadataById(@Param() params) {
-    const functionname = 'update picture metadata by id';
-    console.log(functionname + ' ' + params.id);
-    return functionname;
-  }
-
-  @Put('/file/:id')
-  updateOnePictureById(@Param() params) {
-    const functionname = 'update one picture by id';
-    console.log(functionname + ' ' + params.id);
-    return functionname;
   }
 
   @Delete('/:id')
+  @ApiTags('Storage')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'integer for the image id',
+    type: String,
+  })
+  @ApiOperation({
+    summary: 'delete one sensorData by id',
+  })
+  @ApiOkResponse({
+    description: 'Successful Operation',
+    type: null,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: String,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
+    type: String,
+  })
+  @ApiNotFoundResponse({
+    description: 'ID not found',
+    type: String,
+  })
   deleteOnePictureById(@Param() params) {
-    const functionname = 'delete one picture by id';
+    const functionname = 'delete one picture entry by id';
     console.log(functionname + ' ' + params.id);
     return functionname;
   }
 
-  @Get('/ids')
-  getAllIds() {
-    const functionname = 'get all ids';
-    console.log(functionname);
-    return functionname;
+  @Put('/:id')
+  @ApiTags('Storage')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'id of sensordata',
+    type: String,
+  })
+  @ApiBody({ type: UpdateSensorDataDto })
+  @ApiOperation({
+    summary: 'update sensordata by id',
+  })
+  @ApiOkResponse({
+    description: 'Successful Operation',
+    type: null,
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation Error',
+    type: String,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'wrong API key',
+    type: String,
+  })
+  @ApiNotFoundResponse({
+    description: 'ID not found',
+    type: String,
+  })
+  updateSensorDataById(@Param() params, @Body() metadata: MetadataDto) {
+    const functionname = 'update picture metadata by id';
+    console.log(functionname + ' ' + params.id);
   }
 }
