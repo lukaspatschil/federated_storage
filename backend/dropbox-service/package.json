@@ -27,7 +27,7 @@
     "@nestjs/core": "^8.1.2",
     "@nestjs/microservices": "^8.1.2",
     "@nestjs/platform-express": "^8.1.2",
-    "dropbox": "^10.19.0",
+    "dropbox": "^10.20.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.4.0"

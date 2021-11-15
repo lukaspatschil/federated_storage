@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package picture;
+
+service PictureStorageService {
+  rpc GetPictureById (Id) returns (stream Data) {}
+  rpc CreatePictureById (stream CreatePictureEntity) returns (Res) {}
+  rpc RemovePictureById (Id) returns (Res) {}
+}
+
+message Id {
+  string id = 1;
+}
+
+message CreatePictureEntity {
+  string id = 1;
+  string mimeType = 2;
+  bytes data = 3;
+}
+
+message Data {
+  bytes data = 1;
+}
+
+message Res {
+  // we send an empty message because we just want the http status code
+}
