@@ -10,7 +10,7 @@ async function bootstrap() {
       transport: Transport.GRPC,
       options: {
         package: 'dropbox',
-        protoPath: join(__dirname, '../../proto/picture.proto'),
+        protoPath: join(__dirname, '../../proto/pictureStorage.proto'),
         url: 'dropbox-service:5000',
       },
     },
