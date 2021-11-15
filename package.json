@@ -31,7 +31,8 @@
     "start:dev:logger-service": "npm run start:dev -w logger-service",
     "start:dev:minio-service": "npm run start:dev -w minio-service",
     "start:dev:mongodb-service": "npm run start:dev -w mongodb-service",
-    "start:dev:picture-service": "npm run start:dev -w picture-service"
+    "start:dev:picture-service": "npm run start:dev -w picture-service",
+    "generate:protoc": "cd backend/proto && protoc --plugin=../../node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=nestJs=true --ts_proto_out=../service-types/types/proto *.proto"
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "ts-proto": "^1.85.0"
   }
 }
