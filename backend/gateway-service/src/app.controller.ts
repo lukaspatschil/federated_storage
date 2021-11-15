@@ -90,7 +90,6 @@ export class AppController {
   readOneSensorDataById(@Param() params) {
     const functionname = 'readOneSensorDataById';
     console.log(functionname + ' ' + params.id);
-    return functionname;
   }
 
   @Get()
@@ -143,7 +142,6 @@ export class AppController {
   readPictureEndpointById(@Param() params) {
     const functionname = 'read picture endpoint by id';
     console.log(functionname + ' ' + params.id);
-    return functionname;
   }
 
   @Delete('/:id')
@@ -210,6 +208,5 @@ export class AppController {
   updateSensorDataById(@Param() params, @Body() metadata: MetadataDto) {
     const functionname = 'update picture metadata by id';
     console.log(functionname + ' ' + params.id);
-    return functionname;
   }
 }

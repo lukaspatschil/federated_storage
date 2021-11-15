@@ -12,7 +12,7 @@ export class CreatePictureDto {
 
   @ApiProperty({
     description: 'Base64 encoding of the image',
-    example: 'Base64',
+    example: 'base64image',
   })
   @IsBase64()
   @IsNotEmpty()
