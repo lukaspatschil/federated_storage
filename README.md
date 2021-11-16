@@ -83,6 +83,10 @@ To stop the containers run `docker-compose stop` or delete them by running `dock
 
 When installing a new dependency you will need to rebuild the docker container with `docker-compose build container-name`.
 
+#### protoc
+
+With `npm run generate:protoc` you can generate TS declarations of the proto files. In order to do so you will need protoc installed on your system.
+
 ### Production
 
 TODO
