@@ -9,8 +9,8 @@ async function bootstrap() {
     {
       transport: Transport.GRPC,
       options: {
-        package: 'minio',
-        protoPath: join(__dirname, '../../proto/minio.proto'),
+        package: 'pictureStorage',
+        protoPath: join(__dirname, '../../proto/pictureStorage.proto'),
         url: 'minio-service:5000',
       },
     },

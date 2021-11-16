@@ -11,8 +11,8 @@ import { AppService } from './app.service';
         name: 'MINIO_PACKAGE',
         transport: Transport.GRPC,
         options: {
-          package: 'minio',
-          protoPath: join(__dirname, '../../proto/minio.proto'),
+          package: 'pictureStorage',
+          protoPath: join(__dirname, '../proto/pictureStorage.proto'),
           url: 'minio-service:5000',
         },
       },
@@ -22,8 +22,8 @@ import { AppService } from './app.service';
         name: 'DROPBOX_PACKAGE',
         transport: Transport.GRPC,
         options: {
-          package: 'dropbox',
-          protoPath: join(__dirname, '../../proto/dropbox.proto'),
+          package: 'pictureStorage',
+          protoPath: join(__dirname, '../proto/pictureStorage.proto'),
           url: 'dropbox-service:5000',
         },
       },
