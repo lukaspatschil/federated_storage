@@ -31,6 +31,12 @@ services:
       WAIT_HOSTS: rabbitmq:5672
       WAIT_TIMEOUT: 120
       WAIT_SLEEP_INTERVAL: 5
+      RABBITMQ_URL: 'rabbitmq'
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: 'guest'
+      RABBITMQ_PASSWORD: 'guest'
+      MQ_EXCHANGE_NAME: 'logger-queue'
+      MQ_LOGS_ROUTING_KEY: 'logger-queue'
     networks:
       - backend
       - frontend
@@ -74,6 +80,10 @@ services:
       WAIT_HOSTS: rabbitmq:5672
       WAIT_TIMEOUT: 120
       WAIT_SLEEP_INTERVAL: 5
+      RABBITMQ_URL: 'rabbitmq'
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: 'guest'
+      RABBITMQ_PASSWORD: 'guest'
     networks:
       - backend
 

@@ -4,7 +4,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "Shared types used in all services",
-  "main": "types/index.ts",
+  "main": ".",
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -15,5 +15,8 @@
     "url": "git@hyde.infosys.tuwien.ac.at:aic21/G4T2.git"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@nestjs/microservices": "^8.2.0"
+  }
 }

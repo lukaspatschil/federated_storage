@@ -6,6 +6,7 @@ import {
   Put,
   Delete,
   Param,
+  Logger,
 } from '@nestjs/common';
 import { ClientGrpc, ClientProxy } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
@@ -13,30 +14,25 @@ import { PictureServiceClient } from './lib';
 
 @Controller('api/v1/picture')
 export class AppController {
+  private readonly logger = new Logger();
+
   private pictureService: PictureServiceClient;
 
-  constructor(
-    @Inject('PICTURE_PACKAGE') private client: ClientGrpc,
-    @Inject('LOGGER_SERVICE') private logger: ClientProxy,
-  ) {}
+  constructor(@Inject('PICTURE_PACKAGE') private client: ClientGrpc) {}
 
   onModuleInit() {
     this.pictureService =
       this.client.getService<PictureServiceClient>('PictureService');
-
-    this.logger.connect();
   }
 
   @Get()
   getPicture(): Observable<{ id: number; name: string }> {
     console.log('test');
-    const logMessage = {
-      message: 'This is a log message1111!',
-      date: new Date().toISOString(),
-      level: 'LOG',
-    };
-
-    this.logger.emit({ cmd: 'log' }, logMessage);
+    this.logger.log('THis is a message');
+    this.logger.warn('This is a warning!');
+    this.logger.error('ERRROR');
+    this.logger.debug('Debug message');
+    this.logger.verbose('verbose message');
 
     return this.pictureService.findOne({ id: 1 });
   }

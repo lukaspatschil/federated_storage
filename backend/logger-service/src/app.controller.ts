@@ -5,7 +5,7 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
-import { LogEntry } from 'service-types';
+import { LogEntry } from '../../service-types/types';
 import { AppService } from './app.service';
 
 @Controller()
@@ -14,6 +14,6 @@ export class AppController {
 
   @MessagePattern({ cmd: 'log' })
   log(@Payload() logEntry: LogEntry, @Ctx() context: RmqContext) {
-    console.log(`${logEntry.date} -- [${logEntry.level}] ${logEntry.message}`);
+    this.appService.writeToFile(logEntry);
   }
 }

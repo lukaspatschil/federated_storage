@@ -3,6 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AmqpLoggerModule } from './amqp-logger/amqp-logger.module';
 
 @Module({
   imports: [
@@ -16,18 +17,8 @@ import { AppService } from './app.service';
           url: 'picture-service:5000',
         },
       },
-      {
-        name: 'LOGGER_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://guest:guest@rabbitmq:5672'],
-          queue: 'logger_queue',
-          queueOptions: {
-            durable: false,
-          },
-        },
-      },
     ]),
+    AmqpLoggerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
