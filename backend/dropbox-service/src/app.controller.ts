@@ -40,6 +40,7 @@ export class AppController {
         console.log(uploadErr);
       });
   }
+  
 
   login(): Dropbox {
     console.log('login function called');
