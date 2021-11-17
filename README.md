@@ -38,7 +38,7 @@ TODO
 
 TODO
 
-#### Picture service
+#### ShortPictureDto service
 
 TODO
 
