@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LogEntry } from '../../service-types/types';
 import fs from 'fs/promises';
+import { join } from 'path';
 
 @Injectable()
 export class AppService {
