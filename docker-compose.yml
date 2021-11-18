@@ -5,6 +5,8 @@ services:
     ports:
         - 5672:5672
         - 15672:15672
+    env_file:
+     - ./.develop.env
     volumes:
         - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
@@ -29,14 +31,8 @@ services:
       - rabbitmq
     environment:
       WAIT_HOSTS: rabbitmq:5672
-      WAIT_TIMEOUT: 120
-      WAIT_SLEEP_INTERVAL: 5
-      RABBITMQ_URL: 'rabbitmq'
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USERNAME: 'guest'
-      RABBITMQ_PASSWORD: 'guest'
-      MQ_EXCHANGE_NAME: 'logger-queue'
-      MQ_LOGS_ROUTING_KEY: 'logger-queue'
+    env_file:
+      - ./.develop.env
     networks:
       - backend
       - frontend
@@ -59,6 +55,8 @@ services:
     #   WAIT_HOSTS: rabbitmq:5672
     #   WAIT_TIMEOUT: 120
     #   WAIT_SLEEP_INTERVAL: 5
+    env_file:
+      - ./.develop.env
     networks:
       - backend
 
@@ -78,12 +76,8 @@ services:
       - rabbitmq
     environment:
       WAIT_HOSTS: rabbitmq:5672
-      WAIT_TIMEOUT: 120
-      WAIT_SLEEP_INTERVAL: 5
-      RABBITMQ_URL: 'rabbitmq'
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USERNAME: 'guest'
-      RABBITMQ_PASSWORD: 'guest'
+    env_file:
+      - ./.develop.env
     networks:
       - backend
 
@@ -105,6 +99,8 @@ services:
     #   WAIT_HOSTS: rabbitmq:5672
     #   WAIT_TIMEOUT: 120
     #   WAIT_SLEEP_INTERVAL: 5
+    env_file:
+      - ./.develop.env
     networks:
       - backend
 
@@ -147,6 +143,8 @@ services:
     #   WAIT_HOSTS: rabbitmq:5672
     #   WAIT_TIMEOUT: 120
     #   WAIT_SLEEP_INTERVAL: 5
+    env_file:
+      - ./.develop.env
     networks:
       - backend
   

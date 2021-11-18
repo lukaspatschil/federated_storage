@@ -1,21 +1,15 @@
-import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
-import { ConsoleLogger, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConsoleLogger, Injectable, Inject } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { LogEntry, LOG_LEVEL } from '../../../service-types/types';
 
 @Injectable()
 export class AmqpLoggerService extends ConsoleLogger {
-  private readonly exchangeName: string;
-  private readonly logsRoutingKey: string;
-
   constructor(
-    private readonly amqpConnection: AmqpConnection,
-    private readonly configService: ConfigService,
+    @Inject('LOGGER_SERVICE') private readonly amqpConnection: ClientProxy,
   ) {
     super();
 
-    this.exchangeName = this.configService.get<string>('MQ_EXCHANGE_NAME');
-    this.logsRoutingKey = this.configService.get<string>('MQ_LOGS_ROUTING_KEY');
+    amqpConnection.connect();
   }
 
   override log(message: string, context?: string, ...optionalParams: any[]) {
@@ -60,10 +54,6 @@ export class AmqpLoggerService extends ConsoleLogger {
       level,
     };
 
-    this.amqpConnection.publish(
-      this.exchangeName,
-      this.logsRoutingKey,
-      logMessage,
-    );
+    this.amqpConnection.emit({ cmd: 'log' }, logMessage);
   }
 }

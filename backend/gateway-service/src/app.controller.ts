@@ -8,7 +8,7 @@ import {
   Param,
   Logger,
 } from '@nestjs/common';
-import { ClientGrpc, ClientProxy } from '@nestjs/microservices';
+import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { PictureServiceClient } from './lib';
 

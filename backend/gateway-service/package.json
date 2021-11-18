@@ -21,7 +21,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@golevelup/nestjs-rabbitmq": "^1.18.1",
     "@grpc/grpc-js": "^1.4.2",
     "@grpc/proto-loader": "^0.6.6",
     "@nestjs/common": "^8.1.2",

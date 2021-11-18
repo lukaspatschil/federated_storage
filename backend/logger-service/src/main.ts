@@ -9,7 +9,7 @@ async function bootstrap() {
   const PASSWORD = process.env.RABBITMQ_PASSWORD;
 
   if (!PORT || !USERNAME || !PASSWORD || !URL) {
-    throw new Error("Port, username or password for Rabbit MQ is not set!");
+    throw new Error('Port, username or password for Rabbit MQ is not set!');
   }
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
