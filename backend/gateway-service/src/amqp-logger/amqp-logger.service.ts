@@ -1,6 +1,6 @@
 import { ConsoleLogger, Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { LogEntry, LOG_LEVEL } from '../../../service-types/types';
+import { LogEntry, LOG_LEVEL } from 'service-types/types';
 
 @Injectable()
 export class AmqpLoggerService extends ConsoleLogger {
