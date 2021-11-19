@@ -7,6 +7,7 @@ import {
   Delete,
   Param,
   Body,
+  Logger,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { PictureServiceClient } from './lib';
@@ -29,6 +30,8 @@ import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
 
 @Controller('api/v1/sensordata')
 export class AppController {
+  private readonly logger = new Logger('gateway-service');
+
   private pictureService: PictureServiceClient;
 
   constructor(@Inject('PICTURE_PACKAGE') private client: ClientGrpc) {}

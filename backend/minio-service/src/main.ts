@@ -1,12 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
+import { AmqpLoggerService } from './amqp-logger/amqp-logger.service';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
+      logger: false,
       transport: Transport.GRPC,
       options: {
         package: 'pictureStorage',
@@ -15,6 +17,8 @@ async function bootstrap() {
       },
     },
   );
+  app.useLogger(app.get(AmqpLoggerService));
+
   app.listen();
 }
 
