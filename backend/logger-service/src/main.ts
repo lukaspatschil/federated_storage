@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const URL = process.env.RABBITMQ_URL;
-  const PORT = process.env.PORT;
+  const PORT = process.env.RABBITMQ_PORT;
   const USERNAME = process.env.RABBITMQ_USERNAME;
   const PASSWORD = process.env.RABBITMQ_PASSWORD;
 

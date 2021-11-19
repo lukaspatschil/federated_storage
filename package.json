@@ -27,6 +27,7 @@
     "build:minio-service": "npm run build -w minio-service ",
     "build:mongodb-service": "npm run build -w mongodb-service",
     "build:picture-service": "npm run build -w picture-service",
+    "start:dev": "npm-run-all start:dev:*",
     "start:dev:dropbox-service": "npm run start:dev -w dropbox-service",
     "start:dev:gateway-service": "npm run start:dev -w gateway-service",
     "start:dev:logger-service": "npm run start:dev -w logger-service",
