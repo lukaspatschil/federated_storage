@@ -6,7 +6,7 @@ const fs = require('fs');
 
 (async function generateTypes() {
     const services = await (await readdir('./backend')).filter(el => el.endsWith('service'));
-    const servicePaths = services.map(service => path.join(__dirname, '..', 'backend', service));
+    const servicePaths = services.map(service => path.join(__dirname, '..', 'backend', service, 'src'));
     
     const typeFiles = './backend/service-types';
 

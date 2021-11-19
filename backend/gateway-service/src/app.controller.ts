@@ -14,7 +14,7 @@ import { PictureServiceClient } from './lib';
 
 @Controller('api/v1/picture')
 export class AppController {
-  private readonly logger = new Logger();
+  private readonly logger = new Logger('gateway-service');
 
   private pictureService: PictureServiceClient;
 

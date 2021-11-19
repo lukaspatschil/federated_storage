@@ -5,7 +5,7 @@ import {
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
-import { LogEntry } from 'service-types/types';
+import { LogEntry } from './service-types/types';
 import { AppService } from './app.service';
 
 @Controller()

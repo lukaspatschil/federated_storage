@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { LogEntry } from 'service-types/types';
+import { LogEntry } from './service-types/types';
 import fs from 'fs/promises';
 import { join } from 'path';
 import { Cron } from '@nestjs/schedule';
@@ -16,7 +16,10 @@ export class AppService {
   async writeToFile(logEntry: LogEntry) {
     const logMessage = `[${logEntry.serviceName}] -- ${logEntry.date}    ${logEntry.level}    ${logEntry.message}\n`;
 
-    await fs.appendFile(this.filePath, logMessage);
+    console.log(`Logging message: "${logMessage}"`);
+
+    //! File writting is currently not supported :(
+    // await fs.appendFile(this.filePath, logMessage);
   }
 
   @Cron('* * 12 * * *')
