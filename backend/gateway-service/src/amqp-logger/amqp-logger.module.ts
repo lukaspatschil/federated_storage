@@ -8,7 +8,7 @@ import {
 import { AmqpLoggerService } from './amqp-logger.service';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule.forRoot()],
   providers: [
     {
       provide: 'LOGGER_SERVICE',
