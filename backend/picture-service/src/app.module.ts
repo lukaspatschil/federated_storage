@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { join } from 'path';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { Module } from '@nestjs/common';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { AppService } from './app.service';
         transport: Transport.GRPC,
         options: {
           package: 'pictureStorage',
-          protoPath: join(__dirname, '../proto/pictureStorage.proto'),
+          protoPath: join(__dirname, '../../proto/pictureStorage.proto'),
           url: 'minio-service:5000',
         },
       },
@@ -23,7 +24,7 @@ import { AppService } from './app.service';
         transport: Transport.GRPC,
         options: {
           package: 'pictureStorage',
-          protoPath: join(__dirname, '../proto/pictureStorage.proto'),
+          protoPath: join(__dirname, '../../proto/pictureStorage.proto'),
           url: 'dropbox-service:5000',
         },
       },
