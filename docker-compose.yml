@@ -125,15 +125,15 @@ services:
     networks:
       - backend
 
-  picture-service:
+  sensordata-service:
     build:
       context: .
       dockerfile: ./backend/Dockerfile.dev
       args:
-        - BUILD_CONTEXT=picture-service
-    hostname: picture-service
+        - BUILD_CONTEXT=sensordata-service
+    hostname: sensordata-service
     volumes: 
-      - ./backend/picture-service:/base/backend/picture-service/
+      - ./backend/sensordata-service:/base/backend/sensordata-service/
       - ./backend/proto:/base/backend/proto/
       - ./backend/service-types/:/base/backend/service-types/
       - /base/node_modules

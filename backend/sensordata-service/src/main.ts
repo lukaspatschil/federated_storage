@@ -1,24 +1,23 @@
-import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { join } from 'path';
+
 import { AmqpLoggerService } from './amqp-logger/amqp-logger.service';
 import { AppModule } from './app.module';
+import { NestFactory } from '@nestjs/core';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
-      logger: false,
       transport: Transport.GRPC,
       options: {
-        package: 'picture',
-        protoPath: join(__dirname, '../../proto/picture.proto'),
-        url: 'picture-service:5000',
+        package: 'sensorData',
+        protoPath: join(__dirname, '../../proto/sensorData.proto'),
+        url: 'sensordata-service:5000',
       },
     },
   );
-  app.useLogger(app.get(AmqpLoggerService));
-
+  //app.useLogger(app.get(AmqpLoggerService));
   app.listen();
 }
 

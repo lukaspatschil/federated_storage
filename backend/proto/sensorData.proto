@@ -3,10 +3,10 @@ syntax = "proto3";
 package sensorData;
 
 service SensorDataService {
-  rpc CreateSensorData(SensorDataCreation)  returns (Empty) {}
+  rpc CreateSensorData(stream SensorDataCreation)  returns (Empty) {}
   rpc GetSensorDataById(Id)  returns (SensorData) {}
   rpc GetAllSensorData(Empty) returns (SensorDataArray) {}
-  rpc GetPictureById(Id) returns (Picture) {}
+  rpc GetPictureById(Id) returns (stream Picture) {}
   rpc removeSensorDataById(Id) returns (Empty) {}
 }
 
