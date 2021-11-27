@@ -26,7 +26,7 @@ describe('LoggerController', () => {
         message: 'test',
         date: new Date().toISOString(),
         level: LOG_LEVEL.LOG,
-        serviceName: 'TestService'
+        serviceName: 'TestService',
       };
       jest.spyOn(loggerService, 'writeToFile').mockImplementation((x) => {});
 
@@ -34,7 +34,7 @@ describe('LoggerController', () => {
       loggerController.log(logMessage);
 
       // Then
-      expect(loggerService.writeToFile).toHaveBeenCalledOnceWith(logMessage);
+      expect(loggerService.writeToFile).toHaveBeenCalledWith(logMessage);
     });
   });
 });
