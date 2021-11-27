@@ -13,11 +13,11 @@ export interface Id {
 export interface CreatePictureEntity {
   id: string;
   mimeType: string;
-  data: Uint8Array;
+  data: Buffer;
 }
 
 export interface Data {
-  data: Uint8Array;
+  data: Buffer;
 }
 
 /** we send an empty message because we just want the http status code */

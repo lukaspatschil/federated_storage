@@ -35,7 +35,7 @@
     "start:dev:mongodb-service": "npm run start:dev -w mongodb-service",
     "start:dev:picture-service": "npm run start:dev -w picture-service",
     "generate": "npm-run-all generate:*",
-    "generate:protoc": "cd backend/proto && protoc --plugin=../../node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=nestJs=true --ts_proto_out=../service-types/types/proto *.proto",
+    "generate:protoc": "cd backend/proto && protoc --plugin=../../node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=env=node --ts_proto_opt=nestJs=true --ts_proto_out=../service-types/types/proto *.proto",
     "generate:types": "node ./scripts/generateTypes.js"
   },
   "repository": {
