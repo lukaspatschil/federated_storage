@@ -1,28 +1,19 @@
-import {
-  ClientGrpc,
-  GrpcMethod,
-  GrpcService,
-  GrpcStreamMethod,
-} from '@nestjs/microservices';
 import { Controller, Inject, Logger } from '@nestjs/common';
 import {
-  DropboxServiceClient,
-  MinIOServiceClient,
-  MongoDBServiceClient,
-  PictureById,
-} from './lib';
+  SensorDataServiceController,
+  SensorDataServiceControllerMethods,
+} from './service-types/types/proto/sensorData';
+import { Observable, Subject, of } from 'rxjs';
+import { Picture } from './service-types/types/proto/picture';
 import {
   Empty,
   Id,
-  Picture,
   SensorData,
   SensorDataCreation,
-  SensorDataServiceController,
-} from './service-types/types/proto/sensorData';
-import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
-import { Observable, Subject, of } from 'rxjs';
+} from './service-types/types/proto/shared';
 
 @Controller()
+@SensorDataServiceControllerMethods()
 export class AppController implements SensorDataServiceController {
   private logger = new Logger('sensordata-service controller');
 
@@ -54,7 +45,7 @@ export class AppController implements SensorDataServiceController {
   }
   */
 
-  @GrpcStreamMethod('SensorDataService', 'CreateSensorData')
+  //@GrpcStreamMethod('SensorDataService', 'CreateSensorData')
   createSensorData(request: Observable<SensorDataCreation>) {
     const subject = new Subject<Empty>();
 
@@ -71,7 +62,7 @@ export class AppController implements SensorDataServiceController {
     return subject.asObservable();
   }
 
-  @GrpcMethod('SensorDataService', 'GetSensorDataById')
+  //@GrpcMethod('SensorDataService', 'GetSensorDataById')
   getSensorDataById(request: Id) {
     const sensorData: SensorData = {
       id: '1',
@@ -96,12 +87,12 @@ export class AppController implements SensorDataServiceController {
     return sensorData;
   }
 
-  @GrpcMethod('SensorDataService', 'GetAllSensorData')
+  //@GrpcMethod('SensorDataService', 'GetAllSensorData')
   getAllSensorData() {
     return { sensorData: [] };
   }
 
-  @GrpcMethod('SensorDataService', 'GetPictureById')
+  //@GrpcMethod('SensorDataService', 'GetPictureById')
   getPictureById(request: Id) {
     const picture: Picture = {
       id: 'a1',
@@ -113,7 +104,7 @@ export class AppController implements SensorDataServiceController {
     return of(picture);
   }
 
-  @GrpcMethod('SensorDataService', 'RemoveSensorDataById')
+  //@GrpcMethod('SensorDataService', 'RemoveSensorDataById')
   removeSensorDataById(request: Id) {
     return {};
   }

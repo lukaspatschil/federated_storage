@@ -3,44 +3,30 @@ import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { util, configure } from "protobufjs/minimal";
 import * as Long from "long";
 import { Observable } from "rxjs";
+import { Empty, PictureData, Id, PictureCreationById } from "./shared";
 
 export const protobufPackage = "pictureStorage";
-
-export interface Id {
-  id: string;
-}
-
-export interface CreatePictureEntity {
-  id: string;
-  mimeType: string;
-  data: Buffer;
-}
-
-export interface Data {
-  data: Buffer;
-}
-
-/** we send an empty message because we just want the http status code */
-export interface Res {}
 
 export const PICTURE_STORAGE_PACKAGE_NAME = "pictureStorage";
 
 export interface PictureStorageServiceClient {
-  getPictureById(request: Id): Observable<Data>;
+  createPictureById(
+    request: Observable<PictureCreationById>
+  ): Observable<Empty>;
 
-  createPictureById(request: Observable<CreatePictureEntity>): Observable<Res>;
+  getPictureById(request: Id): Observable<PictureData>;
 
-  removePictureById(request: Id): Observable<Res>;
+  removePictureById(request: Id): Observable<Empty>;
 }
 
 export interface PictureStorageServiceController {
-  getPictureById(request: Id): Observable<Data>;
-
   createPictureById(
-    request: Observable<CreatePictureEntity>
-  ): Promise<Res> | Observable<Res> | Res;
+    request: Observable<PictureCreationById>
+  ): Promise<Empty> | Observable<Empty> | Empty;
 
-  removePictureById(request: Id): Promise<Res> | Observable<Res> | Res;
+  getPictureById(request: Id): Observable<PictureData>;
+
+  removePictureById(request: Id): Promise<Empty> | Observable<Empty> | Empty;
 }
 
 export function PictureStorageServiceControllerMethods() {

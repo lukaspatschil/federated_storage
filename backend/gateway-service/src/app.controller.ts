@@ -26,11 +26,9 @@ import { SensorDataDto } from './dto/sensordata/SensorData.dto';
 import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
 import { PictureDto } from './dto/picture/Picture.dto';
 import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
-import {
-  SensorDataServiceClient,
-  SensorDataCreation,
-} from './service-types/types/proto/sensorData';
+import { SensorDataServiceClient } from './service-types/types/proto/sensorData';
 import { of } from 'rxjs';
+import { SensorDataCreation } from './service-types/types/proto/shared';
 
 @Controller('api/v1/sensordata')
 export class AppController {

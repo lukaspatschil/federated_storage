@@ -7,6 +7,7 @@ import { join } from 'path';
 
 @Module({
   imports: [
+    /*
     ClientsModule.register([
       {
         name: 'MINIO_PACKAGE',
@@ -40,6 +41,7 @@ import { join } from 'path';
         },
       },
     ]),
+    */
   ],
   controllers: [AppController],
   providers: [AppService],

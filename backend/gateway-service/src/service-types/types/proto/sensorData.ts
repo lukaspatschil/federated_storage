@@ -3,76 +3,16 @@ import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { util, configure } from "protobufjs/minimal";
 import * as Long from "long";
 import { Observable } from "rxjs";
+import {
+  Empty,
+  SensorData,
+  SensorDataArray,
+  Picture,
+  Id,
+  SensorDataCreation,
+} from "./shared";
 
 export const protobufPackage = "sensorData";
-
-export interface Empty {}
-
-export interface Id {
-  id: string;
-}
-
-export interface Location {
-  longitude: number;
-  latitude: number;
-}
-
-export interface PictureCreation {
-  mimetype: string;
-  data: Buffer;
-}
-
-export interface PictureWithoutData {
-  id: string;
-  createdAt: string;
-}
-
-export interface Picture {
-  id: string;
-  mimetype: string;
-  data: Buffer;
-  createdAt: string;
-}
-
-export interface MetaDataCreation {
-  name: string;
-  placeIdent: string;
-  seqId: string;
-  datetime: string;
-  frameNum: number;
-  seqNumFrames: number;
-  filename: string;
-  deviceID: string;
-  location: Location | undefined;
-}
-
-export interface MetaData {
-  name: string;
-  placeIdent: string;
-  seqId: string;
-  datetime: string;
-  frameNum: number;
-  seqNumFrames: number;
-  filename: string;
-  deviceID: string;
-  location: Location | undefined;
-  tags: string[];
-}
-
-export interface SensorDataCreation {
-  picture: PictureCreation | undefined;
-  metadata: MetaDataCreation | undefined;
-}
-
-export interface SensorData {
-  id: string;
-  pictures: PictureWithoutData[];
-  metadata: MetaData | undefined;
-}
-
-export interface SensorDataArray {
-  sensorData: SensorData[];
-}
 
 export const SENSOR_DATA_PACKAGE_NAME = "sensorData";
 
