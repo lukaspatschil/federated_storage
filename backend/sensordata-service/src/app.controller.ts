@@ -46,6 +46,7 @@ export class AppController implements SensorDataServiceController {
   }
 
   createSensorData(request: Observable<SensorDataCreation>) {
+    /*
     // -- Real Response --
     const sensorDataSubject = new Subject<Empty>();
 
@@ -80,9 +81,9 @@ export class AppController implements SensorDataServiceController {
     });
 
     return sensorDataSubject;
+    */
 
     // -- Dummy Response --
-    /*
     const subject = new Subject<Empty>();
 
     const onNext = (message) => {
@@ -96,12 +97,13 @@ export class AppController implements SensorDataServiceController {
     });
 
     return subject.asObservable();
-    */
   }
 
   getSensorDataById(request: Id) {
+    /*
     // -- Real Response --
     return this.sensorDataStorage.getSensorDataById(request);
+    */
 
     // -- Dummy Response --
     const sensorData: SensorData = {
@@ -128,14 +130,17 @@ export class AppController implements SensorDataServiceController {
   }
 
   getAllSensorData() {
+    /*
     // -- Real Response --
     return this.sensorDataStorage.getAllSensorData({});
+    */
 
     // -- Dummy Response --
     return { sensorData: [] };
   }
 
   getPictureById(request: Id) {
+    /*
     // -- Real Response --
     const pictureSubject = new Subject<Picture>();
 
@@ -162,8 +167,8 @@ export class AppController implements SensorDataServiceController {
       });
 
     return pictureSubject.asObservable();
+    */
 
-    /*
     // -- Dummy Response --
     const pictureDummy: Picture = {
       id: 'a1',
@@ -173,10 +178,10 @@ export class AppController implements SensorDataServiceController {
     };
 
     return of(pictureDummy);
-    */
   }
 
   async removeSensorDataById(request: Id) {
+    /*
     // -- Real Response --
     const picture = await firstValueFrom(
       this.sensorDataStorage.getPictureWithoutDataById(request),
@@ -190,6 +195,7 @@ export class AppController implements SensorDataServiceController {
     );
     await firstValueFrom(this.sensorDataStorage.removeSensorDataById(request));
     return {};
+    */
 
     // -- Dummy Response --
     return {};
