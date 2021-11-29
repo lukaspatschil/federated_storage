@@ -1,5 +1,6 @@
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
+import { AmqpLoggerService } from './amqp-logger/amqp-logger.service';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
@@ -10,12 +11,13 @@ async function bootstrap() {
     {
       transport: Transport.GRPC,
       options: {
-        package: 'pictureStorage',
-        protoPath: join(__dirname, '../../proto/pictureStorage.proto'),
-        url: 'dropbox-service:5000',
+        package: 'sensorData',
+        protoPath: join(__dirname, '../../proto/sensorData.proto'),
+        url: 'sensordata-service:5000',
       },
     },
   );
+  //app.useLogger(app.get(AmqpLoggerService));
   app.listen();
 }
 

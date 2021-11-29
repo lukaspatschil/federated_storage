@@ -1,6 +1,6 @@
-const rimraf = require('rimraf');
 const path = require('path');
 const util = require('util');
+const rimraf = util.promisify(require('rimraf'));
 const { promises: { readdir } } = require('fs');
 const fs = require('fs');
 
@@ -11,6 +11,7 @@ const fs = require('fs');
     const typeFiles = './backend/service-types';
 
     servicePaths.forEach(async servicePath => {
+        await rimraf(path.join(servicePath, 'service-types'));
         copyFolderRecursiveSync(typeFiles, servicePath);
     });
 })();
