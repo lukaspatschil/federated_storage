@@ -1,7 +1,7 @@
 {
   "name": "g4t2",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "workspaces": [
     "backend/*",
@@ -36,7 +36,8 @@
     "start:dev:sensordata-service": "npm run start:dev -w sensordata-service",
     "generate": "npm-run-all generate:*",
     "generate:protoc": "cd backend/proto && protoc --plugin=../../node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=env=node --ts_proto_opt=nestJs=true --ts_proto_out=../service-types/types/proto *.proto",
-    "generate:types": "node ./scripts/generateTypes.js"
+    "generate:types": "node ./scripts/generateTypes.js",
+    "pregenerate:protoc": "rimraf backend/service-types/types/proto/*"
   },
   "repository": {
     "type": "git",
