@@ -23,11 +23,13 @@ export class AppController {
   ) {}
 
   onModuleInit() {
-    this.minIOService =
-      this.minioClient.getService<MinIOServiceClient>('MinIOService');
+    this.minIOService = this.minioClient.getService<MinIOServiceClient>(
+      'PictureStorageService',
+    );
 
-    this.dropboxService =
-      this.dropboxClient.getService<DropboxServiceClient>('DropboxService');
+    this.dropboxService = this.dropboxClient.getService<DropboxServiceClient>(
+      'PictureStorageService',
+    );
 
     this.mongodbService =
       this.mongodbClient.getService<MongoDBServiceClient>('MongoDBService');
