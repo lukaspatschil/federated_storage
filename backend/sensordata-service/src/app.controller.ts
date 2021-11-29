@@ -4,7 +4,7 @@ import {
   SensorDataServiceControllerMethods,
 } from './service-types/types/proto/sensorData';
 import { Observable, Subject, of, firstValueFrom, forkJoin } from 'rxjs';
-import { Picture } from './service-types/types/proto/picture';
+import { Picture } from './service-types/types/proto/shared';
 import {
   Empty,
   Id,
