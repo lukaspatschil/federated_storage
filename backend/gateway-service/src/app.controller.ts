@@ -134,7 +134,7 @@ export class AppController {
   readAllSensorData() {
     const functionname = 'readAllSensorData';
     console.log(functionname);
-    return functionname;
+    return this.sensorDataService.getAllSensorData({});
   }
 
   @Get('/picture/:id')

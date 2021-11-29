@@ -3,7 +3,7 @@ import {
   SensorDataServiceController,
   SensorDataServiceControllerMethods,
 } from './service-types/types/proto/sensorData';
-import { Observable, Subject, of } from 'rxjs';
+import { Observable, Subject, of, firstValueFrom, forkJoin } from 'rxjs';
 import { Picture } from './service-types/types/proto/picture';
 import {
   Empty,
@@ -11,42 +11,78 @@ import {
   SensorData,
   SensorDataCreation,
 } from './service-types/types/proto/shared';
+import { PictureStorageServiceClient } from './service-types/types/proto/pictureStorage';
+import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
+import { ClientGrpc } from '@nestjs/microservices';
 
 @Controller()
 @SensorDataServiceControllerMethods()
 export class AppController implements SensorDataServiceController {
   private logger = new Logger('sensordata-service controller');
 
-  /*
-  private minIOService: MinIOServiceClient;
-  private dropboxService: DropboxServiceClient;
-  private mongodbService: MongoDBServiceClient;
-  */
+  private pictureStorageM: PictureStorageServiceClient;
+  private pictureStorageD: PictureStorageServiceClient;
+  private sensorDataStorage: SensorDataStorageServiceClient;
 
-  /*
   constructor(
-    
     @Inject('MINIO_PACKAGE') private minioClient: ClientGrpc,
     @Inject('DROPBOX_PACKAGE') private dropboxClient: ClientGrpc,
     @Inject('MONGODB_PACKAGE') private mongodbClient: ClientGrpc,
-    
   ) {}
- 
 
   onModuleInit() {
-    this.minIOService =
-      this.minioClient.getService<MinIOServiceClient>('MinIOService');
-
-    this.dropboxService =
-      this.dropboxClient.getService<DropboxServiceClient>('DropboxService');
-
-    this.mongodbService =
-      this.mongodbClient.getService<MongoDBServiceClient>('MongoDBService'); 
+    this.pictureStorageM =
+      this.minioClient.getService<PictureStorageServiceClient>(
+        'PictureStorageService',
+      );
+    this.pictureStorageD =
+      this.dropboxClient.getService<PictureStorageServiceClient>(
+        'PictureStorageService',
+      );
+    this.sensorDataStorage =
+      this.mongodbClient.getService<SensorDataStorageServiceClient>(
+        'SensorDataStorageService',
+      );
   }
-  */
 
-  //@GrpcStreamMethod('SensorDataService', 'CreateSensorData')
   createSensorData(request: Observable<SensorDataCreation>) {
+    // -- Real Response --
+    const sensorDataSubject = new Subject<Empty>();
+
+    request.subscribe((sensorDataCreation) => {
+      const { data, ...pictureWithoutData } = sensorDataCreation.picture;
+
+      this.sensorDataStorage
+        .createSensorData({
+          metadata: sensorDataCreation.metadata,
+          picture: pictureWithoutData,
+        })
+        .subscribe((sensorData) => {
+          // ATTENTION: This may not work with multiple pictures, especially regarding concurrency
+          const lastPicture =
+            sensorData.pictures[sensorData.pictures.length - 1];
+
+          const createPictureById = of({
+            id: lastPicture.id,
+            mimetype: pictureWithoutData.mimetype,
+            data: data,
+          });
+
+          const createPictures$ = [
+            this.pictureStorageD.createPictureById(createPictureById),
+            this.pictureStorageM.createPictureById(createPictureById),
+          ];
+
+          forkJoin(createPictures$).subscribe(() => {
+            sensorDataSubject.next(sensorData);
+          });
+        });
+    });
+
+    return sensorDataSubject;
+
+    // -- Dummy Response --
+    /*
     const subject = new Subject<Empty>();
 
     const onNext = (message) => {
@@ -60,10 +96,14 @@ export class AppController implements SensorDataServiceController {
     });
 
     return subject.asObservable();
+    */
   }
 
-  //@GrpcMethod('SensorDataService', 'GetSensorDataById')
   getSensorDataById(request: Id) {
+    // -- Real Response --
+    return this.sensorDataStorage.getSensorDataById(request);
+
+    // -- Dummy Response --
     const sensorData: SensorData = {
       id: '1',
       pictures: [],
@@ -87,44 +127,71 @@ export class AppController implements SensorDataServiceController {
     return sensorData;
   }
 
-  //@GrpcMethod('SensorDataService', 'GetAllSensorData')
   getAllSensorData() {
+    // -- Real Response --
+    return this.sensorDataStorage.getAllSensorData({});
+
+    // -- Dummy Response --
     return { sensorData: [] };
   }
 
-  //@GrpcMethod('SensorDataService', 'GetPictureById')
   getPictureById(request: Id) {
-    const picture: Picture = {
+    // -- Real Response --
+    const pictureSubject = new Subject<Picture>();
+
+    this.sensorDataStorage
+      .getPictureWithoutDataById(request)
+      .subscribe((pictureWithoutData) => {
+        const pictureData$ = [
+          this.pictureStorageD.getPictureById({ id: pictureWithoutData.id }),
+          this.pictureStorageM.getPictureById({ id: pictureWithoutData.id }),
+        ];
+
+        forkJoin(pictureData$).subscribe((res) => {
+          const [pictureDataD, pictureDataM] = res;
+
+          const picture: Picture = {
+            id: pictureWithoutData.id,
+            createdAt: pictureWithoutData.createdAt,
+            mimetype: pictureWithoutData.mimetype,
+            data: pictureDataD.data,
+          };
+
+          pictureSubject.next(picture);
+        });
+      });
+
+    return pictureSubject.asObservable();
+
+    /*
+    // -- Dummy Response --
+    const pictureDummy: Picture = {
       id: 'a1',
       mimetype: 'text/lol',
       data: Buffer.from('asdf', 'base64'),
       createdAt: '2011-10-05T14:48:00.000Z',
     };
 
-    return of(picture);
+    return of(pictureDummy);
+    */
   }
 
-  //@GrpcMethod('SensorDataService', 'RemoveSensorDataById')
-  removeSensorDataById(request: Id) {
+  async removeSensorDataById(request: Id) {
+    // -- Real Response --
+    const picture = await firstValueFrom(
+      this.sensorDataStorage.getPictureWithoutDataById(request),
+    );
+
+    await firstValueFrom(
+      this.pictureStorageD.removePictureById({ id: picture.id }),
+    );
+    await firstValueFrom(
+      this.pictureStorageM.removePictureById({ id: picture.id }),
+    );
+    await firstValueFrom(this.sensorDataStorage.removeSensorDataById(request));
+    return {};
+
+    // -- Dummy Response --
     return {};
   }
-
-  /*
-  @GrpcMethod('PictureService', 'FindOne')
-  async findOne(
-    data: PictureById,
-    metadata: Metadata,
-    call: ServerUnaryCall<any, any>,
-  ): Promise<Observable<Picture>> {
-    this.dropboxService
-      .findOne(data)
-      .subscribe(({ id }) => console.log(`The dropbox gets image with ${id}`));
-
-    this.mongodbService
-      .findOne(data)
-      .subscribe(({ id }) => console.log(`The mongo says ${id}`));
-
-    return this.minIOService.findOne(data);
-  }
-  */
 }

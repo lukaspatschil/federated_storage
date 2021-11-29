@@ -7,7 +7,6 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    /*
     ClientsModule.register([
       {
         name: 'MINIO_PACKAGE',
@@ -35,13 +34,12 @@ import { join } from 'path';
         name: 'MONGODB_PACKAGE',
         transport: Transport.GRPC,
         options: {
-          package: 'mongodb',
-          protoPath: join(__dirname, '../../proto/mongodb.proto'),
+          package: 'sensorDataStorage',
+          protoPath: join(__dirname, '../../proto/sensorDataStorage.proto'),
           url: 'mongodb-service:5000',
         },
       },
     ]),
-    */
   ],
   controllers: [AppController],
   providers: [AppService],
