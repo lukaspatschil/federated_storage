@@ -4,7 +4,11 @@ import {
   SensorDataServiceControllerMethods,
 } from './service-types/types/proto/sensorData';
 import { Observable, Subject, of, firstValueFrom, forkJoin } from 'rxjs';
-import { Picture } from './service-types/types/proto/shared';
+import {
+  IdWithMimetype,
+  Picture,
+  PictureWithoutData,
+} from './service-types/types/proto/shared';
 import {
   Empty,
   Id,
@@ -146,10 +150,15 @@ export class AppController implements SensorDataServiceController {
 
     this.sensorDataStorage
       .getPictureWithoutDataById(request)
-      .subscribe((pictureWithoutData) => {
+      .subscribe((pictureWithoutData: PictureWithoutData) => {
+        const idWithMimetype: IdWithMimetype = {
+          id: pictureWithoutData.id,
+          mimetype: pictureWithoutData.mimetype,
+        };
+
         const pictureData$ = [
-          this.pictureStorageD.getPictureById({ id: pictureWithoutData.id }),
-          this.pictureStorageM.getPictureById({ id: pictureWithoutData.id }),
+          this.pictureStorageD.getPictureById(idWithMimetype),
+          this.pictureStorageM.getPictureById(idWithMimetype),
         ];
 
         forkJoin(pictureData$).subscribe((res) => {
@@ -183,15 +192,19 @@ export class AppController implements SensorDataServiceController {
   async removeSensorDataById(request: Id) {
     /*
     // -- Real Response --
-    const picture = await firstValueFrom(
+    const pictureWithoutData = await firstValueFrom(
       this.sensorDataStorage.getPictureWithoutDataById(request),
     );
 
+    const idWithMimetype: IdWithMimetype = {
+      id: pictureWithoutData.id,
+      mimetype: pictureWithoutData.mimetype,
+    };
     await firstValueFrom(
-      this.pictureStorageD.removePictureById({ id: picture.id }),
+      this.pictureStorageD.removePictureById(idWithMimetype),
     );
     await firstValueFrom(
-      this.pictureStorageM.removePictureById({ id: picture.id }),
+      this.pictureStorageM.removePictureById(idWithMimetype),
     );
     await firstValueFrom(this.sensorDataStorage.removeSensorDataById(request));
     return {};

@@ -6,6 +6,10 @@ message Id {
     string id = 1;
 }
 
+message IdWithMimetype {
+    string id = 1;
+    string mimetype = 2;
+}
 
 message Location {
     double longitude = 1;      
