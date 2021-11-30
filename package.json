@@ -1,7 +1,7 @@
 {
   "name": "g4t2",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "workspaces": [
     "backend/*",
@@ -11,6 +11,7 @@
     "doc": "docs"
   },
   "scripts": {
+    "postinstall": "rimraf node_modules/@types/jest/index.d.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "npm-run-all lint:*",
     "lint:dropbox-service": "npm run lint -w dropbox-service",
@@ -18,20 +19,25 @@
     "lint:logger-service": "npm run lint -w logger-service",
     "lint:minio-service": "npm run lint -w minio-service",
     "lint:mongodb-service": "npm run lint -w mongodb-service",
-    "lint:picture-service": "npm run lint -w picture-service",
+    "lint:sensordata-service": "npm run lint -w sensordata-service",
     "build": "npm-run-all build:*",
     "build:dropbox-service": "npm run build -w dropbox-service",
     "build:gateway-service": "npm run build -w gateway-service",
     "build:logger-service": "npm run build -w logger-service ",
     "build:minio-service": "npm run build -w minio-service ",
     "build:mongodb-service": "npm run build -w mongodb-service",
-    "build:picture-service": "npm run build -w picture-service",
+    "build:sensordata-service": "npm run build -w sensordata-service",
+    "start:dev": "npm-run-all start:dev:*",
     "start:dev:dropbox-service": "npm run start:dev -w dropbox-service",
     "start:dev:gateway-service": "npm run start:dev -w gateway-service",
     "start:dev:logger-service": "npm run start:dev -w logger-service",
     "start:dev:minio-service": "npm run start:dev -w minio-service",
     "start:dev:mongodb-service": "npm run start:dev -w mongodb-service",
-    "start:dev:picture-service": "npm run start:dev -w picture-service"
+    "start:dev:sensordata-service": "npm run start:dev -w sensordata-service",
+    "generate": "npm-run-all generate:*",
+    "generate:protoc": "cd backend/proto && protoc --plugin=../../node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=env=node --ts_proto_opt=nestJs=true --ts_proto_out=../service-types/types/proto *.proto",
+    "generate:types": "node ./scripts/generateTypes.js",
+    "pregenerate:protoc": "rimraf backend/service-types/types/proto/*"
   },
   "repository": {
     "type": "git",
@@ -45,6 +51,7 @@
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "ts-proto": "^1.87.0"
   }
 }

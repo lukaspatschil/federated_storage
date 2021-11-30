@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+import "shared.proto";
+
+package sensorDataStorage;
+
+service SensorDataStorageService {
+  rpc CreateSensorData(SensorDataCreationWithoutPictureData) returns (SensorData) {}
+  rpc GetSensorDataById(Id)  returns (SensorData) {}
+  rpc GetAllSensorData(Empty) returns (SensorDataArray) {}
+  rpc RemoveSensorDataById(Id) returns (Empty) {}
+  rpc GetPictureWithoutDataById(Id) returns (PictureWithoutData) {}
+}

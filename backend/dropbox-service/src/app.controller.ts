@@ -1,76 +1,103 @@
-import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 import { Controller } from '@nestjs/common';
-import { GrpcMethod } from '@nestjs/microservices';
 import DropboxConfig from '../dropbox-config.json';
 import { Dropbox } from 'dropbox';
 import { Logger } from '@nestjs/common';
 import mime from 'mime-types';
-
-type PictureById = {
-  id: string;
-};
-
-export type CreatePictureEntity = {
-  id: string;
-  mimetype: string;
-  data: string;
-};
+import {
+  PictureStorageServiceController,
+  PictureStorageServiceControllerMethods,
+} from './service-types/types/proto/pictureStorage';
+import { Observable, Subject } from 'rxjs';
+import {
+  Empty,
+  Id,
+  PictureCreationById,
+  PictureData,
+} from './service-types/types/proto/shared';
 
 @Controller()
-export class AppController {
+@PictureStorageServiceControllerMethods()
+export class AppController implements PictureStorageServiceController {
   private readonly logger = new Logger(AppController.name);
-
-  @GrpcMethod('PictureStorageService', 'GetPictureById')
-  findOne(data: PictureById): CreatePictureEntity {
-    console.log('FindOne' + data);
-    /*const items = [
-      { id: '1', name: 'John', data: 'Base64' },
-      { id: '2', name: 'Doe', data: 'Base64' },
-    ];*/
-    return null;
-
-    /*return items.find(({ id }) => id === data.id);*/
-  }
-
-  @GrpcMethod('PictureStorageService', 'CreatePictureById')
-  createOne(pic: CreatePictureEntity): CreatePictureEntity {
-    console.log('CreateOne: ' + JSON.stringify(pic));
-    const dbx = this.login();
-
-    //const blob = base64StringToBlob(pic.data, pic.mimetype);
-
-    const blob = Buffer.from(pic.data, 'base64').toString('binary');
-
-    let path;
-    if (pic.mimetype == 'image/jpeg') {
-      path = DropboxConfig.path + pic.id + '.jpeg';
-    } else if (pic.mimetype == 'image/png') {
-      path = DropboxConfig.path + pic.id + '.png';
-    } else {
-      throw new NoCorrectMimeTypeException('Mimetype not suitable');
-    }
-
-    const extension = mime.extension(pic.mimetype);
-
-    dbx
-      .filesUpload({
-        path: path,
-        contents: blob,
-      })
-      .then((response: any) => {
-        console.log(response);
-        this.logger.log(response);
-      })
-      .catch((uploadErr: Error) => {
-        console.log(uploadErr);
-        this.logger.log(uploadErr);
-      });
-    return null;
-  }
 
   login(): Dropbox {
     console.log('login function called');
     const dbx = new Dropbox({ accessToken: DropboxConfig.accessToken });
     return dbx;
+  }
+
+  createPictureById(
+    request: Observable<PictureCreationById>,
+  ): Promise<Empty> | Observable<Empty> | Empty {
+    const subject = new Subject<Empty>();
+
+    console.log('createPictureById');
+
+    const dbx = this.login();
+
+    request.subscribe((picture) => {
+      const path =
+        DropboxConfig.path +
+        picture.id +
+        '.' +
+        mime.extension(picture.mimetype);
+
+      dbx
+        .filesUpload({
+          path: path,
+          contents: picture.data,
+        })
+        .then((response: any) => {
+          console.log(response);
+          subject.next({});
+        })
+        .catch((uploadErr: Error) => {
+          console.log(uploadErr);
+          subject.next({});
+        });
+    });
+
+    return subject.asObservable();
+  }
+
+  getPictureById(request: Id): Observable<PictureData> {
+    const data = new Subject<PictureData>();
+
+    const dbx = this.login();
+
+    const path =
+      DropboxConfig.path + request.id + '.' + mime.extension(request.mimetype);
+
+    dbx
+      .filesDownload({ path: path })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((downloadErr: Error) => {
+        console.log(downloadErr);
+      });
+
+    return data.asObservable();
+  }
+
+  removePictureById(request: Id): Promise<Empty> | Observable<Empty> | Empty {
+    const subject = new Subject<Empty>();
+
+    const dbx = this.login();
+
+    const path =
+      DropboxConfig.path + request.id + '.' + mime.extension(request.mimetype);
+
+    dbx
+      .filesDeleteV2({ path: path })
+      .then((response: any) => {
+        console.log(response);
+        subject.next({});
+      })
+      .catch((deleteErr: Error) => {
+        console.log(deleteErr);
+        subject.next({});
+      });
+    return subject;
   }
 }
