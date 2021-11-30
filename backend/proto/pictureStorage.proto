@@ -6,6 +6,6 @@ package pictureStorage;
 
 service PictureStorageService {
   rpc CreatePictureById (stream PictureCreationById) returns (Empty) {}
-  rpc GetPictureById (Id) returns (stream PictureData) {}
-  rpc RemovePictureById (Id) returns (Empty) {}
+  rpc GetPictureById (IdWithMimetype) returns (stream PictureData) {}
+  rpc RemovePictureById (IdWithMimetype) returns (Empty) {}
 }
