@@ -112,7 +112,13 @@ export class AppController implements SensorDataServiceController {
     // -- Dummy Response --
     const sensorData: SensorData = {
       id: '1',
-      pictures: [],
+      pictures: [
+        {
+          id: '1',
+          createdAt: '2011-10-05T14:48:00.000Z',
+          mimetype: 'image/png',
+        },
+      ],
       metadata: {
         name: 'GRASMERE 1',
         placeIdent: '6ea10ab8-2e32-11e9-b03f-dca9047ef277',
