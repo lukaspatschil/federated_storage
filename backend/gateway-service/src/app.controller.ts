@@ -7,9 +7,9 @@ import {
   Delete,
   Param,
   Body,
+  Logger,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { PictureServiceClient } from './lib';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -26,16 +26,21 @@ import { SensorDataDto } from './dto/sensordata/SensorData.dto';
 import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
 import { PictureDto } from './dto/picture/Picture.dto';
 import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
+import { SensorDataServiceClient } from './service-types/types/proto/sensorData';
+import { of } from 'rxjs';
+import { SensorDataCreation } from './service-types/types/proto/shared';
 
 @Controller('api/v1/sensordata')
 export class AppController {
-  private pictureService: PictureServiceClient;
+  private readonly logger = new Logger('gateway-service');
 
-  constructor(@Inject('PICTURE_PACKAGE') private client: ClientGrpc) {}
+  private sensorDataService: SensorDataServiceClient;
+
+  constructor(@Inject('SENSORDATA_PACKAGE') private client: ClientGrpc) {}
 
   onModuleInit() {
-    this.pictureService =
-      this.client.getService<PictureServiceClient>('PictureService');
+    this.sensorDataService =
+      this.client.getService<SensorDataServiceClient>('SensorDataService');
   }
 
   @Post()
@@ -57,7 +62,26 @@ export class AppController {
     //const functionname = 'CreateOneSensorData';
     //console.log(functionname + ': ' + JSON.stringify(sensordata));
     //return functionname;
-    return null;
+
+    const sensorDataEntity: SensorDataCreation = {
+      picture: {
+        mimetype: sensordata.picture.mimetype,
+        data: Buffer.from(sensordata.picture.data, 'base64'),
+      },
+      metadata: {
+        name: sensordata.metadata.name,
+        placeIdent: sensordata.metadata.name,
+        seqId: sensordata.metadata.seqID,
+        datetime: sensordata.metadata.name,
+        frameNum: sensordata.metadata.frameNum,
+        seqNumFrames: sensordata.metadata.seqNumFrames,
+        filename: sensordata.metadata.filename,
+        deviceID: sensordata.metadata.deviceID,
+        location: sensordata.metadata.location,
+      },
+    };
+
+    return this.sensorDataService.createSensorData(of(sensorDataEntity));
   }
 
   @Get('/:id')
@@ -90,6 +114,7 @@ export class AppController {
   readOneSensorDataById(@Param() params) {
     const functionname = 'readOneSensorDataById';
     console.log(functionname + ' ' + params.id);
+    return this.sensorDataService.getSensorDataById({ id: '1' });
   }
 
   @Get()
@@ -109,7 +134,7 @@ export class AppController {
   readAllSensorData() {
     const functionname = 'readAllSensorData';
     console.log(functionname);
-    return functionname;
+    return this.sensorDataService.getAllSensorData({});
   }
 
   @Get('/picture/:id')
@@ -142,6 +167,7 @@ export class AppController {
   readPictureEndpointById(@Param() params) {
     const functionname = 'read picture endpoint by id';
     console.log(functionname + ' ' + params.id);
+    return this.sensorDataService.getPictureById({ id: '1' });
   }
 
   @Delete('/:id')
@@ -174,7 +200,7 @@ export class AppController {
   deleteOnePictureById(@Param() params) {
     const functionname = 'delete one picture entry by id';
     console.log(functionname + ' ' + params.id);
-    return functionname;
+    return this.sensorDataService.removeSensorDataById({ id: '1' });
   }
 
   @Put('/:id')

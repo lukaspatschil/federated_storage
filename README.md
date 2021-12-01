@@ -34,7 +34,7 @@ TODO
 
 TODO
 
-#### Gateway
+#### Gateway service
 
 TODO
 
@@ -44,11 +44,16 @@ TODO
 
 #### Logger service
 
-TODO
+The logger service provides a centralized logging for all applications.
+It listens on the RabbitMQ `logging-queue` for incoming log messages. When it receives them it logs them to the console and also writes the entry to a dedicated file which is changed every 12 hours and is named after the creation time and date.
+
+The logger extends the Nest.js logger and therefore implements all of its log levels.
+The client connects via the AmqpLoggerModule to the queue and can be used in all clients via dependency injection.
 
 #### RabbitMQ
 
-TODO
+RabbitMq is a messaging broker which is used to communicate between the different services.
+In our special case it is only used to queue log messages which are then forwarded to the logger service and written to the log file.
 
 ### Storage
 
@@ -82,6 +87,18 @@ In order to start all services run `docker-compose up` in order to start the app
 To stop the containers run `docker-compose stop` or delete them by running `docker-compose down`.
 
 When installing a new dependency you will need to rebuild the docker container with `docker-compose build container-name`.
+
+#### Generating code
+
+With `npm run generate` all generate scripts will be executed.
+
+##### protoc
+
+With `npm run generate:protoc` you can generate TS declarations of the proto files. In order to do so you will need protoc installed on your system.
+
+##### types
+
+With `npm run generate:types` you copy all the interfaces and types in backend/service-types to every service
 
 ### Production
 

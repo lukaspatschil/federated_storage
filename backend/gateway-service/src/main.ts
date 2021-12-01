@@ -1,10 +1,13 @@
 import { NestFactory } from '@nestjs/core';
+import { AmqpLoggerService } from './amqp-logger/amqp-logger.service';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: false,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Federated Storage Infrastructure for IoT Sensor Data')
@@ -22,6 +25,8 @@ async function bootstrap() {
   );
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  app.useLogger(app.get(AmqpLoggerService));
 
   await app.listen(3000);
 }
