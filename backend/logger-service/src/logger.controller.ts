@@ -1,19 +1,17 @@
 import { Controller } from '@nestjs/common';
 import {
-  Ctx,
   MessagePattern,
   Payload,
-  RmqContext,
 } from '@nestjs/microservices';
 import { LogEntry } from './service-types/types';
-import { AppService } from './app.service';
+import { LoggerService } from './logger.service';
 
 @Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+export class LoggerController {
+  constructor(private readonly appService: LoggerService) {}
 
   @MessagePattern({ cmd: 'log' })
-  log(@Payload() logEntry: LogEntry, @Ctx() context: RmqContext) {
+  log(@Payload() logEntry: LogEntry) {
     this.appService.writeToFile(logEntry);
   }
 }

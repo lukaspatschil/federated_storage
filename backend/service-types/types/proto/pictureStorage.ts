@@ -3,7 +3,12 @@ import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
 import { util, configure } from "protobufjs/minimal";
 import * as Long from "long";
 import { Observable } from "rxjs";
-import { Empty, PictureData, Id, PictureCreationById } from "./shared";
+import {
+  Empty,
+  PictureData,
+  IdWithMimetype,
+  PictureCreationById,
+} from "./shared";
 
 export const protobufPackage = "pictureStorage";
 
@@ -14,9 +19,9 @@ export interface PictureStorageServiceClient {
     request: Observable<PictureCreationById>
   ): Observable<Empty>;
 
-  getPictureById(request: Id): Observable<PictureData>;
+  getPictureById(request: IdWithMimetype): Observable<PictureData>;
 
-  removePictureById(request: Id): Observable<Empty>;
+  removePictureById(request: IdWithMimetype): Observable<Empty>;
 }
 
 export interface PictureStorageServiceController {
@@ -24,9 +29,11 @@ export interface PictureStorageServiceController {
     request: Observable<PictureCreationById>
   ): Promise<Empty> | Observable<Empty> | Empty;
 
-  getPictureById(request: Id): Observable<PictureData>;
+  getPictureById(request: IdWithMimetype): Observable<PictureData>;
 
-  removePictureById(request: Id): Promise<Empty> | Observable<Empty> | Empty;
+  removePictureById(
+    request: IdWithMimetype
+  ): Promise<Empty> | Observable<Empty> | Empty;
 }
 
 export function PictureStorageServiceControllerMethods() {

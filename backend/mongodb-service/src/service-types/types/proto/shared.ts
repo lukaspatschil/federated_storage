@@ -10,6 +10,11 @@ export interface Id {
   id: string;
 }
 
+export interface IdWithMimetype {
+  id: string;
+  mimetype: string;
+}
+
 export interface Location {
   longitude: number;
   latitude: number;
