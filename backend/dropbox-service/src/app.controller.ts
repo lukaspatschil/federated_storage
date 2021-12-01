@@ -50,6 +50,7 @@ export class AppController implements PictureStorageServiceController {
         .then((response: any) => {
           console.log(response);
           subject.next({});
+          subject.complete();
         })
         .catch((uploadErr: Error) => {
           console.log(uploadErr);
@@ -62,7 +63,7 @@ export class AppController implements PictureStorageServiceController {
 
   getPictureById(request: IdWithMimetype): Observable<PictureData> {
     const data = new Subject<PictureData>();
-
+    let returnData: PictureData;
     const dbx = this.login();
 
     const path =
@@ -72,9 +73,16 @@ export class AppController implements PictureStorageServiceController {
       .filesDownload({ path: path })
       .then((response) => {
         console.log(response);
+        returnData = {
+          data: (<any>response).fileBinary,
+        };
+        data.next(returnData);
+        data.complete();
       })
       .catch((downloadErr: Error) => {
         console.log(downloadErr);
+        /*data.next(downloadErr);
+        data.complete();*/
       });
 
     return data.asObservable();
@@ -95,10 +103,12 @@ export class AppController implements PictureStorageServiceController {
       .then((response: any) => {
         console.log(response);
         subject.next({});
+        subject.complete();
       })
       .catch((deleteErr: Error) => {
         console.log(deleteErr);
-        subject.next({});
+        subject.next(deleteErr);
+        subject.complete();
       });
     return subject;
   }
