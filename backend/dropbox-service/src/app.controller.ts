@@ -10,7 +10,7 @@ import {
 import { Observable, Subject } from 'rxjs';
 import {
   Empty,
-  Id,
+  IdWithMimetype,
   PictureCreationById,
   PictureData,
 } from './service-types/types/proto/shared';
@@ -60,7 +60,7 @@ export class AppController implements PictureStorageServiceController {
     return subject.asObservable();
   }
 
-  getPictureById(request: Id): Observable<PictureData> {
+  getPictureById(request: IdWithMimetype): Observable<PictureData> {
     const data = new Subject<PictureData>();
 
     const dbx = this.login();
@@ -80,7 +80,9 @@ export class AppController implements PictureStorageServiceController {
     return data.asObservable();
   }
 
-  removePictureById(request: Id): Promise<Empty> | Observable<Empty> | Empty {
+  removePictureById(
+    request: IdWithMimetype,
+  ): Promise<Empty> | Observable<Empty> | Empty {
     const subject = new Subject<Empty>();
 
     const dbx = this.login();

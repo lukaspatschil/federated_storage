@@ -48,5 +48,9 @@ describe('AppController', () => {
       };
       appController.removePictureById(newObject);
     });
+
+    it('create new image in dropbox', () =>{
+
+    })
   });
 });
