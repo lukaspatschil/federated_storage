@@ -7,7 +7,6 @@ import {
   PictureData,
 } from './service-types/types/proto/shared';
 import { EMPTY, find, first, of } from 'rxjs';
-import { experimental } from '@grpc/grpc-js';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -43,7 +42,7 @@ describe('AppController', () => {
   });
 
   describe('development tests', () => {
-    /*it('test login', () => {
+    it('test login', () => {
       appController.login();
     });
 
@@ -60,32 +59,28 @@ describe('AppController', () => {
     });
 
     it('test download function', () => {
-      const newObject: Id = {
+      const newObject = {
         id: 'asdf',
         mimetype: 'image/jpeg',
       };
       appController.getPictureById(newObject);
     });
 
-    it('test delete function', () => {
-      const newObject: Id = {
+    /*it('test delete function', () => {
+      const newObject = {
         id: 'asdf',
         mimetype: 'image/jpeg',
       };
       appController.removePictureById(newObject);
-    });
-
-    it('create new image in dropbox', () =>{
-
-    })*/
-    describe('Dropbox tests', () => {
-      test('create file should find file and delete it afterwards', async () => {
-        appController.createPictureById(of(newObject));
-        appController.getPictureById(findObject).subscribe((response) => {
-          expect(response.data).toBe(newObject.data);
-          appController.removePictureById(findObject);
-        });
+    });*/
+  });
+  /*describe('Dropbox tests', () => {
+    test('create file should find file and delete it afterwards', async () => {
+      appController.createPictureById(of(newObject));
+      appController.getPictureById(findObject).subscribe((response) => {
+        expect(response.data).toBe(newObject.data);
+        appController.removePictureById(findObject);
       });
     });
-  });
+  });*/
 });

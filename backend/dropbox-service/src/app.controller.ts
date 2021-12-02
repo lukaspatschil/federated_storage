@@ -74,7 +74,7 @@ export class AppController implements PictureStorageServiceController {
       .then((response) => {
         console.log(response);
         returnData = {
-          data: (<any>response).fileBinary,
+          data: (<any>response.result).fileBinary,
         };
         data.next(returnData);
         data.complete();
