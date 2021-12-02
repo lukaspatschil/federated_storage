@@ -54,7 +54,8 @@ export class AppController implements PictureStorageServiceController {
         })
         .catch((uploadErr: Error) => {
           console.log(uploadErr);
-          subject.next({});
+          subject.error(uploadErr.message);
+          subject.complete();
         });
     });
 
@@ -81,8 +82,8 @@ export class AppController implements PictureStorageServiceController {
       })
       .catch((downloadErr: Error) => {
         console.log(downloadErr);
-        /*data.next(downloadErr);
-        data.complete();*/
+        data.error(downloadErr.message);
+        data.complete();
       });
 
     return data.asObservable();
@@ -107,7 +108,7 @@ export class AppController implements PictureStorageServiceController {
       })
       .catch((deleteErr: Error) => {
         console.log(deleteErr);
-        subject.next(deleteErr);
+        subject.error(deleteErr.message);
         subject.complete();
       });
     return subject;
