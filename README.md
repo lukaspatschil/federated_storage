@@ -36,11 +36,13 @@ TODO
 
 #### Gateway service
 
-TODO
+The gateway service provides a HTTP API and is the access point to the backend. 
 
-#### ShortPictureDto service
+Depending on the endpoint the gateway service relays the request to the matching services. In our case all requests use the `/sensordata` endpoint and therefore all requests are relayed to the sensordata service.
 
-TODO
+#### Sensordata service
+
+The sensordata service is dedicated to handle everything sensordata related. In our case this means every request. It handles the distributed storage of all the data related to sensors and is therefore connected to the Dropbox service, MinIO service and MongoDB service.
 
 #### Logger service
 
