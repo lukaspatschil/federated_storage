@@ -2,11 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
 import { AmqpLoggerService } from './amqp-logger/amqp-logger.service';
-import { AppModule } from './app.module';
+import { MongoDBModule } from './mongodb.module';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
+    MongoDBModule,
     {
       logger: false,
       transport: Transport.GRPC,
