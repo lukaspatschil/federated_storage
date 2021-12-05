@@ -1,5 +1,4 @@
 import { Controller, Logger } from '@nestjs/common';
-import DropboxConfig from '../dropbox-config.json';
 import { Dropbox } from 'dropbox';
 import mime from 'mime-types';
 import {
@@ -23,7 +22,7 @@ export class AppController implements PictureStorageServiceController {
 
   login(): Dropbox {
     this.logger.log('login function called');
-    return new Dropbox({ accessToken: DropboxConfig.accessToken });
+    return new Dropbox({ accessToken: process.env.DROPBOX_ACCESSTOKEN });
   }
 
   createPictureById(
@@ -37,7 +36,7 @@ export class AppController implements PictureStorageServiceController {
 
     request.subscribe((picture) => {
       const path =
-        DropboxConfig.path +
+        process.env.DROPBOX_PATH +
         picture.id +
         '.' +
         mime.extension(picture.mimetype);
@@ -54,7 +53,7 @@ export class AppController implements PictureStorageServiceController {
         })
         .catch((uploadErr: Error) => {
           throw new RpcException({
-            code: status.NOT_FOUND,
+            code: status.INTERNAL,
             message: uploadErr.message,
           });
         });
@@ -72,7 +71,7 @@ export class AppController implements PictureStorageServiceController {
     const dbx = this.login();
 
     const path =
-      DropboxConfig.path + request.id + '.' + mime.extension(request.mimetype);
+      process.env.DROPBOX_PATH + request.id + '.' + mime.extension(request.mimetype);
 
     dbx
       .filesDownload({ path: path })
@@ -85,10 +84,13 @@ export class AppController implements PictureStorageServiceController {
         data.complete();
       })
       .catch((downloadErr: Error) => {
-        // TODO
+
         this.logger.log(downloadErr);
-        data.error(downloadErr.message);
-        data.complete();
+
+        throw new RpcException({
+          code: status.NOT_FOUND,
+          message: downloadErr.message,
+        });
       });
 
     return data.asObservable();
@@ -104,7 +106,7 @@ export class AppController implements PictureStorageServiceController {
     const dbx = this.login();
 
     const path =
-      DropboxConfig.path + request.id + '.' + mime.extension(request.mimetype);
+      process.env.DROPBOX_PATH + request.id + '.' + mime.extension(request.mimetype);
 
     dbx
       .filesDeleteV2({ path: path })
@@ -114,10 +116,13 @@ export class AppController implements PictureStorageServiceController {
         subject.complete();
       })
       .catch((deleteErr: Error) => {
-        // TODO
+
         this.logger.log(deleteErr);
-        subject.error(deleteErr.message);
-        subject.complete();
+
+        throw new RpcException({
+          code: status.NOT_FOUND,
+          message: deleteErr.message,
+        });
       });
     return subject;
   }
