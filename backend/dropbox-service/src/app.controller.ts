@@ -1,7 +1,6 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import DropboxConfig from '../dropbox-config.json';
 import { Dropbox } from 'dropbox';
-import { Logger } from '@nestjs/common';
 import mime from 'mime-types';
 import {
   PictureStorageServiceController,
@@ -14,6 +13,7 @@ import {
   PictureCreationById,
   PictureData,
 } from './service-types/types/proto/shared';
+import path from 'path';
 
 @Controller()
 @PictureStorageServiceControllerMethods()
@@ -21,9 +21,8 @@ export class AppController implements PictureStorageServiceController {
   private readonly logger = new Logger(AppController.name);
 
   login(): Dropbox {
-    console.log('login function called');
-    const dbx = new Dropbox({ accessToken: DropboxConfig.accessToken });
-    return dbx;
+    this.logger.log('login function called');
+    return new Dropbox({ accessToken: DropboxConfig.accessToken });
   }
 
   createPictureById(
@@ -53,6 +52,7 @@ export class AppController implements PictureStorageServiceController {
           subject.complete();
         })
         .catch((uploadErr: Error) => {
+          // TODO
           console.log(uploadErr);
           subject.error(uploadErr.message);
           subject.complete();
@@ -65,6 +65,9 @@ export class AppController implements PictureStorageServiceController {
   getPictureById(request: IdWithMimetype): Observable<PictureData> {
     const data = new Subject<PictureData>();
     let returnData: PictureData;
+
+    console.log('getPictureById');
+
     const dbx = this.login();
 
     const path =
@@ -81,6 +84,7 @@ export class AppController implements PictureStorageServiceController {
         data.complete();
       })
       .catch((downloadErr: Error) => {
+        // TODO
         console.log(downloadErr);
         data.error(downloadErr.message);
         data.complete();
@@ -93,6 +97,8 @@ export class AppController implements PictureStorageServiceController {
     request: IdWithMimetype,
   ): Promise<Empty> | Observable<Empty> | Empty {
     const subject = new Subject<Empty>();
+
+    console.log('removePictureById');
 
     const dbx = this.login();
 
@@ -107,10 +113,42 @@ export class AppController implements PictureStorageServiceController {
         subject.complete();
       })
       .catch((deleteErr: Error) => {
+        // TODO
         console.log(deleteErr);
         subject.error(deleteErr.message);
         subject.complete();
       });
     return subject;
   }
+
+  /*getAllFilesInPath(): Subject<Empty> {
+    const subject = new Subject<Empty>();
+
+    const dbx = this.login();
+
+    dbx
+      .filesListFolder({ path: DropboxConfig.path })
+      .then((response) => {
+        console.log(response);
+        subject.next(response.result.entries.length);
+        subject.complete();
+      })
+      .catch((error: Error) => {
+        console.log(error);
+        subject.error(error.message);
+        subject.complete();
+      });
+
+    return subject;
+  }
+
+  checkIfFileExists(tempPath: string): Subject<Empty> {
+    const subject = new Subject<Empty>();
+
+    const dbx = this.login();
+
+    dbx.filesListFolder({ path: path.dirname(tempPath) }).then((result) => {});
+
+    return subject;
+  }*/
 }

@@ -6,7 +6,7 @@ import {
   PictureCreationById,
   PictureData,
 } from './service-types/types/proto/shared';
-import { EMPTY, find, first, of } from 'rxjs';
+import { of } from 'rxjs';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -46,7 +46,7 @@ describe('AppController', () => {
       appController.login();
     });
 
-    it('test upload function', () => {
+    /*it('test upload function', () => {
       const newObject: PictureCreationById = {
         id: 'asdf',
         mimetype: 'image/jpeg',
@@ -56,14 +56,19 @@ describe('AppController', () => {
         ),
       };
       appController.createPictureById(of(newObject));
-    });
+    });*/
 
     it('test download function', () => {
       const newObject = {
         id: 'asdf',
         mimetype: 'image/jpeg',
       };
-      appController.getPictureById(newObject);
+      /*appController.getAllFilesInPath().next((response) => {
+        console.log(response);
+      });*/
+      appController.getPictureById(newObject).subscribe((response) => {
+        console.log(response);
+      });
     });
 
     /*it('test delete function', () => {
@@ -74,13 +79,13 @@ describe('AppController', () => {
       appController.removePictureById(newObject);
     });*/
   });
-  /*describe('Dropbox tests', () => {
-    test('create file should find file and delete it afterwards', async () => {
+  describe('Dropbox tests', () => {
+    it('create file should find file and delete it afterwards', async () => {
       appController.createPictureById(of(newObject));
       appController.getPictureById(findObject).subscribe((response) => {
         expect(response.data).toBe(newObject.data);
         appController.removePictureById(findObject);
       });
     });
-  });*/
+  });
 });
