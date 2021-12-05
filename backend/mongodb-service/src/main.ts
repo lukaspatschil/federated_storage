@@ -8,7 +8,6 @@ async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     AppModule,
     {
-      logger: false,
       transport: Transport.GRPC,
       options: {
         package: 'mongodb',

@@ -55,6 +55,8 @@
     "ts-proto": "^1.87.0"
   },
   "dependencies": {
-    "@types/jest": "^27.0.3"
+    "@nestjs/mongoose": "^9.0.1",
+    "@types/jest": "^27.0.3",
+    "mongoose": "^6.0.14"
   }
 }
