@@ -13,7 +13,8 @@ import {
   PictureCreationById,
   PictureData,
 } from './service-types/types/proto/shared';
-import path from 'path';
+import { RpcException } from '@nestjs/microservices';
+import { status } from '@grpc/grpc-js';
 
 @Controller()
 @PictureStorageServiceControllerMethods()
@@ -30,7 +31,7 @@ export class AppController implements PictureStorageServiceController {
   ): Promise<Empty> | Observable<Empty> | Empty {
     const subject = new Subject<Empty>();
 
-    console.log('createPictureById');
+    this.logger.log('createPictureById');
 
     const dbx = this.login();
 
@@ -47,15 +48,15 @@ export class AppController implements PictureStorageServiceController {
           contents: picture.data,
         })
         .then((response: any) => {
-          console.log(response);
+          this.logger.log(response);
           subject.next({});
           subject.complete();
         })
         .catch((uploadErr: Error) => {
-          // TODO
-          console.log(uploadErr);
-          subject.error(uploadErr.message);
-          subject.complete();
+          throw new RpcException({
+            code: status.NOT_FOUND,
+            message: uploadErr.message,
+          });
         });
     });
 
@@ -66,7 +67,7 @@ export class AppController implements PictureStorageServiceController {
     const data = new Subject<PictureData>();
     let returnData: PictureData;
 
-    console.log('getPictureById');
+    this.logger.log('getPictureById');
 
     const dbx = this.login();
 
@@ -76,7 +77,7 @@ export class AppController implements PictureStorageServiceController {
     dbx
       .filesDownload({ path: path })
       .then((response) => {
-        console.log(response);
+        this.logger.log(response);
         returnData = {
           data: (<any>response.result).fileBinary,
         };
@@ -85,7 +86,7 @@ export class AppController implements PictureStorageServiceController {
       })
       .catch((downloadErr: Error) => {
         // TODO
-        console.log(downloadErr);
+        this.logger.log(downloadErr);
         data.error(downloadErr.message);
         data.complete();
       });
@@ -98,7 +99,7 @@ export class AppController implements PictureStorageServiceController {
   ): Promise<Empty> | Observable<Empty> | Empty {
     const subject = new Subject<Empty>();
 
-    console.log('removePictureById');
+    this.logger.log('removePictureById');
 
     const dbx = this.login();
 
@@ -108,47 +109,16 @@ export class AppController implements PictureStorageServiceController {
     dbx
       .filesDeleteV2({ path: path })
       .then((response: any) => {
-        console.log(response);
+        this.logger.log(response);
         subject.next({});
         subject.complete();
       })
       .catch((deleteErr: Error) => {
         // TODO
-        console.log(deleteErr);
+        this.logger.log(deleteErr);
         subject.error(deleteErr.message);
         subject.complete();
       });
     return subject;
   }
-
-  /*getAllFilesInPath(): Subject<Empty> {
-    const subject = new Subject<Empty>();
-
-    const dbx = this.login();
-
-    dbx
-      .filesListFolder({ path: DropboxConfig.path })
-      .then((response) => {
-        console.log(response);
-        subject.next(response.result.entries.length);
-        subject.complete();
-      })
-      .catch((error: Error) => {
-        console.log(error);
-        subject.error(error.message);
-        subject.complete();
-      });
-
-    return subject;
-  }
-
-  checkIfFileExists(tempPath: string): Subject<Empty> {
-    const subject = new Subject<Empty>();
-
-    const dbx = this.login();
-
-    dbx.filesListFolder({ path: path.dirname(tempPath) }).then((result) => {});
-
-    return subject;
-  }*/
 }
