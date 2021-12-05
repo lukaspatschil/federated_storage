@@ -200,7 +200,7 @@ export class AppController {
   deleteOnePictureById(@Param() params) {
     const functionname = 'delete one picture entry by id';
     console.log(functionname + ' ' + params.id);
-    return this.sensorDataService.removeSensorDataById({ id: '1' });
+    return this.sensorDataService.removeSensorDataById({ id: params.id });
   }
 
   @Put('/:id')

@@ -14,7 +14,7 @@ services:
         - backend
 
   mongodb:
-    image: mongo:latest
+    image: mongo:5.0.4
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=root
@@ -23,6 +23,8 @@ services:
       - 27017:27017
     volumes:
       - mongodb_data_container:/data/db
+    networks:
+      - mongodb_internal
 
   gateway-service:
     build:
@@ -131,8 +133,11 @@ services:
       - rabbitmq
     environment:
       WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
     networks:
       - backend
+      - mongodb_internal
 
   sensordata-service:
     build:
@@ -174,4 +179,6 @@ networks:
   backend:
     driver: bridge
   frontend:
+    driver: bridge
+  mongodb_internal:
     driver: bridge

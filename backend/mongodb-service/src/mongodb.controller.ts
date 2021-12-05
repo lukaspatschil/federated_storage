@@ -26,22 +26,34 @@ export class MongoDBController implements SensorDataStorageServiceClient {
   createSensorData(
     request: SensorDataCreationWithoutPictureData,
   ): Observable<SensorData> {
+    this.logger.log(`Creating sensor data. ${JSON.stringify(request)}`);
+
     return from(this.mongodbService.createOne(request));
   }
 
   getSensorDataById(request: Id): Observable<SensorData> {
+    this.logger.log(`Retrieving sensor data by id. ${JSON.stringify(request)}`);
+
     return from(this.mongodbService.findOne(request.id));
   }
 
   getAllSensorData(request: Empty): Observable<SensorDataArray> {
+    this.logger.log(`Retrieving sensor data. ${JSON.stringify(request)}`);
+
     return from(this.mongodbService.findAll());
   }
 
   removeSensorDataById(request: Id): Observable<Empty> {
+    this.logger.log(`Removing sensor data by id. ${JSON.stringify(request)}`);
+
     return from(this.mongodbService.deleteOne(request.id));
   }
 
   getPictureWithoutDataById(request: Id): Observable<PictureWithoutData> {
+    this.logger.log(
+      `Retrieving picture data by id. ${JSON.stringify(request)}`,
+    );
+
     return from(this.mongodbService.findOnePicture(request.id));
   }
 }

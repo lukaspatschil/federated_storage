@@ -1,34 +1,35 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { LocationDocument } from './Location.schema';
 
 @Schema({ _id: false })
 export class MetaData extends Document {
-  @Prop()
+  @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true })
   placeIdent: string;
 
-  @Prop()
+  @Prop({ required: true })
   seqId: string;
 
-  @Prop()
+  @Prop({ type: Date, required: true })
   datetime: Date;
 
-  @Prop()
+  @Prop({ required: true })
   frameNum: number;
 
-  @Prop()
+  @Prop({ required: true })
   seqNumFrames: number;
 
-  @Prop()
+  @Prop({ required: true })
   filename: string;
 
-  @Prop()
+  @Prop({ required: true })
   deviceID: string;
 
-  @Prop()
-  location: string;
+  @Prop(LocationDocument)
+  location: LocationDocument;
 
   @Prop({ type: [String] })
   tags: string[];
