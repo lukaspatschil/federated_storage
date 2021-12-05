@@ -17,7 +17,7 @@ async function bootstrap() {
       },
     },
   );
-  app.useLogger(app.get(AmqpLoggerService));
+  // app.useLogger(app.get(AmqpLoggerService));
 
   app.listen();
 }

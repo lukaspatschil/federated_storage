@@ -1,5 +1,6 @@
 import { Controller, Logger } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
+import { MongoDBService } from './mongodb.service';
 import {
   SensorDataStorageServiceClient,
   SensorDataStorageServiceControllerMethods,
@@ -18,25 +19,29 @@ import {
 export class MongoDBController implements SensorDataStorageServiceClient {
   private readonly logger = new Logger(MongoDBController.name);
 
+  constructor(private readonly mongodbService: MongoDBService) {
+    this.logger.log('MongoDBController created');
+  }
+
   createSensorData(
     request: SensorDataCreationWithoutPictureData,
   ): Observable<SensorData> {
-    return null;
+    return from(this.mongodbService.createOne(request));
   }
 
   getSensorDataById(request: Id): Observable<SensorData> {
-    return null;
+    return from(this.mongodbService.findOne(request.id));
   }
 
   getAllSensorData(request: Empty): Observable<SensorDataArray> {
-    return null;
+    return from(this.mongodbService.findAll());
   }
 
   removeSensorDataById(request: Id): Observable<Empty> {
-    return null;
+    return from(this.mongodbService.deleteOne(request.id));
   }
 
   getPictureWithoutDataById(request: Id): Observable<PictureWithoutData> {
-    return null;
+    return from(this.mongodbService.findOnePicture(request.id));
   }
 }

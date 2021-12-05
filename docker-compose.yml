@@ -13,6 +13,17 @@ services:
     networks:
         - backend
 
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=nestjs
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+
   gateway-service:
     build:
       context: .
@@ -116,12 +127,10 @@ services:
       - ./backend/proto:/base/backend/proto/
       - ./backend/service-types/:/base/backend/service-types/
       - /base/node_modules
-    # depends_on:
-    #   - rabbitmq
-    # environment:
-    #   WAIT_HOSTS: rabbitmq:5672
-    #   WAIT_TIMEOUT: 120
-    #   WAIT_SLEEP_INTERVAL: 5
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
     networks:
       - backend
 
@@ -157,6 +166,9 @@ services:
   #       - 4200:4200
   #   networks:
   #     - frontend
+
+volumes:
+  mongodb_data_container:
 
 networks:
   backend:
