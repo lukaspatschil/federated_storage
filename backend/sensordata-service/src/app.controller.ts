@@ -17,7 +17,8 @@ import {
 } from './service-types/types/proto/shared';
 import { PictureStorageServiceClient } from './service-types/types/proto/pictureStorage';
 import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
-import { ClientGrpc } from '@nestjs/microservices';
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
+import { status } from '@grpc/grpc-js';
 
 @Controller()
 @SensorDataServiceControllerMethods()
