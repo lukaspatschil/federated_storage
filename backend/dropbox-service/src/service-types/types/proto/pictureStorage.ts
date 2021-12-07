@@ -69,7 +69,6 @@ export const PICTURE_STORAGE_SERVICE_NAME = "PictureStorageService";
 
 // If you get a compile-error about 'Constructor<Long> and ... have no overlap',
 // add '--ts_proto_opt=esModuleInterop=true' as a flag when calling 'protoc'.
-// @ts-ignore
 if (util.Long !== Long) {
   util.Long = Long as any;
   configure();

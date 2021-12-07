@@ -154,6 +154,10 @@ services:
       - ./backend/proto:/base/backend/proto/
       - ./backend/service-types/:/base/backend/service-types/
       - /base/node_modules
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
     # depends_on:
     #   - rabbitmq
     # environment:
