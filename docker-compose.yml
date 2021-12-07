@@ -13,6 +13,23 @@ services:
     networks:
         - backend
 
+  minio-server:
+    container_name: minio-server
+    hostname: minio-server
+    image: minio/minio:RELEASE.2021-04-22T15-44-28Z.hotfix.e16e75ce3
+    networks:
+      - minio_internal
+    ports:
+      - 9000:9000
+    volumes:
+      - minio-data:/data
+    env_file:
+      - ./.develop.env
+    command: server /data
+    labels:
+      - "traefik.enable=false"
+    restart: always
+  
   gateway-service:
     build:
       context: .
@@ -88,21 +105,23 @@ services:
       args:
         - BUILD_CONTEXT=minio-service
     hostname: minio-service
+    depends_on:
+      - minio-server
+    links:
+      - minio-server
     volumes: 
       - ./backend/minio-service:/base/backend/minio-service/
       - ./backend/proto:/base/backend/proto/
       - ./backend/service-types/:/base/backend/service-types/
       - /base/node_modules
-    # depends_on:
-    #   - rabbitmq
-    # environment:
-    #   WAIT_HOSTS: rabbitmq:5672
-    #   WAIT_TIMEOUT: 120
-    #   WAIT_SLEEP_INTERVAL: 5
     env_file:
-      - ./.develop.env
+      - .develop.env
     networks:
+      - minio_internal
       - backend
+    environment:
+      WAIT_HOSTS: rabbitmq:5672, minio-server:9000
+   
 
   mongodb-service:
     build:
@@ -163,3 +182,8 @@ networks:
     driver: bridge
   frontend:
     driver: bridge
+  minio_internal:
+    driver: bridge
+
+volumes:
+  minio-data:

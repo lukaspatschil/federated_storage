@@ -9,7 +9,6 @@ COPY package*.json .
 COPY ./backend/$BUILD_CONTEXT/package.json backend/$BUILD_CONTEXT/
 
 # Add local packages
-COPY ./backend/service-types/ backend/service-types/
 COPY ./backend/proto/ backend/proto/
 
 RUN npm install

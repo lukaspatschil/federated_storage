@@ -17,7 +17,8 @@ import {
 } from './service-types/types/proto/shared';
 import { PictureStorageServiceClient } from './service-types/types/proto/pictureStorage';
 import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
-import { ClientGrpc } from '@nestjs/microservices';
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
+import { status } from '@grpc/grpc-js';
 
 @Controller()
 @SensorDataServiceControllerMethods()
@@ -50,6 +51,23 @@ export class AppController implements SensorDataServiceController {
   }
 
   createSensorData(request: Observable<SensorDataCreation>) {
+    const sensorDataSubject = new Subject<Empty>();
+    request.subscribe((sensorDataCreation) => {
+      const { data, ...pictureWithoutData } = sensorDataCreation.picture;
+
+      const createPictureById = of({
+        id: '1',
+        mimetype: pictureWithoutData.mimetype,
+        data: data,
+      });
+      this.pictureStorageM
+        .createPictureById(createPictureById)
+        .subscribe(() => {
+          sensorDataSubject.next({});
+        });
+    });
+    return sensorDataSubject.asObservable();
+
     /*
     // -- Real Response --
     const sensorDataSubject = new Subject<Empty>();
@@ -185,14 +203,26 @@ export class AppController implements SensorDataServiceController {
     */
 
     // -- Dummy Response --
-    const pictureDummy: Picture = {
-      id: 'a1',
+    const pictureSubject = new Subject<Picture>();
+
+    const idWithMimetype: IdWithMimetype = {
+      id: request.id,
       mimetype: 'text/lol',
-      data: Buffer.from('asdf', 'base64'),
-      createdAt: '2011-10-05T14:48:00.000Z',
     };
 
-    return of(pictureDummy);
+    this.pictureStorageM
+      .getPictureById(idWithMimetype)
+      .subscribe((pictureData) => {
+        const pictureDummy: Picture = {
+          id: request.id,
+          mimetype: 'text/lol',
+          data: pictureData.data,
+          createdAt: '2011-10-05T14:48:00.000Z',
+        };
+        pictureSubject.next(pictureDummy);
+      });
+
+    return pictureSubject.asObservable();
   }
 
   async removeSensorDataById(request: Id) {
