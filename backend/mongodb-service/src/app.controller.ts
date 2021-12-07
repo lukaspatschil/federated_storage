@@ -1,9 +1,11 @@
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
-import { Controller } from '@nestjs/common';
+import {Controller, Logger} from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import {Observable, Subject} from "rxjs";
 import {Empty, PictureCreationById} from "mongodb-service/src/service-types/types/proto/shared";
 import mime from "mime-types";
+import Any = jasmine.Any;
+import {PictureStorageServiceControllerMethods} from "./service-types/types/proto/pictureStorage";
 
 type PictureById = {
   id: number;
@@ -15,8 +17,10 @@ type Picture = {
 };
 
 @Controller()
+@PictureStorageServiceControllerMethods()
 export class AppController {
-  @GrpcMethod('MongoDBService', 'FindOne')
+  private readonly logger = new Logger(AppController.name);
+  @GrpcMethod('MongoDBService', 'createPictureById')
   findOne(
     data: PictureById,
     metadata: Metadata,
@@ -31,23 +35,22 @@ export class AppController {
   }
 
   createPictureById(
-      request: Observable<PictureCreationById>,
-  ): Observable<Empty> {
+    request: Observable<PictureCreationById>,
+  ): Promise<Empty> | Observable<Empty> | Empty {
     const subject = new Subject<Empty>();
     console.log('createPictureById');
-
     request.subscribe((picture) => {
+
       const path =
-          MongoDb.path +
+          DropboxConfig.path +
           picture.id +
           '.' +
           mime.extension(picture.mimetype);
 
-      dbx
-          .filesUpload({
-            path: path,
-            contents: picture.data,
-          })
+      .filesUpload({
+        path: path,
+        contents: picture.data,
+      })
           .then((response: any) => {
             console.log(response);
             subject.next({});
@@ -57,7 +60,9 @@ export class AppController {
             console.log(uploadErr);
             subject.next({});
           });
-    });
+      });
+    return request;
+  }
 
   getPictureById(){}
 

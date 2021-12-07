@@ -57,6 +57,7 @@
   "dependencies": {
     "@nestjs/mongoose": "^9.0.1",
     "@types/jest": "^27.0.3",
-    "mongoose": "^6.0.14"
+    "mongoose": "^6.0.14",
+    "mongoose-geojson-schema": "^2.1.7"
   }
 }

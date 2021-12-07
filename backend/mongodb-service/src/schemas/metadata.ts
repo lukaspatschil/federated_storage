@@ -1,5 +1,8 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import * as mongoose from 'mongoose-geojson-schema';
+
+//var GeoJSON = require('mongoogse-geojson-schema');
 
 export type MetadataDocument = Metadata & Document;
 
@@ -32,8 +35,9 @@ export class Metadata {
   @Prop()
   devideId: string;
 
-  @Prop()
-  location: string;
+  @Prop({ type: mongoose.Schema.Types.Mixed, ref: 'GeoJSON.Point' })
+  location: mongoose.Schema.Types.Point;
+
   @Prop()
   tags: ['food', 'meat', 'zebra'];
 }
