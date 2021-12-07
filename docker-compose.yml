@@ -29,6 +29,19 @@ services:
     labels:
       - "traefik.enable=false"
     restart: always
+    
+  mongodb:
+    image: mongo:5.0.4
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=nestjs
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - mongodb_internal
 
   gateway-service:
     build:
@@ -133,14 +146,15 @@ services:
       - ./backend/proto:/base/backend/proto/
       - ./backend/service-types/:/base/backend/service-types/
       - /base/node_modules
-    # depends_on:
-    #   - rabbitmq
-    # environment:
-    #   WAIT_HOSTS: rabbitmq:5672
-    #   WAIT_TIMEOUT: 120
-    #   WAIT_SLEEP_INTERVAL: 5
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
     networks:
       - backend
+      - mongodb_internal
 
   sensordata-service:
     build:
@@ -179,6 +193,10 @@ services:
   #   networks:
   #     - frontend
 
+volumes:
+  mongodb_data_container:
+  minio-data:
+
 networks:
   backend:
     driver: bridge
@@ -186,6 +204,5 @@ networks:
     driver: bridge
   minio_internal:
     driver: bridge
-
-volumes:
-  minio-data:
+  mongodb_internal:
+    driver: bridge
