@@ -1,4 +1,4 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Logger, OnModuleInit } from '@nestjs/common';
 import { Dropbox } from 'dropbox';
 import mime from 'mime-types';
 import {
@@ -14,16 +14,23 @@ import {
 } from './service-types/types/proto/shared';
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 @PictureStorageServiceControllerMethods()
-export class AppController implements PictureStorageServiceController {
+export class AppController
+  implements PictureStorageServiceController, OnModuleInit
+{
   private readonly logger = new Logger(AppController.name);
+  private dbx: Dropbox;
 
-  login(): Dropbox {
-    this.logger.log('login function called');
-    return new Dropbox({ accessToken: process.env.DROPBOX_ACCESSTOKEN });
+  onModuleInit() {
+    this.dbx = new Dropbox({
+      accessToken: this.configService.get('DROPBOX_ACCESSTOKEN'),
+    });
   }
+
+  constructor(private readonly configService: ConfigService) {}
 
   createPictureById(
     request: Observable<PictureCreationById>,
@@ -32,16 +39,14 @@ export class AppController implements PictureStorageServiceController {
 
     this.logger.log('createPictureById');
 
-    const dbx = this.login();
-
     request.subscribe((picture) => {
       const path =
-        process.env.DROPBOX_PATH +
+        this.configService.get('DROPBOX_PATH') +
         picture.id +
         '.' +
         mime.extension(picture.mimetype);
 
-      dbx
+      this.dbx
         .filesUpload({
           path: path,
           contents: picture.data,
@@ -68,12 +73,13 @@ export class AppController implements PictureStorageServiceController {
 
     this.logger.log('getPictureById');
 
-    const dbx = this.login();
-
     const path =
-      process.env.DROPBOX_PATH + request.id + '.' + mime.extension(request.mimetype);
+      this.configService.get('DROPBOX_PATH') +
+      request.id +
+      '.' +
+      mime.extension(request.mimetype);
 
-    dbx
+    this.dbx
       .filesDownload({ path: path })
       .then((response) => {
         this.logger.log(response);
@@ -84,7 +90,6 @@ export class AppController implements PictureStorageServiceController {
         data.complete();
       })
       .catch((downloadErr: Error) => {
-
         this.logger.log(downloadErr);
 
         throw new RpcException({
@@ -103,12 +108,13 @@ export class AppController implements PictureStorageServiceController {
 
     this.logger.log('removePictureById');
 
-    const dbx = this.login();
-
     const path =
-      process.env.DROPBOX_PATH + request.id + '.' + mime.extension(request.mimetype);
+      this.configService.get('DROPBOX_PATH') +
+      request.id +
+      '.' +
+      mime.extension(request.mimetype);
 
-    dbx
+    this.dbx
       .filesDeleteV2({ path: path })
       .then((response: any) => {
         this.logger.log(response);
@@ -116,7 +122,6 @@ export class AppController implements PictureStorageServiceController {
         subject.complete();
       })
       .catch((deleteErr: Error) => {
-
         this.logger.log(deleteErr);
 
         throw new RpcException({
