@@ -27,7 +27,7 @@ import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
 import { PictureDto } from './dto/picture/Picture.dto';
 import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
 import { SensorDataServiceClient } from './service-types/types/proto/sensorData';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { SensorDataCreation } from './service-types/types/proto/shared';
 
 @Controller('api/v1/sensordata')
@@ -164,10 +164,19 @@ export class AppController {
     description: 'ID not found',
     type: String,
   })
-  readPictureEndpointById(@Param() params) {
+  async readPictureEndpointById(@Param() params) {
     const functionname = 'read picture endpoint by id';
     console.log(functionname + ' ' + params.id);
-    return this.sensorDataService.getPictureById({ id: '1' });
+    const picture = await firstValueFrom(
+      this.sensorDataService.getPictureById({ id: '1' }),
+    );
+    const pictureDto: PictureDto = {
+      id: picture.id,
+      data: picture.data.toString('base64'),
+      mimetype: picture.mimetype,
+      createdAt: picture.createdAt,
+    };
+    return pictureDto;
   }
 
   @Delete('/:id')
