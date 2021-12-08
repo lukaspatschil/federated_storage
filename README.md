@@ -61,7 +61,7 @@ In our special case it is only used to queue log messages which are then forward
 
 #### Dropbox service
 
-TODO
+The Dropbox service is the connection to the Dropbox. It provides the possibility to upload, delete and get image data from the Dropbox. The connection is established by the official Dropbox SDK for Javascript.
 
 #### MongoDB service
 
