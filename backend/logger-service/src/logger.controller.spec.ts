@@ -28,6 +28,7 @@ describe('LoggerController', () => {
         level: LOG_LEVEL.LOG,
         serviceName: 'TestService',
       };
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       jest.spyOn(loggerService, 'writeToFile').mockImplementation((x) => {});
 
       // When

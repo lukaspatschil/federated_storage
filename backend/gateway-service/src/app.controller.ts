@@ -113,7 +113,7 @@ export class AppController {
   })
   readOneSensorDataById(@Param() params) {
     const functionname = 'readOneSensorDataById';
-    console.log(functionname + ' ' + params.id);
+    this.logger.log(functionname + ' ' + params.id);
     return this.sensorDataService.getSensorDataById({ id: '1' });
   }
 
