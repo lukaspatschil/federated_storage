@@ -1,12 +1,12 @@
-import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
-import {Controller, Logger} from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import {Observable, Subject} from "rxjs";
-import {Empty, PictureCreationById} from "mongodb-service/src/service-types/types/proto/shared";
-import mime from "mime-types";
-import Any = jasmine.Any;
-import {PictureStorageServiceControllerMethods} from "./service-types/types/proto/pictureStorage";
-import {Id, PictureData} from "../../service-types/types/proto/shared";
+import { Observable, Subject } from 'rxjs';
+import {
+  Empty,
+  PictureCreationById,
+} from 'mongodb-service/src/service-types/types/proto/shared';
+import { PictureStorageServiceControllerMethods } from './service-types/types/proto/pictureStorage';
+import { Id, PictureData } from '../../service-types/types/proto/shared';
 
 type PictureById = {
   id: number;
@@ -35,6 +35,4 @@ export class AppController {
   removePictureById(request: Id): Observable<Empty> {
     return this.removePictureById(request);
   }
-
-
 }

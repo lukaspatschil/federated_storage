@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import * as mongoose from 'mongoose-geojson-schema';
 
 //var GeoJSON = require('mongoogse-geojson-schema');

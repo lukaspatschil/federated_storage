@@ -23,46 +23,39 @@ export class AppService implements PictureStorageServiceClient {
 
   createPictureById(
     request: Observable<PictureCreationById>,
-  ): Promise<Empty> | Observable<Empty> | Empty {
+  ): Observable<Empty> {
     const createdInput = new Subject<Empty>();
     this.logger.log('createPictureById');
 
     request.subscribe((pictureCreation) => {
-      this.inputModel.init(pictureCreation.data, (error) => {
+      this.inputModel.create(pictureCreation.data, (error) => {
         if (error) {
-          this.logger.error(
-            'Error through adding a picture with id ' + createdInput.id,
-          );
+          this.logger.error('Error through adding a picture with id ');
           throw new RpcException({
-            code: status.INTERNAL,
+            //code: status.INTERNAL,
             message: error.message,
           });
         }
         createdInput.next({});
         createdInput.complete();
-        this.logger.log(
-          'Successfully added a picture with id ' + createdInput.id,
-        );
+        this.logger.log('Successfully added a picture with id ');
       });
     });
     return createdInput.asObservable();
   }
 
   getPictureById(request: Id): Observable<PictureData> {
-    const getInput = new Subject<Empty>();
+    const getInput = new Subject<PictureData>();
     this.inputModel.findById(request.id, (error) => {
       if (error) {
-        this.logger.error(
-          'Error through getting a picture with id ' + getInput.id,
-        );
+        this.logger.error('Error through getting a picture with id ');
         throw new RpcException({
-          code: status.INTERNAL,
+          //code: status.NOT_FOUND,
           message: error.message,
         });
       }
-      getInput.next({});
       getInput.complete();
-      this.logger.log('Successfully getting a picture with id ' + getInput.id);
+      this.logger.log('Successfully getting a picture with id ');
     });
     return getInput.asObservable();
   }
@@ -71,17 +64,13 @@ export class AppService implements PictureStorageServiceClient {
     const removedInput = new Subject<Empty>();
     this.inputModel.remove(request.id, (error) => {
       if (error) {
-        this.logger.error(
-          'Error through removing the object: ' + error.message,
-        );
+        this.logger.error('Error through removing the object: ');
         throw new RpcException({
-          code: status.INTERNAL,
+          //code: status.INTERNAL,
           message: error.message,
         });
       } else {
-        this.logger.log(
-          'Successfully removed the object with id ' + request.id,
-        );
+        this.logger.log('Successfully removed the object with id ');
       }
       removedInput.next({});
       removedInput.complete();
