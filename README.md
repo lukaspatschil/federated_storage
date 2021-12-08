@@ -69,7 +69,7 @@ TODO
 
 #### MinIO service
 
-TODO
+It is used to connect and to store picture data on a Minio Server. It provides the same possibilities as the Dropbox service, to upload, delete and get image data from the Minio Server.
 
 ## How to run
 
