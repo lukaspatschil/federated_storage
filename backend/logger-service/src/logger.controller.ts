@@ -1,17 +1,18 @@
-import { Controller } from '@nestjs/common';
-import {
-  MessagePattern,
-  Payload,
-} from '@nestjs/microservices';
+import { Controller, Logger } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { LogEntry } from './service-types/types';
 import { LoggerService } from './logger.service';
 
 @Controller()
 export class LoggerController {
-  constructor(private readonly appService: LoggerService) {}
+  private readonly logger = new Logger(LoggerController.name);
+
+  constructor(private readonly loggerService: LoggerService) {}
 
   @MessagePattern({ cmd: 'log' })
   log(@Payload() logEntry: LogEntry) {
-    this.appService.writeToFile(logEntry);
+    this.logger.log(`New message reviced. ${logEntry}`);
+
+    this.loggerService.writeToFile(logEntry);
   }
 }
