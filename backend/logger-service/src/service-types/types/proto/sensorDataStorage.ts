@@ -7,7 +7,7 @@ import {
   SensorData,
   SensorDataArray,
   Empty,
-  PictureWithoutData,
+  PictureWithoutDataArray,
   SensorDataCreationWithoutPictureData,
   Id,
 } from "./shared";
@@ -27,7 +27,7 @@ export interface SensorDataStorageServiceClient {
 
   removeSensorDataById(request: Id): Observable<Empty>;
 
-  getPictureWithoutDataById(request: Id): Observable<PictureWithoutData>;
+  getPictureWithoutDataById(request: Id): Observable<PictureWithoutDataArray>;
 }
 
 export interface SensorDataStorageServiceController {
@@ -48,9 +48,9 @@ export interface SensorDataStorageServiceController {
   getPictureWithoutDataById(
     request: Id
   ):
-    | Promise<PictureWithoutData>
-    | Observable<PictureWithoutData>
-    | PictureWithoutData;
+    | Promise<PictureWithoutDataArray>
+    | Observable<PictureWithoutDataArray>
+    | PictureWithoutDataArray;
 }
 
 export function SensorDataStorageServiceControllerMethods() {

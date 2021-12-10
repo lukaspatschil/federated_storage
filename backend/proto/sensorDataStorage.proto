@@ -9,5 +9,5 @@ service SensorDataStorageService {
   rpc GetSensorDataById(Id)  returns (SensorData) {}
   rpc GetAllSensorData(Empty) returns (SensorDataArray) {}
   rpc RemoveSensorDataById(Id) returns (Empty) {}
-  rpc GetPictureWithoutDataById(Id) returns (PictureWithoutData) {}
+  rpc GetPictureWithoutDataById(Id) returns (PictureWithoutDataArray) {}
 }

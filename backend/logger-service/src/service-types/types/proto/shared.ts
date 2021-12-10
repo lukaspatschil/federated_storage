@@ -66,6 +66,10 @@ export interface PictureWithoutData {
   mimetype: string;
 }
 
+export interface PictureWithoutDataArray {
+  pictures: PictureWithoutData[];
+}
+
 export interface PictureData {
   data: Buffer;
 }
