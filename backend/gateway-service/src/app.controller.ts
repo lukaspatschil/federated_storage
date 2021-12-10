@@ -131,10 +131,12 @@ export class AppController {
     description: 'wrong API key',
     type: String,
   })
-  readAllSensorData() {
-    const functionname = 'readAllSensorData';
-    console.log(functionname);
-    return this.sensorDataService.getAllSensorData({});
+  async getAllSensorData() {
+    this.logger.log('getAllSensorData()');
+    const res = await firstValueFrom(
+      this.sensorDataService.getAllSensorData({}),
+    );
+    return res.sensorData;
   }
 
   @Get('/picture/:id')
