@@ -3,5 +3,5 @@ export enum LOG_LEVEL {
   WARN = 'WARN',
   ERROR = 'ERROR',
   DEBUG = 'DEBUG',
-  VERBOSE = 'VERBOSE'
+  VERBOSE = 'VERBOSE',
 }

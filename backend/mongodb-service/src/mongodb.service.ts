@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   Empty,
-  PictureWithoutDataArray,
+  PictureWithoutData,
   SensorData,
   SensorDataArray,
   SensorDataCreationWithoutPictureData,
@@ -50,19 +50,23 @@ export class MongoDBService {
     return this.mapSensorDataDocumentToSensorData(data) as any;
   }
 
-  async findOnePicture(id: string): Promise<PictureWithoutDataArray> {
+  async findOnePicture(id: string): Promise<PictureWithoutData> {
     this.logger.log(`Finding picture data by id. ${id}`);
 
-    const data = await this.sensorDataModel.findById(id);
+    const data = await this.sensorDataModel.findOne({
+      pictures: { $elemMatch: { _id: id } },
+    });
 
-    if (!data) {
+    const picture = data.pictures.find((el) => el.id === id);
+
+    if (!picture) {
       throw new RpcException({
         code: status.NOT_FOUND,
         message: `Picture with id ${id} not found`,
       });
     }
 
-    return { pictures: data.pictures } as any;
+    return picture as any;
   }
 
   async createOne(
