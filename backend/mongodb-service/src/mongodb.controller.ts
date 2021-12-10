@@ -8,7 +8,7 @@ import {
 import {
   Empty,
   Id,
-  PictureWithoutDataArray,
+  PictureWithoutData,
   SensorData,
   SensorDataArray,
   SensorDataCreationWithoutPictureData,
@@ -49,7 +49,7 @@ export class MongoDBController implements SensorDataStorageServiceClient {
     return from(this.mongodbService.deleteOne(request.id));
   }
 
-  getPictureWithoutDataById(request: Id): Observable<PictureWithoutDataArray> {
+  getPictureWithoutDataById(request: Id): Observable<PictureWithoutData> {
     this.logger.log(
       `Retrieving picture data by id. ${JSON.stringify(request)}`,
     );
