@@ -148,22 +148,14 @@ export class AppController implements SensorDataServiceController {
   async removeSensorDataById(request: Id) {
     this.logger.log(`removeSensorDataById( ${request.id} )`);
 
-    const pictureWithoutData = await firstValueFrom(
-      this.sensorDataStorage.getPictureWithoutDataById(request),
+    const sensordata = await firstValueFrom(
+      this.sensorDataStorage.getSensorDataById(request),
     );
 
-    const idWithMimetype: IdWithMimetype = {
-      id: pictureWithoutData.id,
-      mimetype: pictureWithoutData.mimetype,
-    };
-    /*
-    await firstValueFrom(
-      this.pictureStorageD.removePictureById(idWithMimetype),
-    );
-    */
-    await firstValueFrom(
-      this.pictureStorageM.removePictureById(idWithMimetype),
-    );
+    for (const picture of sensordata.pictures) {
+      await firstValueFrom(this.pictureStorageM.removePictureById(picture));
+    }
+
     await firstValueFrom(this.sensorDataStorage.removeSensorDataById(request));
     return {};
   }
