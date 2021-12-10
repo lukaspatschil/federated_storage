@@ -152,9 +152,13 @@ export class AppController implements SensorDataServiceController {
       this.sensorDataStorage.getSensorDataById(request),
     );
 
+    const requests: Promise<Empty>[] = [];
     for (const picture of sensordata.pictures) {
-      await firstValueFrom(this.pictureStorageM.removePictureById(picture));
+      requests.push(
+        firstValueFrom(this.pictureStorageM.removePictureById(picture)),
+      );
     }
+    await Promise.all(requests);
 
     await firstValueFrom(this.sensorDataStorage.removeSensorDataById(request));
     return {};
