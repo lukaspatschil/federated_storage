@@ -114,7 +114,7 @@ export class AppController {
   readOneSensorDataById(@Param() params) {
     const functionname = 'readOneSensorDataById';
     this.logger.log(functionname + ' ' + params.id);
-    return this.sensorDataService.getSensorDataById({ id: '1' });
+    return this.sensorDataService.getSensorDataById({ id: params.id });
   }
 
   @Get()
@@ -168,7 +168,7 @@ export class AppController {
     const functionname = 'read picture endpoint by id';
     console.log(functionname + ' ' + params.id);
     const picture = await firstValueFrom(
-      this.sensorDataService.getPictureById({ id: '1' }),
+      this.sensorDataService.getPictureById({ id: params.id }),
     );
     const pictureDto: PictureDto = {
       id: picture.id,

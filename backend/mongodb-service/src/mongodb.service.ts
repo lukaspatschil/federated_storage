@@ -97,6 +97,7 @@ export class MongoDBService {
 
   private mapSensorDataDocumentToSensorData(data: SensorDataDocument) {
     return {
+      id: data._id,
       pictures: data.pictures.map((picture) => ({
         id: picture._id,
         createdAt: picture.createdAt.toISOString(),
