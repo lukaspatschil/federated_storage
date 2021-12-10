@@ -52,7 +52,7 @@ export class AppController implements SensorDataServiceController {
 
   createSensorData(request: Observable<SensorDataCreation>) {
     this.logger.log('createSensorData(): started');
-    // -- Real Response --
+
     const sensorDataSubject = new Subject<Empty>();
 
     request.subscribe((sensorDataCreation) => {
@@ -80,7 +80,7 @@ export class AppController implements SensorDataServiceController {
           });
 
           const createPictures$ = [
-            //this.pictureStorageD.createPictureById(createPictureById),
+            this.pictureStorageD.createPictureById(createPictureById),
             this.pictureStorageM.createPictureById(createPictureById),
           ];
 
@@ -121,7 +121,7 @@ export class AppController implements SensorDataServiceController {
         };
 
         const pictureData$ = [
-          //this.pictureStorageD.getPictureById(idWithMimetype),
+          this.pictureStorageD.getPictureById(idWithMimetype),
           this.pictureStorageM.getPictureById(idWithMimetype),
         ];
 
@@ -154,6 +154,9 @@ export class AppController implements SensorDataServiceController {
 
     const requests: Promise<Empty>[] = [];
     for (const picture of sensordata.pictures) {
+      requests.push(
+        firstValueFrom(this.pictureStorageD.removePictureById(picture)),
+      );
       requests.push(
         firstValueFrom(this.pictureStorageM.removePictureById(picture)),
       );

@@ -1,6 +1,6 @@
 import { Controller, Logger, OnModuleInit } from '@nestjs/common';
 import { Dropbox } from 'dropbox';
-import mime from 'mime-types';
+import * as mime from 'mime-types';
 import {
   PictureStorageServiceController,
   PictureStorageServiceControllerMethods,
