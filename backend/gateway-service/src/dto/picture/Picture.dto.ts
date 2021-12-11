@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsString,
 } from 'class-validator';
+import { Replica } from './Replica.dto';
 
 export class PictureDto {
   @ApiProperty({ description: 'id of the picture entry', example: '1' })
@@ -36,7 +37,7 @@ export class PictureDto {
 
   @ApiProperty({
     description: 'status of the replica',
-    example: 'OK'
+    example: 'OK',
   })
   @IsNotEmpty()
   replica: Replica;
