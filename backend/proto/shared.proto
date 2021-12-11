@@ -64,6 +64,10 @@ message PictureWithoutData {
     string mimetype = 3;
 }
 
+message PictureWithoutDataArray {
+    repeated PictureWithoutData pictures = 1;
+}
+
 message PictureData {
     bytes data = 1;
 }

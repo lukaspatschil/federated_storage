@@ -57,9 +57,10 @@ export class MongoDBService {
       pictures: { $elemMatch: { _id: id } },
     });
 
-    const picture = data.pictures.find((el) => el.id === id);
+    const picture = data?.pictures.find((el) => el.id === id);
 
     if (!picture) {
+      this.logger.error('RPC Error');
       throw new RpcException({
         code: status.NOT_FOUND,
         message: `Picture with id ${id} not found`,
@@ -97,6 +98,7 @@ export class MongoDBService {
 
   private mapSensorDataDocumentToSensorData(data: SensorDataDocument) {
     return {
+      id: data._id,
       pictures: data.pictures.map((picture) => ({
         id: picture._id,
         createdAt: picture.createdAt.toISOString(),
