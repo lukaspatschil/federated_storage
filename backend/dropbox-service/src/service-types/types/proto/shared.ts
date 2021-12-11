@@ -65,6 +65,7 @@ export interface PictureWithoutData {
   id: string;
   createdAt: string;
   mimetype: string;
+  hash: string;
 }
 
 export interface PictureWithoutDataArray {

@@ -63,6 +63,7 @@ message PictureWithoutData {
     string id = 1;
     string createdAt = 2;
     string mimetype = 3;
+    string hash = 4;
 }
 
 message PictureWithoutDataArray {
