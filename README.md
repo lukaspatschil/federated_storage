@@ -22,8 +22,6 @@ TODO
 
 ![Architecture](./docs/architecture.png)
 
-(This is subject to change in the future!)
-
 ## Components
 
 ### Frontend app
@@ -65,7 +63,7 @@ The Dropbox service is the connection to the Dropbox. It provides the possibilit
 
 #### MongoDB service
 
-TODO
+The MongoDB service is the connection to the MongoDB. It provides the possibility to store and get data from the MongoDB. It saves the metadata of the pictures and the data of the sensors.
 
 #### MinIO service
 
