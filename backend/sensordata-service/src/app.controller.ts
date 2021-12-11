@@ -12,13 +12,12 @@ import {
 import {
   Empty,
   Id,
-  SensorData,
   SensorDataCreation,
 } from './service-types/types/proto/shared';
 import { PictureStorageServiceClient } from './service-types/types/proto/pictureStorage';
 import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
-import { ClientGrpc, RpcException } from '@nestjs/microservices';
-import { status } from '@grpc/grpc-js';
+import { ClientGrpc } from '@nestjs/microservices';
+import * as crypto from 'crypto';
 
 @Controller()
 @SensorDataServiceControllerMethods()
@@ -56,7 +55,14 @@ export class AppController implements SensorDataServiceController {
     const sensorDataSubject = new Subject<Empty>();
 
     request.subscribe((sensorDataCreation) => {
-      const { data, ...pictureWithoutData } = sensorDataCreation.picture;
+      const { data, mimetype } = sensorDataCreation.picture;
+
+      const hash = crypto
+        .createHash('sha256')
+        .update(sensorDataCreation.picture.data)
+        .digest('hex');
+
+      const pictureWithoutData = { mimetype, hash };
 
       this.sensorDataStorage
         .createSensorData({
