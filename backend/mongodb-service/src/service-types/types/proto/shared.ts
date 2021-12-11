@@ -81,6 +81,7 @@ export interface Picture {
   mimetype: string;
   data: Buffer;
   createdAt: string;
+  replica: string;
 }
 
 export interface SensorDataCreation {

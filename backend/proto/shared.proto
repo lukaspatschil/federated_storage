@@ -79,6 +79,7 @@ message Picture {
     string mimetype = 2;
     bytes data = 3;
     string createdAt = 4;
+    string replica = 5;
 }
 
 
