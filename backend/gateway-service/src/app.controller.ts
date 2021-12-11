@@ -175,6 +175,7 @@ export class AppController {
       data: picture.data.toString('base64'),
       mimetype: picture.mimetype,
       createdAt: picture.createdAt,
+      replica: Replica.OK,
     };
     return pictureDto;
   }

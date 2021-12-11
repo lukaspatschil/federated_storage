@@ -33,4 +33,11 @@ export class PictureDto {
   @IsDate()
   @IsNotEmpty()
   createdAt: string;
+
+  @ApiProperty({
+    description: 'status of the replica',
+    example: 'OK'
+  })
+  @IsNotEmpty()
+  replica: Replica;
 }
