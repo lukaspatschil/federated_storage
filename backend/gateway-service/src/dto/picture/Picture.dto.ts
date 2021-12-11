@@ -6,7 +6,7 @@ import {
   IsNotEmpty,
   IsString,
 } from 'class-validator';
-import { Replica } from './Replica.dto';
+import { Replica } from 'src/service-types/types';
 
 export class PictureDto {
   @ApiProperty({ description: 'id of the picture entry', example: '1' })

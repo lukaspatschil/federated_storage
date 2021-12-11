@@ -18,6 +18,7 @@ import { PictureStorageServiceClient } from './service-types/types/proto/picture
 import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
 import { ClientGrpc } from '@nestjs/microservices';
 import * as crypto from 'crypto';
+import { Replica } from './service-types/types';
 
 @Controller()
 @SensorDataServiceControllerMethods()
@@ -129,17 +130,34 @@ export class AppController implements SensorDataServiceController {
         const pictureData$ = [
           this.pictureStorageD.getPictureById(idWithMimetype),
           this.pictureStorageM.getPictureById(idWithMimetype),
-        ];
+        ] as const;
 
         forkJoin(pictureData$).subscribe((res) => {
           this.logger.log('getPictureById(): fetched images');
-          const [pictureDataM] = res;
+          const [pictureDataD, pictureDataM] = res;
+
+          const hashM = crypto
+            .createHash('sha256')
+            .update(pictureDataM.data)
+            .digest('hex');
+          const hashD = crypto
+            .createHash('sha256')
+            .update(pictureDataD.data)
+            .digest('hex');
+
+          // Maybe for the future?
+          // const replicaStatus = this.compareHash(
+          //   pictureWithoutData.hash,
+          //   hashM,
+          //   hashD,
+          // );
 
           const picture: Picture = {
             id: pictureWithoutData.id,
             createdAt: pictureWithoutData.createdAt,
             mimetype: pictureWithoutData.mimetype,
             data: pictureDataM.data,
+            replica: hashD === hashM ? Replica.OK : Replica.FAULTY,
           };
 
           pictureSubject.next(picture);
@@ -171,5 +189,15 @@ export class AppController implements SensorDataServiceController {
 
     await firstValueFrom(this.sensorDataStorage.removeSensorDataById(request));
     return {};
+  }
+
+  private compareHash(hash1: string, hash2: string, hash3: string): Replica {
+    if (hash1 === hash2 && hash1 === hash3) {
+      return Replica.OK;
+    } else if (hash1 === hash2 || hash1 === hash3) {
+      return Replica.FAULTY;
+    } else {
+      return Replica.MISSING;
+    }
   }
 }

@@ -29,7 +29,7 @@ import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
 import { SensorDataServiceClient } from './service-types/types/proto/sensorData';
 import { firstValueFrom, of } from 'rxjs';
 import { SensorDataCreation } from './service-types/types/proto/shared';
-import { Replica } from './dto/picture/Replica.dto';
+import { Replica } from './service-types/types';
 
 @Controller('api/v1/sensordata')
 export class AppController {
@@ -178,7 +178,7 @@ export class AppController {
       data: picture.data.toString('base64'),
       mimetype: picture.mimetype,
       createdAt: picture.createdAt,
-      replica: Replica.OK,
+      replica: picture.replica as Replica,
     };
     return pictureDto;
   }
