@@ -79,6 +79,8 @@ export class AppController implements SensorDataServiceController {
               lastPicture.id,
           );
 
+          this.logger.debug(JSON.stringify(sensorData));
+
           const createPictureById = of({
             id: lastPicture.id,
             mimetype: pictureWithoutData.mimetype,

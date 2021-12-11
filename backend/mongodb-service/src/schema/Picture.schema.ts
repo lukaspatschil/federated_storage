@@ -8,6 +8,9 @@ export class PictureDocument extends Document {
 
   @Prop()
   mimetype: string;
+
+  @Prop()
+  hash: string;
 }
 
 export const PictureSchema = SchemaFactory.createForClass(PictureDocument);

@@ -103,6 +103,7 @@ export class MongoDBService {
         id: picture._id,
         createdAt: picture.createdAt.toISOString(),
         mimetype: picture.mimetype,
+        hash: picture.hash,
       })),
       metadata: {
         name: data.metadata.name,
