@@ -57,9 +57,10 @@ export class MongoDBService {
       pictures: { $elemMatch: { _id: id } },
     });
 
-    const picture = data.pictures.find((el) => el.id === id);
+    const picture = data?.pictures.find((el) => el.id === id);
 
     if (!picture) {
+      this.logger.error('RPC Error');
       throw new RpcException({
         code: status.NOT_FOUND,
         message: `Picture with id ${id} not found`,
