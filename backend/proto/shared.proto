@@ -50,6 +50,7 @@ message PictureCreation {
 
 message PictureCreationWithoutData {
     string mimetype = 1;
+    string hash = 2;
 }
 
 message PictureCreationById {

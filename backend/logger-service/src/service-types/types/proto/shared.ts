@@ -52,6 +52,7 @@ export interface PictureCreation {
 
 export interface PictureCreationWithoutData {
   mimetype: string;
+  hash: string;
 }
 
 export interface PictureCreationById {
@@ -64,6 +65,10 @@ export interface PictureWithoutData {
   id: string;
   createdAt: string;
   mimetype: string;
+}
+
+export interface PictureWithoutDataArray {
+  pictures: PictureWithoutData[];
 }
 
 export interface PictureData {
