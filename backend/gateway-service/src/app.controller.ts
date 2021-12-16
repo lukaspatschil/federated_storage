@@ -71,9 +71,9 @@ export class AppController {
       },
       metadata: {
         name: sensordata.metadata.name,
-        placeIdent: sensordata.metadata.name,
+        placeIdent: sensordata.metadata.placeIdent,
         seqId: sensordata.metadata.seqID,
-        datetime: sensordata.metadata.name,
+        datetime: sensordata.metadata.datetime.toISOString(),
         frameNum: sensordata.metadata.frameNum,
         seqNumFrames: sensordata.metadata.seqNumFrames,
         filename: sensordata.metadata.filename,

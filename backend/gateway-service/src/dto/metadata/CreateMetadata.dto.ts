@@ -32,8 +32,8 @@ export class CreateMetadataDto {
   seqID: string;
 
   @ApiProperty({
-    description: 'datetime of the captured image - (ISO 8601)',
-    example: '2009-06-30T18:30:00+02:00',
+    description: 'datetime of the captured image',
+    example: '22-Apr-2019 (00:53:00.000000)',
   })
   @Type(() => Date)
   @IsDate()
