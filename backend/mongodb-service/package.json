@@ -1,6 +1,6 @@
 {
   "name": "mongodb-service",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "description": "",
   "author": "",
   "private": true,
@@ -24,9 +24,12 @@
     "@grpc/grpc-js": "^1.4.2",
     "@grpc/proto-loader": "^0.6.6",
     "@nestjs/common": "^8.1.2",
+    "@nestjs/config": "^1.1.0",
     "@nestjs/core": "^8.1.2",
     "@nestjs/microservices": "^8.1.2",
+    "@nestjs/mongoose": "^9.0.1",
     "@nestjs/platform-express": "^8.1.2",
+    "mongoose": "^6.0.14",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.4.0"

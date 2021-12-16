@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+message Empty {}
+
+message Id {
+    string id = 1;
+}
+
+message IdWithMimetype {
+    string id = 1;
+    string mimetype = 2;
+}
+
+message Location {
+    double longitude = 1;      
+    double latitude = 2;
+}
+
+
+message MetaDataCreation {
+    string name = 1;
+    string placeIdent = 2;
+    string seqId = 3;
+    string datetime = 4;
+    int32 frameNum = 5;
+    int32 seqNumFrames = 6;
+    string filename = 7;
+    string deviceID = 8;
+    Location location = 9;
+}
+
+message MetaData {
+    string name = 1;
+    string placeIdent = 2;
+    string seqId = 3;
+    string datetime = 4;
+    int32 frameNum = 5;
+    int32 seqNumFrames = 6;
+    string filename = 7;
+    string deviceID = 8;
+    Location location = 9;
+    repeated string tags = 10;
+}
+
+
+message PictureCreation {
+    string mimetype = 1;
+    bytes data = 2;
+}
+
+message PictureCreationWithoutData {
+    string mimetype = 1;
+    string hash = 2;
+}
+
+message PictureCreationById {
+    string id = 1;
+    string mimetype = 2;
+    bytes data = 3;
+}
+
+message PictureWithoutData {
+    string id = 1;
+    string createdAt = 2;
+    string mimetype = 3;
+    string hash = 4;
+}
+
+message PictureWithoutDataArray {
+    repeated PictureWithoutData pictures = 1;
+}
+
+message PictureData {
+    bytes data = 1;
+}
+
+message Picture {
+    string id = 1;
+    string mimetype = 2;
+    bytes data = 3;
+    string createdAt = 4;
+    string replica = 5;
+}
+
+
+message SensorDataCreation {
+    PictureCreation picture = 1;
+    MetaDataCreation metadata = 2;
+}
+
+message SensorDataCreationWithoutPictureData {
+    PictureCreationWithoutData picture = 1;
+    MetaDataCreation metadata = 2;
+}
+  
+message SensorData {
+    string id = 1;
+    repeated PictureWithoutData pictures = 2;
+    MetaData metadata = 3;
+}
+
+message SensorDataArray {
+    repeated SensorData sensorData = 1;
+}

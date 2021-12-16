@@ -5,102 +5,181 @@ services:
     ports:
         - 5672:5672
         - 15672:15672
+    env_file:
+     - ./.develop.env
     volumes:
         - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
         - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
         - backend
 
+  minio-server:
+    container_name: minio-server
+    hostname: minio-server
+    image: minio/minio:RELEASE.2021-04-22T15-44-28Z.hotfix.e16e75ce3
+    networks:
+      - minio_internal
+    ports:
+      - 9000:9000
+    volumes:
+      - minio-data:/data
+    env_file:
+      - ./.develop.env
+    command: server /data
+    labels:
+      - "traefik.enable=false"
+    restart: always
+    
+  mongodb:
+    image: mongo:5.0.4
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=nestjs
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - mongodb_internal
+
   gateway-service:
-    build: ./backend/gateway-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=gateway-service
     hostname: gateway-service
+    volumes: 
+      - ./backend/gateway-service:/base/backend/gateway-service/
+      - ./backend/proto:/base/backend/proto/
+      - ./backend/service-types/:/base/backend/service-types/
+      - /base/node_modules
     ports:
       - 3000:3000
-    volumes:
-      - ./backend/gateway-service:/var/www/gateway-service
-      - /var/www/gateway-service/node_modules
-    # depends_on:
-    #   - rabbitmq
-    # environment:
-    #   WAIT_HOSTS: rabbitmq:5672
-    #   WAIT_TIMEOUT: 120
-    #   WAIT_SLEEP_INTERVAL: 5
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
     networks:
       - backend
       - frontend
 
   dropbox-service:
-    build: ./backend/dropbox-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=dropbox-service
     hostname: dropbox-service
-    volumes:
-      - ./backend/dropbox-service:/var/www/dropbox-service
-      - /var/www/dropbox-service/node_modules
-    # depends_on:
-    #   - rabbitmq
-    # environment:
-    #   WAIT_HOSTS: rabbitmq:5672
-    #   WAIT_TIMEOUT: 120
-    #   WAIT_SLEEP_INTERVAL: 5
-    networks:
-      - backend
-
-  logger-service:
-    build: ./backend/logger-service
-    hostname: logger-service
-    volumes:
-      - ./backend/logger-service:/var/www/logger-service
-      - /var/www/logger-service/node_modules
+    volumes: 
+      - ./backend/dropbox-service:/base/backend/dropbox-service/
+      - ./backend/proto:/base/backend/proto/
+      - ./backend/service-types/:/base/backend/service-types/
+      - /base/node_modules
     depends_on:
       - rabbitmq
     environment:
       WAIT_HOSTS: rabbitmq:5672
-      WAIT_TIMEOUT: 120
-      WAIT_SLEEP_INTERVAL: 5
+    env_file:
+      - ./.develop.env
+    networks:
+      - backend
+
+  logger-service:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=logger-service
+    hostname: logger-service
+    volumes: 
+      - ./backend/logger-service:/base/backend/logger-service/
+      - ./backend/proto:/base/backend/proto/
+      - ./backend/service-types/:/base/backend/service-types/
+      - /base/node_modules
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
     networks:
       - backend
 
   minio-service:
-    build: ./backend/minio-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=minio-service
     hostname: minio-service
+    depends_on:
+      - minio-server
+    links:
+      - minio-server
     volumes:
-      - ./backend/minio-service:/var/www/minio-service
-      - /var/www/minio-service/node_modules
-    # depends_on:
-    #   - rabbitmq
-    # environment:
-    #   WAIT_HOSTS: rabbitmq:5672
-    #   WAIT_TIMEOUT: 120
-    #   WAIT_SLEEP_INTERVAL: 5
+      - ./backend/minio-service:/base/backend/minio-service/
+      - ./backend/proto:/base/backend/proto/
+      - ./backend/service-types/:/base/backend/service-types/
+      - /base/node_modules
+    env_file:
+      - .develop.env
     networks:
+      - minio_internal
       - backend
+    environment:
+      WAIT_HOSTS: rabbitmq:5672, minio-server:9000
+
 
   mongodb-service:
-    build: ./backend/mongodb-service
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=mongodb-service
     hostname: mongodb-service
-    volumes:
-      - ./backend/mongodb-service:/var/www/mongodb-service
-      - /var/www/mongodb-service/node_modules
-    # depends_on:
-    #   - rabbitmq
-    # environment:
-    #   WAIT_HOSTS: rabbitmq:5672
-    #   WAIT_TIMEOUT: 120
-    #   WAIT_SLEEP_INTERVAL: 5
+    volumes: 
+      - ./backend/mongodb-service:/base/backend/mongodb-service/
+      - ./backend/proto:/base/backend/proto/
+      - ./backend/service-types/:/base/backend/service-types/
+      - /base/node_modules
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
     networks:
       - backend
+      - mongodb_internal
 
-  picture-service:
-    build: ./backend/picture-service
-    hostname: picture-service
-    volumes:
-      - ./backend/picture-service:/var/www/picture-service
-      - /var/www/picture-service/node_modules
+  sensordata-service:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.dev
+      args:
+        - BUILD_CONTEXT=sensordata-service
+    hostname: sensordata-service
+    volumes: 
+      - ./backend/sensordata-service:/base/backend/sensordata-service/
+      - ./backend/proto:/base/backend/proto/
+      - ./backend/service-types/:/base/backend/service-types/
+      - /base/node_modules
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
     # depends_on:
     #   - rabbitmq
     # environment:
     #   WAIT_HOSTS: rabbitmq:5672
     #   WAIT_TIMEOUT: 120
     #   WAIT_SLEEP_INTERVAL: 5
+    env_file:
+      - ./.develop.env
     networks:
       - backend
   
@@ -114,8 +193,16 @@ services:
   #   networks:
   #     - frontend
 
+volumes:
+  mongodb_data_container:
+  minio-data:
+
 networks:
   backend:
     driver: bridge
   frontend:
+    driver: bridge
+  minio_internal:
+    driver: bridge
+  mongodb_internal:
     driver: bridge
