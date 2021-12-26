@@ -19,6 +19,7 @@ import { SensorDataStorageServiceClient } from './service-types/types/proto/sens
 import { ClientGrpc } from '@nestjs/microservices';
 import * as crypto from 'crypto';
 import { Replica } from './service-types/types';
+import * as Buffer from "buffer";
 
 @Controller()
 @SensorDataServiceControllerMethods()
@@ -152,15 +153,16 @@ export class AppController implements SensorDataServiceController {
           //    hashD,
           //);
 
-          const pictureStatus = this.replicate(pictureWithoutData, pictureDataM.data, pictureDataD.data);
+          const status = this.replicate(pictureWithoutData, pictureDataM.data, pictureDataD.data);
 
           const picture: Picture = {
             id: pictureWithoutData.id,
             createdAt: pictureWithoutData.createdAt,
             mimetype: pictureWithoutData.mimetype,
-            data: pictureDataM.data,
+            //data: pictureDataM.data,
+            data: status.image,
             //replica: hashD === hashM ? Replica.OK : Replica.FAULTY,
-            replica: pictureStatus
+            replica: status.status
           };
 
           pictureSubject.next(picture);
@@ -207,7 +209,7 @@ export class AppController implements SensorDataServiceController {
   private replicate(
       pictureData: PictureWithoutData,
       pictureMinio: Buffer,
-      pictureDropbox: Buffer): Replica {
+      pictureDropbox: Buffer): Status {
 
     const hashMinio = crypto
         .createHash('sha256')
@@ -219,21 +221,25 @@ export class AppController implements SensorDataServiceController {
         .digest('hex');
 
     if (pictureData.hash === hashMinio && pictureData.hash === hashDropbox) {
-      return Replica.OK;
+      return new Status(Replica.OK, pictureMinio)
+      //return Replica.OK;
     } else if (pictureData.hash === hashMinio || pictureData.hash === hashDropbox) {
       // replace faulty
       if (pictureData.hash === hashMinio){
         // replace dropbox
         this.replicateData(pictureData, pictureMinio, this.pictureStorageDropbox)
+        return new Status(Replica.REPLICATED, pictureMinio)
       } else{
         // replace Monio
         this.replicateData(pictureData, pictureDropbox, this.pictureStorageMinio)
+        return new Status(Replica.REPLICATED, pictureDropbox)
       }
       //return Replica.FAULTY;
-      return Replica.REPLACED
+      //return Replica.REPLICATED
     } else {
       // not possible to determine the correct image
-      return Replica.MISSING
+      //return Replica.MISSING
+      return new Status(Replica.MISSING, null)
     }
   }
 
@@ -246,4 +252,15 @@ export class AppController implements SensorDataServiceController {
     storage.createPictureById(createPictureById)
   }
 
+}
+
+class Status{
+  status: Replica;
+  image: Buffer;
+
+
+  constructor(status: Replica, image: Buffer) {
+    this.status = status;
+    this.image = image;
+  }
 }
