@@ -25,8 +25,8 @@ import { Replica } from './service-types/types';
 export class AppController implements SensorDataServiceController {
   private logger = new Logger('sensordata-service controller');
 
-  private pictureStorageM: PictureStorageServiceClient;
-  private pictureStorageD: PictureStorageServiceClient;
+  private pictureStorageMinio: PictureStorageServiceClient;
+  private pictureStorageDropbox: PictureStorageServiceClient;
   private sensorDataStorage: SensorDataStorageServiceClient;
 
   constructor(
@@ -36,11 +36,11 @@ export class AppController implements SensorDataServiceController {
   ) {}
 
   onModuleInit() {
-    this.pictureStorageM =
+    this.pictureStorageMinio =
       this.minioClient.getService<PictureStorageServiceClient>(
         'PictureStorageService',
       );
-    this.pictureStorageD =
+    this.pictureStorageDropbox =
       this.dropboxClient.getService<PictureStorageServiceClient>(
         'PictureStorageService',
       );
@@ -87,8 +87,8 @@ export class AppController implements SensorDataServiceController {
           });
 
           const createPictures$ = [
-            this.pictureStorageD.createPictureById(createPictureById),
-            this.pictureStorageM.createPictureById(createPictureById),
+            this.pictureStorageDropbox.createPictureById(createPictureById),
+            this.pictureStorageMinio.createPictureById(createPictureById),
           ];
 
           forkJoin(createPictures$).subscribe(() => {
@@ -128,8 +128,8 @@ export class AppController implements SensorDataServiceController {
         };
 
         const pictureData$ = [
-          this.pictureStorageD.getPictureById(idWithMimetype),
-          this.pictureStorageM.getPictureById(idWithMimetype),
+          this.pictureStorageDropbox.getPictureById(idWithMimetype),
+          this.pictureStorageMinio.getPictureById(idWithMimetype),
         ] as const;
 
         forkJoin(pictureData$).subscribe((res) => {
@@ -146,18 +146,21 @@ export class AppController implements SensorDataServiceController {
             .digest('hex');
 
           // Maybe for the future?
-          // const replicaStatus = this.compareHash(
-          //   pictureWithoutData.hash,
-          //   hashM,
-          //   hashD,
-          // );
+          //const replicaStatus = this.compareHash(
+          //    pictureWithoutData.hash,
+          //    hashM,
+          //    hashD,
+          //);
+
+          const pictureStatus = this.replicate(pictureWithoutData, pictureDataM.data, pictureDataD.data);
 
           const picture: Picture = {
             id: pictureWithoutData.id,
             createdAt: pictureWithoutData.createdAt,
             mimetype: pictureWithoutData.mimetype,
             data: pictureDataM.data,
-            replica: hashD === hashM ? Replica.OK : Replica.FAULTY,
+            //replica: hashD === hashM ? Replica.OK : Replica.FAULTY,
+            replica: pictureStatus
           };
 
           pictureSubject.next(picture);
@@ -179,10 +182,10 @@ export class AppController implements SensorDataServiceController {
     const requests: Promise<Empty>[] = [];
     for (const picture of sensordata.pictures) {
       requests.push(
-        firstValueFrom(this.pictureStorageD.removePictureById(picture)),
+        firstValueFrom(this.pictureStorageDropbox.removePictureById(picture)),
       );
       requests.push(
-        firstValueFrom(this.pictureStorageM.removePictureById(picture)),
+        firstValueFrom(this.pictureStorageMinio.removePictureById(picture)),
       );
     }
     await Promise.all(requests);
@@ -191,7 +194,7 @@ export class AppController implements SensorDataServiceController {
     return {};
   }
 
-  private compareHash(hash1: string, hash2: string, hash3: string): Replica {
+/*  private compareHash(hash1: string, hash2: string, hash3: string): Replica {
     if (hash1 === hash2 && hash1 === hash3) {
       return Replica.OK;
     } else if (hash1 === hash2 || hash1 === hash3) {
@@ -199,5 +202,48 @@ export class AppController implements SensorDataServiceController {
     } else {
       return Replica.MISSING;
     }
+  }*/
+
+  private replicate(
+      pictureData: PictureWithoutData,
+      pictureMinio: Buffer,
+      pictureDropbox: Buffer): Replica {
+
+    const hashMinio = crypto
+        .createHash('sha256')
+        .update(pictureMinio)
+        .digest('hex');
+    const hashDropbox = crypto
+        .createHash('sha256')
+        .update(pictureDropbox)
+        .digest('hex');
+
+    if (pictureData.hash === hashMinio && pictureData.hash === hashDropbox) {
+      return Replica.OK;
+    } else if (pictureData.hash === hashMinio || pictureData.hash === hashDropbox) {
+      // replace faulty
+      if (pictureData.hash === hashMinio){
+        // replace dropbox
+        this.replicateData(pictureData, pictureMinio, this.pictureStorageDropbox)
+      } else{
+        // replace Monio
+        this.replicateData(pictureData, pictureDropbox, this.pictureStorageMinio)
+      }
+      //return Replica.FAULTY;
+      return Replica.REPLACED
+    } else {
+      // not possible to determine the correct image
+      return Replica.MISSING
+    }
   }
+
+  private replicateData(pictureData : PictureWithoutData, picture: Buffer, storage: PictureStorageServiceClient){
+    const createPictureById = of({
+      id: pictureData.id,
+      mimetype: pictureData.mimetype,
+      data: picture,
+    });
+    storage.createPictureById(createPictureById)
+  }
+
 }
