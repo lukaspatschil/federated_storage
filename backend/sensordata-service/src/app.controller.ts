@@ -258,7 +258,6 @@ class Status{
   status: Replica;
   image: Buffer;
 
-
   constructor(status: Replica, image: Buffer) {
     this.status = status;
     this.image = image;
