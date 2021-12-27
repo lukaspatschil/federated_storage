@@ -146,23 +146,14 @@ export class AppController implements SensorDataServiceController {
             .update(pictureDataD.data)
             .digest('hex');
 
-          // Maybe for the future?
-          //const replicaStatus = this.compareHash(
-          //    pictureWithoutData.hash,
-          //    hashM,
-          //    hashD,
-          //);
-
           const status = this.replicate(pictureWithoutData, pictureDataM.data, pictureDataD.data);
 
           const picture: Picture = {
             id: pictureWithoutData.id,
             createdAt: pictureWithoutData.createdAt,
             mimetype: pictureWithoutData.mimetype,
-            //data: pictureDataM.data,
-            data: status.image,
-            //replica: hashD === hashM ? Replica.OK : Replica.FAULTY,
-            replica: status.status
+            data: status[1],
+            replica: status[0]
           };
 
           pictureSubject.next(picture);
@@ -209,7 +200,7 @@ export class AppController implements SensorDataServiceController {
   private replicate(
       pictureData: PictureWithoutData,
       pictureMinio: Buffer,
-      pictureDropbox: Buffer): Status {
+      pictureDropbox: Buffer): [Replica, Buffer] {
 
     const hashMinio = crypto
         .createHash('sha256')
@@ -222,32 +213,28 @@ export class AppController implements SensorDataServiceController {
 
     if (pictureData.hash === hashMinio && pictureData.hash === hashDropbox) {
       this.logger.log("sensordata getPictureById(): Status OK")
-      return new Status(Replica.OK, pictureMinio)
-      //return Replica.OK;
+      return [Replica.OK, pictureMinio]
     } else if (pictureData.hash === hashMinio || pictureData.hash === hashDropbox) {
-      // replace faulty
+      // replace faulty image
       if (pictureData.hash === hashMinio){
         // replace dropbox
         this.replicateData(pictureData, pictureMinio, this.pictureStorageDropbox)
         this.logger.log("sensordata getPictureById(): Status REPLICATED: Dropbox file faulty")
-        return new Status(Replica.REPLICATED, pictureMinio)
+        return [Replica.REPLICATED, pictureMinio]
       } else{
         // replace Monio
         this.replicateData(pictureData, pictureDropbox, this.pictureStorageMinio)
         this.logger.log("sensordata getPictureById(): Status REPLICATED: MinIO file faulty")
-        return new Status(Replica.REPLICATED, pictureDropbox)
+        return [Replica.REPLICATED, pictureDropbox]
       }
-      //return Replica.FAULTY;
-      //return Replica.REPLICATED
     } else {
       // not possible to determine the correct image
-      //return Replica.MISSING
       this.logger.log("sensordata getPictureById(): Status MISSING: All files faulty")
-      return new Status(Replica.MISSING, null)
+      return [Replica.MISSING, null]
     }
   }
 
-  private replicateData(pictureData : PictureWithoutData, picture: Buffer, storage: PictureStorageServiceClient){
+  private replicateData(pictureData: PictureWithoutData, picture: Buffer, storage: PictureStorageServiceClient){
     const createPictureById = of({
       id: pictureData.id,
       mimetype: pictureData.mimetype,
@@ -256,14 +243,4 @@ export class AppController implements SensorDataServiceController {
     storage.createPictureById(createPictureById)
   }
 
-}
-
-class Status{
-  status: Replica;
-  image: Buffer;
-
-  constructor(status: Replica, image: Buffer) {
-    this.status = status;
-    this.image = image;
-  }
 }
