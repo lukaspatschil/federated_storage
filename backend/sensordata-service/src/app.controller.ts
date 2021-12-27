@@ -221,6 +221,7 @@ export class AppController implements SensorDataServiceController {
         .digest('hex');
 
     if (pictureData.hash === hashMinio && pictureData.hash === hashDropbox) {
+      this.logger.log("sensordata getPictureById(): Status OK")
       return new Status(Replica.OK, pictureMinio)
       //return Replica.OK;
     } else if (pictureData.hash === hashMinio || pictureData.hash === hashDropbox) {
@@ -228,10 +229,12 @@ export class AppController implements SensorDataServiceController {
       if (pictureData.hash === hashMinio){
         // replace dropbox
         this.replicateData(pictureData, pictureMinio, this.pictureStorageDropbox)
+        this.logger.log("sensordata getPictureById(): Status REPLICATED: Dropbox file faulty")
         return new Status(Replica.REPLICATED, pictureMinio)
       } else{
         // replace Monio
         this.replicateData(pictureData, pictureDropbox, this.pictureStorageMinio)
+        this.logger.log("sensordata getPictureById(): Status REPLICATED: MinIO file faulty")
         return new Status(Replica.REPLICATED, pictureDropbox)
       }
       //return Replica.FAULTY;
@@ -239,6 +242,7 @@ export class AppController implements SensorDataServiceController {
     } else {
       // not possible to determine the correct image
       //return Replica.MISSING
+      this.logger.log("sensordata getPictureById(): Status MISSING: All files faulty")
       return new Status(Replica.MISSING, null)
     }
   }
