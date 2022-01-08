@@ -3,10 +3,11 @@ import {
   SensorDataServiceController,
   SensorDataServiceControllerMethods,
 } from './service-types/types/proto/sensorData';
-import { Observable, Subject, of, firstValueFrom, forkJoin } from 'rxjs';
+import { Observable, Subject, of, firstValueFrom, forkJoin, catchError, map } from 'rxjs';
 import {
   IdWithMimetype,
   Picture,
+  PictureData,
   PictureWithoutData,
 } from './service-types/types/proto/shared';
 import {
@@ -16,10 +17,11 @@ import {
 } from './service-types/types/proto/shared';
 import { PictureStorageServiceClient } from './service-types/types/proto/pictureStorage';
 import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
-import { ClientGrpc } from '@nestjs/microservices';
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import * as crypto from 'crypto';
 import { Replica } from './service-types/types';
 import * as Buffer from "buffer";
+import { status } from '@grpc/grpc-js';
 
 @Controller()
 @SensorDataServiceControllerMethods()
@@ -128,32 +130,59 @@ export class AppController implements SensorDataServiceController {
           mimetype: pictureWithoutData.mimetype,
         };
 
+        const emptyPictureData: PictureData = {
+          data: null,
+        }
+
         const pictureData$ = [
-          this.pictureStorageDropbox.getPictureById(idWithMimetype),
-          this.pictureStorageMinio.getPictureById(idWithMimetype),
+          this.pictureStorageDropbox.getPictureById(idWithMimetype).pipe(
+              catchError(err => {
+                this.logger.error(err);
+                return of(emptyPictureData)}),
+          ),
+          this.pictureStorageMinio.getPictureById(idWithMimetype).pipe(
+              catchError(err => {
+                this.logger.error(err);
+                return of(emptyPictureData)}),
+          )
         ] as const;
 
         forkJoin(pictureData$).subscribe((res) => {
           this.logger.log('getPictureById(): fetched images');
           const [pictureDataD, pictureDataM] = res;
 
-          const hashM = crypto
-            .createHash('sha256')
-            .update(pictureDataM.data)
-            .digest('hex');
+          this.logger.log('getPictureById(): fetched images - Dropbox picture data: ' + pictureDataD)
+          this.logger.log('getPictureById(): fetched images - MinIO picture data: ' + pictureDataM)
+
+          if(pictureDataD.data === null && pictureDataM.data === null){
+            this.logger.error("MinIO and Dropbox file invalid")
+            // TODO throw exception
+            /*throw new RpcException({
+              code: status.INTERNAL,
+              message: "MinIO and Dropbox file invalid",
+            });*/
+          }
+
           const hashD = crypto
             .createHash('sha256')
             .update(pictureDataD.data)
             .digest('hex');
+          const hashM = crypto
+              .createHash('sha256')
+              .update(pictureDataM.data)
+              .digest('hex');
 
-          const status = this.replicate(pictureWithoutData, pictureDataM.data, pictureDataD.data);
+          this.logger.log('getPictureById(): fetched images - Hash DropboxData: ' + hashD)
+          this.logger.log('getPictureById(): fetched images - Hash MinIOData: ' + hashM)
+
+          const [status, data] = this.replicate(pictureWithoutData, pictureDataM.data, pictureDataD.data);
 
           const picture: Picture = {
             id: pictureWithoutData.id,
             createdAt: pictureWithoutData.createdAt,
             mimetype: pictureWithoutData.mimetype,
-            data: status[1],
-            replica: status[0]
+            data: data,
+            replica: status
           };
 
           pictureSubject.next(picture);
@@ -216,15 +245,16 @@ export class AppController implements SensorDataServiceController {
       return [Replica.OK, pictureMinio]
     } else if (pictureData.hash === hashMinio || pictureData.hash === hashDropbox) {
       // replace faulty image
+      this.logger.error("sensordata getPictureById(): images need to be replaced")
       if (pictureData.hash === hashMinio){
         // replace dropbox
+        this.logger.error("sensordata getPictureById(): Status REPLICATED: Dropbox file faulty")
         this.replicateData(pictureData, pictureMinio, this.pictureStorageDropbox)
-        this.logger.log("sensordata getPictureById(): Status REPLICATED: Dropbox file faulty")
         return [Replica.REPLICATED, pictureMinio]
       } else{
         // replace Monio
+        this.logger.error("sensordata getPictureById(): Status REPLICATED: MinIO file faulty")
         this.replicateData(pictureData, pictureDropbox, this.pictureStorageMinio)
-        this.logger.log("sensordata getPictureById(): Status REPLICATED: MinIO file faulty")
         return [Replica.REPLICATED, pictureDropbox]
       }
     } else {
@@ -241,6 +271,16 @@ export class AppController implements SensorDataServiceController {
       data: picture,
     });
     storage.createPictureById(createPictureById)
+        .subscribe((response: Empty) => {
+          this.logger.log("Sensordata Service replicateData(): finished" )
+    })
+  }
+
+  private determineIfIsAnimalOrHuman(toBeDetermined: PictureData | Error): Boolean {
+    if((toBeDetermined as PictureData)){
+      return true
+    }
+    return false
   }
 
 }
