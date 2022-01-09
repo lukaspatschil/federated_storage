@@ -132,6 +132,8 @@ export class AppController implements SensorDataServiceController {
 
         const [resultD, resultM] = results;
 
+        this.logger.log("Fetched all data successfully - minio-data: " + resultM.status)
+
         let picture: Picture = {
             id: pictureWithoutData.id,
             createdAt: pictureWithoutData.createdAt,
