@@ -41,10 +41,6 @@ export class MinioService implements OnModuleInit {
           (err, dataStream) => {
             if (err) {
               this.logger.error('Unable to get object: ' + err.message);
-              /*throw new RpcException({
-                code: status.NOT_FOUND,
-                message: err.message,
-              });*/
               reject(new RpcException({
                 code: status.NOT_FOUND,
                 message: err.message,
