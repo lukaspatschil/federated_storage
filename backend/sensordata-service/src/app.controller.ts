@@ -3,7 +3,14 @@ import {
   SensorDataServiceController,
   SensorDataServiceControllerMethods,
 } from './service-types/types/proto/sensorData';
-import { Observable, Subject, of, firstValueFrom, forkJoin, catchError, map } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  of,
+  firstValueFrom,
+  forkJoin,
+  catchError,
+} from 'rxjs';
 import {
   IdWithMimetype,
   Picture,
@@ -20,6 +27,8 @@ import { SensorDataStorageServiceClient } from './service-types/types/proto/sens
 import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import * as crypto from 'crypto';
 import { Replica } from './service-types/types';
+import { rejects } from 'assert';
+import { status } from '@grpc/grpc-js';
 import * as Buffer from "buffer";
 import { status } from '@grpc/grpc-js';
 
@@ -28,8 +37,8 @@ import { status } from '@grpc/grpc-js';
 export class AppController implements SensorDataServiceController {
   private logger = new Logger('sensordata-service controller');
 
-  private pictureStorageMinio: PictureStorageServiceClient;
-  private pictureStorageDropbox: PictureStorageServiceClient;
+  private pictureStorageM: PictureStorageServiceClient;
+  private pictureStorageD: PictureStorageServiceClient;
   private sensorDataStorage: SensorDataStorageServiceClient;
 
   constructor(
@@ -39,11 +48,11 @@ export class AppController implements SensorDataServiceController {
   ) {}
 
   onModuleInit() {
-    this.pictureStorageMinio =
+    this.pictureStorageM =
       this.minioClient.getService<PictureStorageServiceClient>(
         'PictureStorageService',
       );
-    this.pictureStorageDropbox =
+    this.pictureStorageD =
       this.dropboxClient.getService<PictureStorageServiceClient>(
         'PictureStorageService',
       );
@@ -53,56 +62,43 @@ export class AppController implements SensorDataServiceController {
       );
   }
 
-  createSensorData(request: Observable<SensorDataCreation>) {
+  async createSensorData(sensorDataCreation: SensorDataCreation) {
     this.logger.log('createSensorData(): started');
 
-    const sensorDataSubject = new Subject<Empty>();
+    const { data, mimetype } = sensorDataCreation.picture;
 
-    request.subscribe((sensorDataCreation) => {
-      const { data, mimetype } = sensorDataCreation.picture;
+    const hash = crypto
+      .createHash('sha256')
+      .update(sensorDataCreation.picture.data)
+      .digest('hex');
 
-      const hash = crypto
-        .createHash('sha256')
-        .update(sensorDataCreation.picture.data)
-        .digest('hex');
+    const pictureWithoutData = { mimetype, hash };
+    const sensorData = await firstValueFrom(
+      this.sensorDataStorage.createSensorData({
+        metadata: sensorDataCreation.metadata,
+        picture: pictureWithoutData,
+      }),
+    );
 
-      const pictureWithoutData = { mimetype, hash };
+    // ATTENTION: This may not work with multiple pictures, especially regarding concurrency
+    const lastPicture = sensorData.pictures[sensorData.pictures.length - 1];
 
-      this.sensorDataStorage
-        .createSensorData({
-          metadata: sensorDataCreation.metadata,
-          picture: pictureWithoutData,
-        })
-        .subscribe((sensorData) => {
-          // ATTENTION: This may not work with multiple pictures, especially regarding concurrency
-          const lastPicture =
-            sensorData.pictures[sensorData.pictures.length - 1];
+    this.logger.log(
+      'createSensorData(): start saving pictures with id: ' + lastPicture.id,
+    );
 
-          this.logger.log(
-            'createSensorData(): start saving pictures with id: ' +
-              lastPicture.id,
-          );
-
-          const createPictureById = of({
-            id: lastPicture.id,
-            mimetype: pictureWithoutData.mimetype,
-            data: data,
-          });
-
-          const createPictures$ = [
-            this.pictureStorageDropbox.createPictureById(createPictureById),
-            this.pictureStorageMinio.createPictureById(createPictureById),
-          ];
-
-          forkJoin(createPictures$).subscribe(() => {
-            sensorDataSubject.next(sensorData);
-            sensorDataSubject.complete();
-            this.logger.log('createSensorData(): finished');
-          });
-        });
-    });
-
-    return sensorDataSubject;
+    const createPictureById = {
+      id: lastPicture.id,
+      mimetype: pictureWithoutData.mimetype,
+      data: data,
+    };
+    await firstValueFrom(
+      forkJoin([
+        this.pictureStorageD.createPictureById(createPictureById),
+        this.pictureStorageM.createPictureById(createPictureById),
+      ]),
+    );
+    this.logger.log('createSensorData(): finished');
   }
 
   getSensorDataById(request: Id) {
@@ -115,68 +111,58 @@ export class AppController implements SensorDataServiceController {
     return this.sensorDataStorage.getAllSensorData({});
   }
 
-  getPictureById(request: Id) {
+  async getPictureById(request: Id) {
     this.logger.log(`getPictureById( ${request.id} )`);
 
-    const pictureSubject = new Subject<Picture>();
+    const pictureWithoutData = await firstValueFrom(
+      this.sensorDataStorage.getPictureWithoutDataById(request),
+    );
 
-    this.sensorDataStorage
-      .getPictureWithoutDataById(request)
-      .subscribe((pictureWithoutData: PictureWithoutData) => {
-        this.logger.log('getPictureById(): fetched sensordata id');
+    this.logger.log('getPictureById(): fetched sensordata id');
 
-        const idWithMimetype: IdWithMimetype = {
-          id: pictureWithoutData.id,
-          mimetype: pictureWithoutData.mimetype,
-        };
+    const idWithMimetype: IdWithMimetype = {
+      id: pictureWithoutData.id,
+      mimetype: pictureWithoutData.mimetype,
+    };
 
-        const emptyPictureData: PictureData = {
-          data: null,
-        }
+    const results = await Promise.allSettled([
+      firstValueFrom(this.pictureStorageD.getPictureById(idWithMimetype)),
+      firstValueFrom(this.pictureStorageM.getPictureById(idWithMimetype)),
+    ]);
 
-        const pictureData$ = [
-          this.pictureStorageDropbox.getPictureById(idWithMimetype).pipe(
-              catchError(err => {
-                this.logger.error(err);
-                return of(emptyPictureData)}),
-          ),
-          this.pictureStorageMinio.getPictureById(idWithMimetype).pipe(
-              catchError(err => {
-                this.logger.error(err);
-                return of(emptyPictureData)}),
-          )
-        ] as const;
+    const [resultD, resultM] = results;
 
-        forkJoin(pictureData$).subscribe((res) => {
-          this.logger.log('getPictureById(): fetched images');
-          const [pictureDataD, pictureDataM] = res;
+    if (resultD.status === 'rejected' || resultM.status === 'rejected') {
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: 'error when fetching images',
+      });
+    }
 
-          this.logger.log('getPictureById(): fetched images - Dropbox picture data: ' + pictureDataD)
-          this.logger.log('getPictureById(): fetched images - MinIO picture data: ' + pictureDataM)
+    const pictureDataM = resultM.value;
+    const pictureDataD = resultD.value;
 
-          if(pictureDataD.data === null && pictureDataM.data === null){
-            this.logger.error("MinIO and Dropbox file invalid")
-            // TODO throw exception
-            /*throw new RpcException({
-              code: status.INTERNAL,
-              message: "MinIO and Dropbox file invalid",
-            });*/
-          }
-
-          const hashD = crypto
-            .createHash('sha256')
-            .update(pictureDataD.data)
-            .digest('hex');
-          const hashM = crypto
-              .createHash('sha256')
-              .update(pictureDataM.data)
-              .digest('hex');
+    const hashM = crypto
+      .createHash('sha256')
+      .update(pictureDataM.data)
+      .digest('hex');
+    const hashD = crypto
+      .createHash('sha256')
+      .update(pictureDataD.data)
+      .digest('hex');
 
           this.logger.log('getPictureById(): fetched images - Hash DropboxData: ' + hashD)
           this.logger.log('getPictureById(): fetched images - Hash MinIOData: ' + hashM)
 
           const [status, data] = this.replicate(pictureWithoutData, pictureDataM.data, pictureDataD.data);
 
+    const picture: Picture = {
+      id: pictureWithoutData.id,
+      createdAt: pictureWithoutData.createdAt,
+      mimetype: pictureWithoutData.mimetype,
+      data: pictureDataM.data,
+      replica: hashD === hashM ? Replica.OK : Replica.FAULTY,
+    };
           const picture: Picture = {
             id: pictureWithoutData.id,
             createdAt: pictureWithoutData.createdAt,
@@ -185,13 +171,8 @@ export class AppController implements SensorDataServiceController {
             replica: status
           };
 
-          pictureSubject.next(picture);
-          pictureSubject.complete();
-          this.logger.log('getPictureById(): finished');
-        });
-      });
-
-    return pictureSubject.asObservable();
+    this.logger.log('getPictureById(): finished');
+    return picture;
   }
 
   async removeSensorDataById(request: Id) {
@@ -204,10 +185,10 @@ export class AppController implements SensorDataServiceController {
     const requests: Promise<Empty>[] = [];
     for (const picture of sensordata.pictures) {
       requests.push(
-        firstValueFrom(this.pictureStorageDropbox.removePictureById(picture)),
+        firstValueFrom(this.pictureStorageD.removePictureById(picture)),
       );
       requests.push(
-        firstValueFrom(this.pictureStorageMinio.removePictureById(picture)),
+        firstValueFrom(this.pictureStorageM.removePictureById(picture)),
       );
     }
     await Promise.all(requests);

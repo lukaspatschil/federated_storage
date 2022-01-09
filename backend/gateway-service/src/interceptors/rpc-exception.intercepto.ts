@@ -28,10 +28,10 @@ export class RpcExcpetionInterceptor implements NestInterceptor {
         }
 
         if (err?.code && err.code === status.INTERNAL) {
-          new InternalServerErrorException();
+          throw new InternalServerErrorException();
         }
 
-        throw err;
+        throw new InternalServerErrorException();
       }),
     );
   }

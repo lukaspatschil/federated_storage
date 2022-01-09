@@ -87,11 +87,8 @@ export class MinioService implements OnModuleInit {
     return removeSubject.asObservable();
   }
 
-  createPictureById(
-    request: Observable<PictureCreationById>,
-  ): Observable<Empty> {
-    const pictureSubject = new Subject<Empty>();
-    request.subscribe((pictureCreation) => {
+  createPictureById(pictureCreation: PictureCreationById): Promise<Empty> {
+    return new Promise<Empty>((resolve) => {
       this.minioClient.putObject(
         this.bucketName,
         pictureCreation.id,
@@ -106,13 +103,11 @@ export class MinioService implements OnModuleInit {
               message: err.message,
             });
           }
-          pictureSubject.next({});
-          pictureSubject.complete();
+          resolve({});
           this.logger.log('Successfully added picture ' + pictureCreation.id);
         },
       );
     });
-    return pictureSubject.asObservable();
   }
 
   private connectToMinio(): Minio.Client {
