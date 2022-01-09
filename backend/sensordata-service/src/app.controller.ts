@@ -132,7 +132,7 @@ export class AppController implements SensorDataServiceController {
 
         const [resultD, resultM] = results;
 
-        this.logger.log("Fetched all data successfully - minio-data: " + resultM.status)
+        this.logger.log("SensordataService getPictureById(): Fetched all data successfully")
 
         let picture: Picture = {
             id: pictureWithoutData.id,
@@ -142,30 +142,43 @@ export class AppController implements SensorDataServiceController {
             replica: null
         };;
         if (resultD.status === 'rejected' && resultM.status === 'rejected') {
+
+            //both were rejected
+            this.logger.log("SensordataService getPictureById(): Dropbox and MinIO were rejected - Throwing Error and leaving")
             throw new RpcException({
                 code: status.INTERNAL,
                 message: 'error when fetching images',
             });
+
         } else if(resultD.status === 'rejected' || resultM.status === 'rejected'){
+
+            this.logger.log("SensordataService getPictureById(): Dropbox or MinIO were rejected - try to replicate data")
+
             if(resultD.status === 'rejected' && resultM.status === 'fulfilled'){
                 // dropbox file missing, replace dropbox
+                this.logger.log("SensordataService getPictureById(): Dropbox file missing or other error, MinIO ok, replicate Dropbox data")
                 this.replicateData(pictureWithoutData, resultM.value.data, this.pictureStorageD)
                 picture.data = resultM.value.data
-
             } else if (resultD.status === "fulfilled" && resultM.status === "rejected"){
                 // minIO files missing, replace MinIO
+                this.logger.log("SensordataService getPictureById(): MinIO file missing or other error, Dropbox ok, replicate MinIO data")
                 this.replicateData(pictureWithoutData, resultD.value.data, this.pictureStorageM)
                 picture.data = resultD.value.data
             }
+
             picture.replica = Replica.REPLICATED
+
         } else{
+
+            //both data found
+            this.logger.log("SensordataService getPictureById(): found both Dropbox and MinIO data, no error - checking for hash values of the data")
+
             const pictureDataM = resultM.value;
             const pictureDataD = resultD.value;
 
             const [replicaStatus, data] = this.replicate(pictureWithoutData, pictureDataM.data, pictureDataD.data);
             picture.data = data
             picture.replica = replicaStatus
-
         }
 
         this.logger.log('getPictureById(): finished');
@@ -209,25 +222,25 @@ export class AppController implements SensorDataServiceController {
             .digest('hex');
 
         if (pictureData.hash === hashMinio && pictureData.hash === hashDropbox) {
-            this.logger.log("sensordata getPictureById(): Status OK")
+            this.logger.log("sensordata getPictureById() replicate(): Status OK")
             return [Replica.OK, pictureMinio]
         } else if (pictureData.hash === hashMinio || pictureData.hash === hashDropbox) {
             // replace faulty image
-            this.logger.error("sensordata getPictureById(): images need to be replaced")
+            this.logger.error("sensordata getPictureById() replicate(): images need to be replaced")
             if (pictureData.hash === hashMinio) {
                 // replace dropbox
-                this.logger.error("sensordata getPictureById(): Status REPLICATED: Dropbox file faulty")
+                this.logger.error("sensordata getPictureById() replicate(): Status REPLICATED: Dropbox file faulty")
                 this.replicateData(pictureData, pictureMinio, this.pictureStorageD)
                 return [Replica.REPLICATED, pictureMinio]
             } else {
                 // replace Monio
-                this.logger.error("sensordata getPictureById(): Status REPLICATED: MinIO file faulty")
+                this.logger.error("sensordata getPictureById() replicate(): Status REPLICATED: MinIO file faulty")
                 this.replicateData(pictureData, pictureDropbox, this.pictureStorageM)
                 return [Replica.REPLICATED, pictureDropbox]
             }
         } else {
             // not possible to determine the correct image
-            this.logger.log("sensordata getPictureById(): Status MISSING: All files faulty")
+            this.logger.log("sensordata getPictureById() replicate(): Status MISSING: All files faulty")
             return [Replica.MISSING, null]
         }
     }
@@ -240,7 +253,7 @@ export class AppController implements SensorDataServiceController {
         };
         storage.createPictureById(createPictureById)
             .subscribe((response: Empty) => {
-                this.logger.log("Sensordata Service replicateData(): finished")
+                this.logger.log("SensordataService getPictureById() replicateData(): finished")
             })
     }
 
