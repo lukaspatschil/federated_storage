@@ -33,13 +33,10 @@ export class AppController
   constructor(private readonly configService: ConfigService) {}
 
   createPictureById(
-    request: Observable<PictureCreationById>,
+    picture: PictureCreationById,
   ): Promise<Empty> | Observable<Empty> | Empty {
-    const subject = new Subject<Empty>();
-
     this.logger.log('createPictureById');
-
-    request.subscribe((picture) => {
+    return new Promise((resolve) => {
       const path =
         this.configService.get('DROPBOX_PATH') +
         picture.id +
@@ -53,8 +50,7 @@ export class AppController
         })
         .then((response: any) => {
           this.logger.log(response);
-          subject.next({});
-          subject.complete();
+          resolve({});
         })
         .catch((uploadErr: Error) => {
           throw new RpcException({
@@ -63,42 +59,36 @@ export class AppController
           });
         });
     });
-
-    return subject.asObservable();
   }
 
-  getPictureById(request: IdWithMimetype): Observable<PictureData> {
-    const data = new Subject<PictureData>();
-    let returnData: PictureData;
-
+  async getPictureById(request: IdWithMimetype) {
     this.logger.log('getPictureById');
-
     const path =
       this.configService.get('DROPBOX_PATH') +
       request.id +
       '.' +
       mime.extension(request.mimetype);
 
-    this.dbx
-      .filesDownload({ path: path })
-      .then((response) => {
-        this.logger.log(response);
-        returnData = {
-          data: (<any>response.result).fileBinary,
-        };
-        data.next(returnData);
-        data.complete();
-      })
-      .catch((downloadErr: Error) => {
-        this.logger.log(downloadErr);
+    try {
+      const response = await this.dbx.filesDownload({ path: path });
+      this.logger.log(response);
+      return { data: (<any>response.result).fileBinary };
+    } catch (e) {
+      this.logger.error(JSON.stringify(e));
 
+      // TODO: maybe make more specific
+      if (e?.status && e.status == 409) {
         throw new RpcException({
           code: status.NOT_FOUND,
-          message: downloadErr.message,
+          message: 'Path not found',
         });
-      });
+      }
 
-    return data.asObservable();
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: 'Dropbox Response Error',
+      });
+    }
   }
 
   removePictureById(

@@ -27,9 +27,7 @@ export class MinioController implements PictureStorageServiceController {
     return this.minioService.removePictureById(request);
   }
 
-  createPictureById(
-    request: Observable<PictureCreationById>,
-  ): Observable<Empty> {
+  createPictureById(request: PictureCreationById): Promise<Empty> {
     return this.minioService.createPictureById(request);
   }
 }

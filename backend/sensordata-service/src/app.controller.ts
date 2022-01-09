@@ -3,7 +3,14 @@ import {
   SensorDataServiceController,
   SensorDataServiceControllerMethods,
 } from './service-types/types/proto/sensorData';
-import { Observable, Subject, of, firstValueFrom, forkJoin } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  of,
+  firstValueFrom,
+  forkJoin,
+  catchError,
+} from 'rxjs';
 import {
   IdWithMimetype,
   Picture,
@@ -16,9 +23,11 @@ import {
 } from './service-types/types/proto/shared';
 import { PictureStorageServiceClient } from './service-types/types/proto/pictureStorage';
 import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
-import { ClientGrpc } from '@nestjs/microservices';
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import * as crypto from 'crypto';
 import { Replica } from './service-types/types';
+import { rejects } from 'assert';
+import { status } from '@grpc/grpc-js';
 
 @Controller()
 @SensorDataServiceControllerMethods()
@@ -50,56 +59,43 @@ export class AppController implements SensorDataServiceController {
       );
   }
 
-  createSensorData(request: Observable<SensorDataCreation>) {
+  async createSensorData(sensorDataCreation: SensorDataCreation) {
     this.logger.log('createSensorData(): started');
 
-    const sensorDataSubject = new Subject<Empty>();
+    const { data, mimetype } = sensorDataCreation.picture;
 
-    request.subscribe((sensorDataCreation) => {
-      const { data, mimetype } = sensorDataCreation.picture;
+    const hash = crypto
+      .createHash('sha256')
+      .update(sensorDataCreation.picture.data)
+      .digest('hex');
 
-      const hash = crypto
-        .createHash('sha256')
-        .update(sensorDataCreation.picture.data)
-        .digest('hex');
+    const pictureWithoutData = { mimetype, hash };
+    const sensorData = await firstValueFrom(
+      this.sensorDataStorage.createSensorData({
+        metadata: sensorDataCreation.metadata,
+        picture: pictureWithoutData,
+      }),
+    );
 
-      const pictureWithoutData = { mimetype, hash };
+    // ATTENTION: This may not work with multiple pictures, especially regarding concurrency
+    const lastPicture = sensorData.pictures[sensorData.pictures.length - 1];
 
-      this.sensorDataStorage
-        .createSensorData({
-          metadata: sensorDataCreation.metadata,
-          picture: pictureWithoutData,
-        })
-        .subscribe((sensorData) => {
-          // ATTENTION: This may not work with multiple pictures, especially regarding concurrency
-          const lastPicture =
-            sensorData.pictures[sensorData.pictures.length - 1];
+    this.logger.log(
+      'createSensorData(): start saving pictures with id: ' + lastPicture.id,
+    );
 
-          this.logger.log(
-            'createSensorData(): start saving pictures with id: ' +
-              lastPicture.id,
-          );
-
-          const createPictureById = of({
-            id: lastPicture.id,
-            mimetype: pictureWithoutData.mimetype,
-            data: data,
-          });
-
-          const createPictures$ = [
-            this.pictureStorageD.createPictureById(createPictureById),
-            this.pictureStorageM.createPictureById(createPictureById),
-          ];
-
-          forkJoin(createPictures$).subscribe(() => {
-            sensorDataSubject.next(sensorData);
-            sensorDataSubject.complete();
-            this.logger.log('createSensorData(): finished');
-          });
-        });
-    });
-
-    return sensorDataSubject;
+    const createPictureById = {
+      id: lastPicture.id,
+      mimetype: pictureWithoutData.mimetype,
+      data: data,
+    };
+    await firstValueFrom(
+      forkJoin([
+        this.pictureStorageD.createPictureById(createPictureById),
+        this.pictureStorageM.createPictureById(createPictureById),
+      ]),
+    );
+    this.logger.log('createSensorData(): finished');
   }
 
   getSensorDataById(request: Id) {
@@ -112,61 +108,63 @@ export class AppController implements SensorDataServiceController {
     return this.sensorDataStorage.getAllSensorData({});
   }
 
-  getPictureById(request: Id) {
+  async getPictureById(request: Id) {
     this.logger.log(`getPictureById( ${request.id} )`);
 
-    const pictureSubject = new Subject<Picture>();
+    const pictureWithoutData = await firstValueFrom(
+      this.sensorDataStorage.getPictureWithoutDataById(request),
+    );
 
-    this.sensorDataStorage
-      .getPictureWithoutDataById(request)
-      .subscribe((pictureWithoutData: PictureWithoutData) => {
-        this.logger.log('getPictureById(): fetched sensordata id');
+    this.logger.log('getPictureById(): fetched sensordata id');
 
-        const idWithMimetype: IdWithMimetype = {
-          id: pictureWithoutData.id,
-          mimetype: pictureWithoutData.mimetype,
-        };
+    const idWithMimetype: IdWithMimetype = {
+      id: pictureWithoutData.id,
+      mimetype: pictureWithoutData.mimetype,
+    };
 
-        const pictureData$ = [
-          this.pictureStorageD.getPictureById(idWithMimetype),
-          this.pictureStorageM.getPictureById(idWithMimetype),
-        ] as const;
+    const results = await Promise.allSettled([
+      firstValueFrom(this.pictureStorageD.getPictureById(idWithMimetype)),
+      firstValueFrom(this.pictureStorageM.getPictureById(idWithMimetype)),
+    ]);
 
-        forkJoin(pictureData$).subscribe((res) => {
-          this.logger.log('getPictureById(): fetched images');
-          const [pictureDataD, pictureDataM] = res;
+    const [resultD, resultM] = results;
 
-          const hashM = crypto
-            .createHash('sha256')
-            .update(pictureDataM.data)
-            .digest('hex');
-          const hashD = crypto
-            .createHash('sha256')
-            .update(pictureDataD.data)
-            .digest('hex');
-
-          // Maybe for the future?
-          // const replicaStatus = this.compareHash(
-          //   pictureWithoutData.hash,
-          //   hashM,
-          //   hashD,
-          // );
-
-          const picture: Picture = {
-            id: pictureWithoutData.id,
-            createdAt: pictureWithoutData.createdAt,
-            mimetype: pictureWithoutData.mimetype,
-            data: pictureDataM.data,
-            replica: hashD === hashM ? Replica.OK : Replica.FAULTY,
-          };
-
-          pictureSubject.next(picture);
-          pictureSubject.complete();
-          this.logger.log('getPictureById(): finished');
-        });
+    if (resultD.status === 'rejected' || resultM.status === 'rejected') {
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: 'error when fetching images',
       });
+    }
 
-    return pictureSubject.asObservable();
+    const pictureDataM = resultM.value;
+    const pictureDataD = resultD.value;
+
+    const hashM = crypto
+      .createHash('sha256')
+      .update(pictureDataM.data)
+      .digest('hex');
+    const hashD = crypto
+      .createHash('sha256')
+      .update(pictureDataD.data)
+      .digest('hex');
+
+    // Maybe for the future?
+    // const replicaStatus = this.compareHash(
+    //   pictureWithoutData.hash,
+    //   hashM,
+    //   hashD,
+    // );
+
+    const picture: Picture = {
+      id: pictureWithoutData.id,
+      createdAt: pictureWithoutData.createdAt,
+      mimetype: pictureWithoutData.mimetype,
+      data: pictureDataM.data,
+      replica: hashD === hashM ? Replica.OK : Replica.FAULTY,
+    };
+
+    this.logger.log('getPictureById(): finished');
+    return picture;
   }
 
   async removeSensorDataById(request: Id) {

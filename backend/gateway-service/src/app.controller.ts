@@ -82,7 +82,7 @@ export class AppController {
       },
     };
 
-    return this.sensorDataService.createSensorData(of(sensorDataEntity));
+    return this.sensorDataService.createSensorData(sensorDataEntity);
   }
 
   @Get('/:id')
