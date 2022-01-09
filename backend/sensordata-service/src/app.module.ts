@@ -1,7 +1,7 @@
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { SensordataService } from './sensordata.service';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
 import { AmqpLoggerModule } from './amqp-logger/amqp-logger.module';
@@ -44,6 +44,6 @@ import { AmqpLoggerModule } from './amqp-logger/amqp-logger.module';
     AmqpLoggerModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [SensordataService],
 })
 export class AppModule {}
