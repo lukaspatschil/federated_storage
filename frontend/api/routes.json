@@ -1,0 +1,4 @@
+{
+  "/api/v1/sensordata": "/sensordata",
+  "/api/v1/sensordata/picture/:id": "/picture/:id"
+}

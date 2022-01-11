@@ -1,0 +1,29 @@
+<div>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Options</h4>
+    <button type="button" class="close" aria-label="Close" (click)="close()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="form-group">
+      <label for="maxPoints">Points shown: </label>
+      <div class="input-group">
+        <input
+          class="form-control"
+          id="maxPoints"
+          type="number"
+          [value]="points"
+          (input)="pointsChanged($event)"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" type="button" (click)="clearCache()">
+      Clear cache
+    </button>
+  </div>
+</div>
