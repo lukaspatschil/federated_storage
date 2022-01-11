@@ -35,6 +35,8 @@ async function bootstrap() {
 
   app.useLogger(app.get(AmqpLoggerService));
 
+  app.enableCors();
+
   await app.listen(3000);
 }
 bootstrap();

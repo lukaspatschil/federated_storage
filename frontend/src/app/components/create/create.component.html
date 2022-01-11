@@ -1,0 +1,351 @@
+<div>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Create new sensor data</h4>
+    <button type="button" class="close" aria-label="Close" (click)="close()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <form class="form" [formGroup]="sensorDataForm" (ngSubmit)="save()">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <div class="input-group">
+          <input
+            id="name"
+            name="name"
+            formControlName="name"
+            class="form-control"
+          />
+        </div>
+        <div *ngIf="name?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="name?.errors?.['required']"
+          >
+            The sensor data needs a name!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="placeIdent">Place identifier</label>
+        <div class="input-group">
+          <input
+            id="placeIdent"
+            formControlName="placeIdent"
+            class="form-control"
+            name="placeIdent"
+          />
+        </div>
+        <div *ngIf="placeIdent?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="placeIdent?.errors?.['required']"
+          >
+            The sensor data needs a place identifier!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="datetime">Date</label>
+        <div class="input-group">
+          <input
+            id="datetime"
+            formControlName="datetime"
+            class="form-control"
+            placeholder="yyyy-mm-dd"
+            name="dp"
+            ngbDatepicker
+            #dp="ngbDatepicker"
+          />
+          <div class="input-group-append">
+            <button
+              class="btn btn-outline-secondary calendar"
+              (click)="dp.toggle()"
+              type="button"
+            ></button>
+          </div>
+        </div>
+        <div *ngIf="datetime?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="datetime?.errors?.['required']"
+          >
+            The sensor data needs a date!
+          </small>
+          <small
+            class="form-text text-danger"
+            *ngIf="datetime?.errors?.['ngbDate']"
+          >
+            This is not a valid date!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="time">Time</label>
+        <div class="input-group">
+          <ngb-timepicker
+            id="time"
+            formControlName="time"
+            name="time"
+            [seconds]="true"
+            [spinners]="false"
+          ></ngb-timepicker>
+        </div>
+        <div *ngIf="time?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="time?.errors?.['required']"
+          >
+            The sensor data needs a time!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="deviceID">Device ID</label>
+        <div class="input-group">
+          <input
+            id="deviceID"
+            formControlName="deviceID"
+            class="form-control"
+            name="deviceID"
+          />
+        </div>
+        <div *ngIf="deviceID?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="deviceID?.errors?.['required']"
+          >
+            The sensor data needs a device ID!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="filename">Filename</label>
+        <div class="input-group">
+          <input
+            id="filename"
+            formControlName="filename"
+            class="form-control"
+            name="filename"
+          />
+        </div>
+        <div *ngIf="filename?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="filename?.errors?.['required']"
+          >
+            The sensor data needs a filename!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="frameNum">Frame number</label>
+        <div class="input-group">
+          <input
+            type="number"
+            id="frameNum"
+            formControlName="frameNum"
+            class="form-control"
+            name="frameNum"
+          />
+        </div>
+        <div *ngIf="frameNum?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="frameNum?.errors?.['required']"
+          >
+            The sensor data needs a frame number!
+          </small>
+          <small
+            class="form-text text-danger"
+            *ngIf="frameNum?.errors?.['min']"
+          >
+            The frame number must be positive!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="seqID">Sequence ID</label>
+        <div class="input-group">
+          <input
+            id="seqID"
+            formControlName="seqID"
+            class="form-control"
+            name="seqID"
+          />
+        </div>
+        <div *ngIf="seqID?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="seqID?.errors?.['required']"
+          >
+            The sensor data needs a sequence ID!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="seqNumFrames">Number of sequence frames</label>
+        <div class="input-group">
+          <input
+            type="number"
+            id="seqNumFrames"
+            formControlName="seqNumFrames"
+            class="form-control"
+            name="seqNumFrames"
+          />
+        </div>
+        <div *ngIf="seqNumFrames?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="seqNumFrames?.errors?.['required']"
+          >
+            The sensor data needs number of sequence frames!
+          </small>
+          <small
+            class="form-text text-danger"
+            *ngIf="seqNumFrames?.errors?.['min']"
+          >
+            The number of sequence frames must be positive!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="latitude">Latitude</label>
+        <div class="input-group">
+          <input
+            type="number"
+            id="latitude"
+            formControlName="latitude"
+            class="form-control"
+            name="latitude"
+          />
+        </div>
+        <div *ngIf="latitude?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="latitude?.errors?.['required']"
+          >
+            The sensor data needs a latitude!
+          </small>
+          <small
+            class="form-text text-danger"
+            *ngIf="latitude?.errors?.['min']"
+          >
+            The latitude needs to be at least -90!
+          </small>
+          <small
+            class="form-text text-danger"
+            *ngIf="latitude?.errors?.['max']"
+          >
+            The latitude needs to be at most 90!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="longitude">Longitude</label>
+        <div class="input-group">
+          <input
+            type="number"
+            id="longitude"
+            formControlName="longitude"
+            class="form-control"
+            name="longitude"
+          />
+        </div>
+        <div *ngIf="longitude?.touched" class="error">
+          <small
+            class="form-text text-danger"
+            *ngIf="longitude?.errors?.['required']"
+          >
+            The sensor data needs a longitude!
+          </small>
+          <small
+            class="form-text text-danger"
+            *ngIf="longitude?.errors?.['min']"
+          >
+            The longitude needs to be at least -180!
+          </small>
+          <small
+            class="form-text text-danger"
+            *ngIf="longitude?.errors?.['max']"
+          >
+            The longitude needs to be at most 180!
+          </small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="inputPicture">Picture:</label>
+        <div>
+          <div class="input-group">
+            <input
+              type="file"
+              name="picture"
+              formControlName="picture"
+              class="form-control"
+              accept=".png, .jpg, .jpeg"
+            />
+            <div class="input-group-append">
+              <button
+                type="button"
+                class="btn input-group-text"
+                (click)="clearPicture()"
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Clear the picture."
+              >
+                <span class="material-icons mr-1" aria-hidden="true"
+                  >clear</span
+                >
+              </button>
+            </div>
+          </div>
+          <div *ngIf="picture?.touched" class="error">
+            <small
+              class="form-text text-danger"
+              *ngIf="picture?.errors?.['required']"
+            >
+              The sensor data needs a picture!
+            </small>
+            <small
+              class="form-text text-danger"
+              *ngIf="picture?.errors?.['wrongType']"
+            >
+              Only PNG, JPG and JPEG allowed!
+            </small>
+          </div>
+        </div>
+
+        <div *ngIf="picture?.value?.pictureSrc && picture?.valid">
+          <img
+            src="{{picture?.value?.pictureSrc}}"
+            alt="Preview picture"
+            class="mt-2 img-thumbnail d-block"
+          />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      [disabled]="sensorDataForm.invalid"
+      class="btn btn-outline-dark"
+      type="button"
+      (click)="save()"
+    >
+      Create
+    </button>
+  </div>
+</div>

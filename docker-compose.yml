@@ -172,12 +172,6 @@ services:
       - rabbitmq
     environment:
       WAIT_HOSTS: rabbitmq:5672
-    # depends_on:
-    #   - rabbitmq
-    # environment:
-    #   WAIT_HOSTS: rabbitmq:5672
-    #   WAIT_TIMEOUT: 120
-    #   WAIT_SLEEP_INTERVAL: 5
     env_file:
       - ./.develop.env
     networks:
