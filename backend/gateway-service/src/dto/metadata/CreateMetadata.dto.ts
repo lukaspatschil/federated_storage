@@ -10,7 +10,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import {Transform, Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateMetadataDto {
   @ApiProperty({ description: 'name of the file', example: 'GRASMERE 1' })
@@ -38,7 +38,7 @@ export class CreateMetadataDto {
   @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
-  @Transform(({value}) => new Date(value))
+  @Transform(({ value }) => new Date(value))
   datetime: Date;
 
   @ApiProperty({ description: 'frame number', example: 1 })

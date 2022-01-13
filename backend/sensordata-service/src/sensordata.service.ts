@@ -226,15 +226,15 @@ export class SensordataService {
       return [Replica.OK, pictureMinio]
     } else if (pictureData.hash === hashMinio || pictureData.hash === hashDropbox) {
       // replace faulty image
-      this.logger.error("sensordata getPictureById() replicate(): images need to be replaced")
+      this.logger.log("sensordata getPictureById() replicate(): images need to be replaced")
       if (pictureData.hash === hashMinio) {
         // replace dropbox
-        this.logger.error("sensordata getPictureById() replicate(): Status REPLICATED: Dropbox file faulty")
+        this.logger.log("sensordata getPictureById() replicate(): Status REPLICATED: Dropbox file faulty")
         this.replicateData(pictureData, pictureMinio, this.pictureStorageD)
         return [Replica.REPLICATED, pictureMinio]
       } else {
         // replace Monio
-        this.logger.error("sensordata getPictureById() replicate(): Status REPLICATED: MinIO file faulty")
+        this.logger.log("sensordata getPictureById() replicate(): Status REPLICATED: MinIO file faulty")
         this.replicateData(pictureData, pictureDropbox, this.pictureStorageM)
         return [Replica.REPLICATED, pictureDropbox]
       }
