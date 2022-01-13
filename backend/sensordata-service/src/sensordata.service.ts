@@ -63,7 +63,7 @@ export class SensordataService {
   }
 
   async createSensorData(sensorDataCreation: SensorDataCreation) {
-    this.logger.log('createSensorData(): started');
+    this.logger.log('sensorDataService - createSensorData(): started');
 
     const {data, mimetype} = sensorDataCreation.picture;
 
@@ -102,23 +102,23 @@ export class SensordataService {
   }
 
   getSensorDataById(request: Id) {
-    this.logger.log(`getSensorDataById( ${request.id} )`);
+    this.logger.log(`sensorDataService - get sensordata by id: ${request.id}`);
     return this.sensorDataStorage.getSensorDataById(request);
   }
 
   getAllSensorData() {
-    this.logger.log('getAllSensorData()');
+    this.logger.log('sensorDataService - get all sensordata');
     return this.sensorDataStorage.getAllSensorData({});
   }
 
   async getPictureById(request: Id) {
-    this.logger.log(`getPictureById( ${request.id} )`);
+    this.logger.log(`sensorDataService - get picturedata by id: ${request.id}`);
 
     const pictureWithoutData = await firstValueFrom(
         this.sensorDataStorage.getPictureWithoutDataById(request),
     );
 
-    this.logger.log('getPictureById(): fetched sensordata id');
+    this.logger.log('sensorDataService - get picturedata by id: fetched picturedata without imagedata');
 
     const idWithMimetype: IdWithMimetype = {
       id: pictureWithoutData.id,
@@ -132,7 +132,7 @@ export class SensordataService {
 
     const [resultD, resultM] = results;
 
-    this.logger.log("SensordataService getPictureById(): Fetched all data successfully")
+    this.logger.log("sensorDataService - get picturedata by id: Fetched all data")
 
     let picture: Picture = {
       id: pictureWithoutData.id,
@@ -144,7 +144,7 @@ export class SensordataService {
     if (resultD.status === 'rejected' && resultM.status === 'rejected') {
 
       //both were rejected
-      this.logger.log("SensordataService getPictureById(): Dropbox and MinIO were rejected - Throwing Error and leaving")
+      this.logger.log("sensorDataService - get picturedata by id: Dropbox and MinIO were rejected - Throwing Error and leaving")
       throw new RpcException({
         code: status.INTERNAL,
         message: 'error when fetching images',
@@ -152,16 +152,16 @@ export class SensordataService {
 
     } else if(resultD.status === 'rejected' || resultM.status === 'rejected'){
 
-      this.logger.log("SensordataService getPictureById(): Dropbox or MinIO were rejected - try to replicate data")
+      this.logger.log("sensorDataService - get picturedata by id: Dropbox or MinIO were rejected - try to replicate data")
 
       if(resultD.status === 'rejected' && resultM.status === 'fulfilled'){
         // dropbox file missing, replace dropbox
-        this.logger.log("SensordataService getPictureById(): Dropbox file missing or other error, MinIO ok, replicate Dropbox data")
+        this.logger.log("sensorDataService - get picturedata by id: Dropbox file missing or other error, MinIO ok, replicate Dropbox data")
         this.replicateData(pictureWithoutData, resultM.value.data, this.pictureStorageD)
         picture.data = resultM.value.data
       } else if (resultD.status === "fulfilled" && resultM.status === "rejected"){
         // minIO files missing, replace MinIO
-        this.logger.log("SensordataService getPictureById(): MinIO file missing or other error, Dropbox ok, replicate MinIO data")
+        this.logger.log("sensorDataService - get picturedata by id: MinIO file missing or other error, Dropbox ok, replicate MinIO data")
         this.replicateData(pictureWithoutData, resultD.value.data, this.pictureStorageM)
         picture.data = resultD.value.data
       }
@@ -181,12 +181,12 @@ export class SensordataService {
       picture.replica = replicaStatus
     }
 
-    this.logger.log('getPictureById(): finished');
+    this.logger.log('sensorDataService - get picturedata by id: finished');
     return picture;
   }
 
   async removeSensorDataById(request: Id) {
-    this.logger.log(`removeSensorDataById( ${request.id} )`);
+    this.logger.log(`sensorDataService - remove sensordata by id: ${request.id}`);
 
     const sensordata = await firstValueFrom(
         this.sensorDataStorage.getSensorDataById(request),
@@ -222,11 +222,11 @@ export class SensordataService {
         .digest('hex');
 
     if (pictureData.hash === hashMinio && pictureData.hash === hashDropbox) {
-      this.logger.log("sensordata getPictureById() replicate(): Status OK")
+      this.logger.log("sensorDataService - get picturedata by id: replicate(): Status OK")
       return [Replica.OK, pictureMinio]
     } else if (pictureData.hash === hashMinio || pictureData.hash === hashDropbox) {
       // replace faulty image
-      this.logger.log("sensordata getPictureById() replicate(): images need to be replaced")
+      this.logger.log("sensorDataService - get picturedata by id: replicate(): images need to be replaced")
       if (pictureData.hash === hashMinio) {
         // replace dropbox
         this.logger.log("sensordata getPictureById() replicate(): Status REPLICATED: Dropbox file faulty")
@@ -234,13 +234,13 @@ export class SensordataService {
         return [Replica.REPLICATED, pictureMinio]
       } else {
         // replace Monio
-        this.logger.log("sensordata getPictureById() replicate(): Status REPLICATED: MinIO file faulty")
+        this.logger.log("sensorDataService - get picturedata by id: replicate(): Status REPLICATED: MinIO file faulty")
         this.replicateData(pictureData, pictureDropbox, this.pictureStorageM)
         return [Replica.REPLICATED, pictureDropbox]
       }
     } else {
       // not possible to determine the correct image
-      this.logger.log("sensordata getPictureById() replicate(): Status MISSING: All files faulty")
+      this.logger.log("sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty")
       return [Replica.MISSING, null]
     }
   }
@@ -253,7 +253,7 @@ export class SensordataService {
     };
     storage.createPictureById(createPictureById)
         .subscribe((response: Empty) => {
-          this.logger.log("SensordataService getPictureById() replicateData(): finished")
+          this.logger.log("sensorDataService - get picturedata by id: replicateData(): finished")
         })
   }
 }
