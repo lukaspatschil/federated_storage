@@ -88,7 +88,7 @@ export class AppController
       if (e?.status && e.status === 409) {
         throw new RpcException({
           code: status.NOT_FOUND,
-          message: 'Path not found',
+          message: e.message,
         });
       }
 
