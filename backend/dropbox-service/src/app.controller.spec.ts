@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { DropboxController } from './dropbox.controller';
+import { DropboxService } from './dropbox.service';
 import {
   IdWithMimetype,
   PictureCreationById,
@@ -10,7 +10,7 @@ import { of } from 'rxjs';
 import { Dropbox, DropboxResponse, files } from 'dropbox';
 
 describe('AppController', () => {
-  let appController: AppController;
+  let appController: DropboxController;
   let newObject: PictureCreationById;
   let findObject: IdWithMimetype;
   let dataObject: PictureData;
@@ -22,11 +22,11 @@ describe('AppController', () => {
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
+      controllers: [DropboxController],
+      providers: [DropboxService],
     }).compile();
 
-    appController = app.get<AppController>(AppController);
+    appController = app.get<DropboxController>(DropboxController);
 
     newObject = {
       id: 'asdf',
