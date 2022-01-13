@@ -85,7 +85,7 @@ export class AppController
       this.logger.error(JSON.stringify(e));
 
       // TODO: maybe make more specific
-      if (e?.status && e.status == 409) {
+      if (e?.status && e.status === 409) {
         throw new RpcException({
           code: status.NOT_FOUND,
           message: 'Path not found',
