@@ -43,16 +43,24 @@ export class AppController
         '.' +
         mime.extension(picture.mimetype);
 
+      this.logger.log("DropboxService createPictureById(): send request to dropbox")
+
       this.dbx
         .filesUpload({
           path: path,
           contents: picture.data,
+          autorename: false,
+          mode: { ".tag": "overwrite" },
+          mute: true,
+          strict_conflict: false
         })
         .then((response: any) => {
+          this.logger.log("DropboxService createPictureById(): request to dropbox sent sucessfully")
           this.logger.log(response);
           resolve({});
         })
         .catch((uploadErr: Error) => {
+          this.logger.error("DropboxService createPictureByID: " + uploadErr)
           throw new RpcException({
             code: status.INTERNAL,
             message: uploadErr.message,
@@ -77,10 +85,10 @@ export class AppController
       this.logger.error(JSON.stringify(e));
 
       // TODO: maybe make more specific
-      if (e?.status && e.status == 409) {
+      if (e?.status && e.status === 409) {
         throw new RpcException({
           code: status.NOT_FOUND,
-          message: 'Path not found',
+          message: e.message,
         });
       }
 
