@@ -1,8 +1,8 @@
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { AmqpLoggerModule } from './amqp-logger/amqp-logger.module';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { GatewayController } from './gateway.controller';
+import { GatewayService } from './gateway.service';
 import { Module } from '@nestjs/common';
 import { join } from 'path';
 
@@ -21,7 +21,7 @@ import { join } from 'path';
     ]),
     AmqpLoggerModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [GatewayController],
+  providers: [GatewayService],
 })
-export class AppModule {}
+export class GatewayModule {}

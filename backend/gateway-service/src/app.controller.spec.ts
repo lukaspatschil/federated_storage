@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppController } from './app.controller';
+import { GatewayController } from './gateway.controller';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { AppModule } from './app.module';
+import { GatewayModule } from './gateway.module';
 
 describe('AppController', () => {
   let app: INestApplication, JsonBody;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [GatewayModule],
     }).compile();
 
     app = moduleRef.createNestApplication();

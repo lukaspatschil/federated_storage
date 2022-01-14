@@ -30,19 +30,13 @@ import { SensorDataServiceClient } from './service-types/types/proto/sensorData'
 import { firstValueFrom, of } from 'rxjs';
 import { SensorDataCreation } from './service-types/types/proto/shared';
 import { Replica } from './service-types/types';
+import { GatewayService } from './gateway.service';
 
 @Controller('api/v1/sensordata')
-export class AppController {
+export class GatewayController {
   private readonly logger = new Logger('gateway-service');
 
-  private sensorDataService: SensorDataServiceClient;
-
-  constructor(@Inject('SENSORDATA_PACKAGE') private client: ClientGrpc) {}
-
-  onModuleInit() {
-    this.sensorDataService =
-      this.client.getService<SensorDataServiceClient>('SensorDataService');
-  }
+  constructor(private readonly gatewayService: GatewayService) {}
 
   @Post()
   @ApiTags('Storage')
@@ -59,30 +53,11 @@ export class AppController {
     description: 'wrong API key',
     type: String,
   })
-  CreateOneSensorData(@Body() sensordata: CreateSensorDataDto) {
-    //const functionname = 'CreateOneSensorData';
-    //console.log(functionname + ': ' + JSON.stringify(sensordata));
-    //return functionname;
-
-    const sensorDataEntity: SensorDataCreation = {
-      picture: {
-        mimetype: sensordata.picture.mimetype,
-        data: Buffer.from(sensordata.picture.data, 'base64'),
-      },
-      metadata: {
-        name: sensordata.metadata.name,
-        placeIdent: sensordata.metadata.placeIdent,
-        seqId: sensordata.metadata.seqID,
-        datetime: sensordata.metadata.datetime.toISOString(),
-        frameNum: sensordata.metadata.frameNum,
-        seqNumFrames: sensordata.metadata.seqNumFrames,
-        filename: sensordata.metadata.filename,
-        deviceID: sensordata.metadata.deviceID,
-        location: sensordata.metadata.location,
-      },
-    };
-
-    return this.sensorDataService.createSensorData(sensorDataEntity);
+  createOneSensorData(@Body() sensordata: CreateSensorDataDto) {
+    this.myLogger("createOneSensorData", "start - Params: " + JSON.stringify(sensordata))
+    const data = this.gatewayService.createOneSensorData(sensordata)
+    this.myLogger("createOneSensorData", "finished - data: " + JSON.stringify(data))
+    return data
   }
 
   @Get('/:id')
@@ -113,9 +88,10 @@ export class AppController {
     type: String,
   })
   readOneSensorDataById(@Param() params) {
-    const functionname = 'readOneSensorDataById';
-    this.logger.log(functionname + ' ' + params.id);
-    return this.sensorDataService.getSensorDataById({ id: params.id });
+    this.myLogger("readOneSensorDataById", "start - Params: " + JSON.stringify(params))
+    const data = this.gatewayService.readOneSensorDataById(params);
+    this.myLogger("readOneSensorDataById", "finished - data: " + JSON.stringify(params))
+    return data
   }
 
   @Get()
@@ -133,11 +109,9 @@ export class AppController {
     type: String,
   })
   async getAllSensorData() {
-    this.logger.log('getAllSensorData()');
-    const res = await firstValueFrom(
-      this.sensorDataService.getAllSensorData({}),
-    );
-    return res.sensorData;
+    this.myLogger("getAllSensorData", "start")
+    return this.gatewayService.getAllSensorData();
+    this.myLogger("getAllSensorData", "finished")
   }
 
   @Get('/picture/:id')
@@ -168,19 +142,10 @@ export class AppController {
     type: String,
   })
   async readPictureEndpointById(@Param() params) {
-    const functionname = 'read picture endpoint by id';
-    console.log(functionname + ' ' + params.id);
-    const picture = await firstValueFrom(
-      this.sensorDataService.getPictureById({ id: params.id }),
-    );
-    const pictureDto: PictureDto = {
-      id: picture.id,
-      data: picture.data.toString('base64'),
-      mimetype: picture.mimetype,
-      createdAt: picture.createdAt,
-      replica: picture.replica as Replica,
-    };
-    return pictureDto;
+    this.myLogger("readPictureEndpointById", "start - Params: " + JSON.stringify(params))
+    const data = this.gatewayService.readPictureEndpointById(params)
+    this.myLogger("readPictureEndpointById", "finished - data: " + JSON.stringify(data))
+    return data
   }
 
   @Delete('/:id')
@@ -211,9 +176,10 @@ export class AppController {
     type: String,
   })
   deleteOnePictureById(@Param() params) {
-    const functionname = 'delete one picture entry by id';
-    console.log(functionname + ' ' + params.id);
-    return this.sensorDataService.removeSensorDataById({ id: params.id });
+    this.myLogger("deleteOnePictureById", "start - Params: " + JSON.stringify(params))
+    const data = this.gatewayService.deleteOnePictureById(params)
+    this.myLogger("deleteOnePictureById", "finished - data:" + JSON.stringify(data))
+    return data
   }
 
   @Put('/:id')
@@ -245,7 +211,15 @@ export class AppController {
     type: String,
   })
   updateSensorDataById(@Param() params, @Body() metadata: MetadataDto) {
-    const functionname = 'update picture metadata by id';
-    console.log(functionname + ' ' + params.id);
+    this.myLogger("updateSensorDataById", "start - Params: " + JSON.stringify(params) + "Metadata: " + JSON.stringify(metadata))
+    const data = this.gatewayService.updateSensorDataById(params, metadata)
+    this.myLogger("updateSensorDataById", "finished - data: " + JSON.stringify(data))
+    return data
   }
+
+
+  private myLogger(functionname: String, message: String){
+    this.logger.log("GatewayController - " + functionname + ": " + message)
+  }
+
 }
