@@ -25,6 +25,7 @@ import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
 import { PictureDto } from './dto/picture/Picture.dto';
 import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
 import { GatewayService } from './gateway.service';
+import { EmptyDto } from './dto/Empty.dto';
 
 @Controller('api/v1/sensordata')
 export class GatewayController {
@@ -37,7 +38,7 @@ export class GatewayController {
   @ApiOperation({ summary: 'create one sensordata entry' })
   @ApiCreatedResponse({
     description: 'Created',
-    type: null,
+    type: SensorDataDto,
   })
   @ApiBadRequestResponse({
     description: 'Validation Error',
@@ -166,7 +167,7 @@ export class GatewayController {
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: null,
+    type: EmptyDto,
   })
   @ApiBadRequestResponse({
     description: 'Validation Error',
@@ -207,7 +208,7 @@ export class GatewayController {
   })
   @ApiOkResponse({
     description: 'Successful Operation',
-    type: null,
+    type: EmptyDto,
   })
   @ApiBadRequestResponse({
     description: 'Validation Error',
