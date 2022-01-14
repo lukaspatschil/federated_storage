@@ -1,4 +1,4 @@
-import {Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 import { MetadataDto } from './dto/metadata/Metadata.dto';
@@ -18,11 +18,11 @@ export class GatewayService {
 
   onModuleInit() {
     this.sensorDataService =
-        this.client.getService<SensorDataServiceClient>('SensorDataService');
+      this.client.getService<SensorDataServiceClient>('SensorDataService');
   }
 
   createOneSensorData(sensordata: CreateSensorDataDto) {
-    this.myLogger("createOneSensorData", "start")
+    this.myLogger('createOneSensorData', 'start');
 
     const sensorDataEntity: SensorDataCreation = {
       picture: {
@@ -43,30 +43,48 @@ export class GatewayService {
     };
 
     const data = this.sensorDataService.createSensorData(sensorDataEntity);
-    this.myLogger("createOneSensorData", "finished - data: " + JSON.stringify(data))
-    return data
+    this.myLogger(
+      'createOneSensorData',
+      'finished - data: ' + JSON.stringify(data),
+    );
+    return data;
   }
 
   readOneSensorDataById(params) {
-    this.myLogger("readOneSensorDataById", "start - inputData:" + JSON.stringify(params))
+    this.myLogger(
+      'readOneSensorDataById',
+      'start - inputData:' + JSON.stringify(params),
+    );
     const data = this.sensorDataService.getSensorDataById({ id: params.id });
-    this.myLogger("readOneSensorDataById", "finished - data: " + JSON.stringify(data))
-    return data
+    this.myLogger(
+      'readOneSensorDataById',
+      'finished - data: ' + JSON.stringify(data),
+    );
+    return data;
   }
 
   async getAllSensorData() {
-    this.myLogger("getAllSensorData", "start")
+    this.myLogger('getAllSensorData', 'start');
     const res = await firstValueFrom(
-        this.sensorDataService.getAllSensorData({}),
+      this.sensorDataService.getAllSensorData({}),
     );
-    this.myLogger("getAllSensorData", "finished")
+    if (res.sensorData === undefined) {
+      this.logger.log(
+        'Gateway getAllSensorData - object is empty, returning empty list',
+      );
+      return [];
+    }
+    this.myLogger('getAllSensorData', 'finished');
     return res.sensorData;
   }
 
   async readPictureEndpointById(params) {
-    this.myLogger("readPictureEndpointById", "start - inputData:" + JSON.stringify(params))
+    this.myLogger(
+      'readPictureEndpointById',
+      'start - inputData:' + JSON.stringify(params),
+    );
     const picture = await firstValueFrom(
-        this.sensorDataService.getPictureById({ id: params.id }),
+      this.sensorDataService.getPictureById({ id: params.id }),
     );
     const pictureDto: PictureDto = {
       id: picture.id,
@@ -75,23 +93,35 @@ export class GatewayService {
       createdAt: picture.createdAt,
       replica: picture.replica as Replica,
     };
-    this.myLogger("readPictureEndpointById", "finished")
+    this.myLogger('readPictureEndpointById', 'finished');
     return pictureDto;
   }
 
   deleteOnePictureById(params) {
-    this.myLogger("deleteOnePictureById", "start - inputData:" + JSON.stringify(params))
+    this.myLogger(
+      'deleteOnePictureById',
+      'start - inputData:' + JSON.stringify(params),
+    );
     const data = this.sensorDataService.removeSensorDataById({ id: params.id });
-    this.myLogger("deleteOnePictureById", "finished - data: " + JSON.stringify(data))
-    return data
+    this.myLogger(
+      'deleteOnePictureById',
+      'finished - data: ' + JSON.stringify(data),
+    );
+    return data;
   }
 
   updateSensorDataById(params, metadata: MetadataDto) {
-    this.myLogger("updateSensorDataById", "start - inputData:" + JSON.stringify(params) + " - Metadata: " + JSON.stringify(metadata))
+    this.myLogger(
+      'updateSensorDataById',
+      'start - inputData:' +
+        JSON.stringify(params) +
+        ' - Metadata: ' +
+        JSON.stringify(metadata),
+    );
     //this.myLogger("deleteOnePictureById", "finished - data: " + JSON.stringify(data))
   }
 
-  private myLogger(functionname: String, message: String){
-    this.logger.log("GatewayService - " + functionname + ": " + message)
+  private myLogger(functionname: string, message: string) {
+    this.logger.log('GatewayService - ' + functionname + ': ' + message);
   }
 }

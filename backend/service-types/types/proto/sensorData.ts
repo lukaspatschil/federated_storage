@@ -7,6 +7,7 @@ import {
   SensorData,
   SensorDataArray,
   Picture,
+  Empty,
   SensorDataCreation,
   Id,
 } from "./shared";
@@ -16,7 +17,7 @@ export const protobufPackage = "sensorData";
 export const SENSOR_DATA_PACKAGE_NAME = "sensorData";
 
 export interface SensorDataServiceClient {
-  createSensorData(request: SensorDataCreation): Observable<Empty>;
+  createSensorData(request: SensorDataCreation): Observable<SensorData>;
 
   getSensorDataById(request: Id): Observable<SensorData>;
 
@@ -30,7 +31,7 @@ export interface SensorDataServiceClient {
 export interface SensorDataServiceController {
   createSensorData(
     request: SensorDataCreation
-  ): Promise<Empty> | Observable<Empty> | Empty;
+  ): Promise<SensorData> | Observable<SensorData> | SensorData;
 
   getSensorDataById(
     request: Id
