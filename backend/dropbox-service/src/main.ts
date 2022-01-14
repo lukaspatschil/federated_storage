@@ -1,12 +1,12 @@
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
-import { AppModule } from './app.module';
+import { DropboxModule } from './dropbox.module';
 import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
+      DropboxModule,
     {
       transport: Transport.GRPC,
       options: {

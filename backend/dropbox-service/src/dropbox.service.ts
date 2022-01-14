@@ -15,7 +15,7 @@ import {
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
+import { DropboxController } from './dropbox.controller';
 
 @Injectable()
 export class DropboxService {
