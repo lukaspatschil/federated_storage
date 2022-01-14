@@ -41,7 +41,6 @@ export class DetailsComponent implements OnInit {
       minute: this.displayedMetaData?.metadata?.datetime.getMinutes(),
       second: this.displayedMetaData?.metadata?.datetime.getSeconds()
     };
-    console.log(time);
 
     this.sensorDataForm = this.formBuilder.group({
       name: [this.displayedMetaData?.metadata?.name, [Validators.required]],
