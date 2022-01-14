@@ -33,7 +33,7 @@ export class GatewayService {
         name: sensordata.metadata.name,
         placeIdent: sensordata.metadata.placeIdent,
         seqId: sensordata.metadata.seqID,
-        datetime: sensordata.metadata.datetime.toISOString(),
+        datetime: String(sensordata.metadata.datetime),
         frameNum: sensordata.metadata.frameNum,
         seqNumFrames: sensordata.metadata.seqNumFrames,
         filename: sensordata.metadata.filename,
