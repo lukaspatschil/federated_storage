@@ -22,7 +22,7 @@ export class GatewayService {
   }
 
   createOneSensorData(sensordata: CreateSensorDataDto) {
-    this.myLogger("createOneSensorData", "start - inputData:" + JSON.stringify(sensordata))
+    this.myLogger("createOneSensorData", "start")
 
     const sensorDataEntity: SensorDataCreation = {
       picture: {
@@ -75,7 +75,7 @@ export class GatewayService {
       createdAt: picture.createdAt,
       replica: picture.replica as Replica,
     };
-    this.myLogger("readPictureEndpointById", "finished - data: " + JSON.stringify(pictureDto))
+    this.myLogger("readPictureEndpointById", "finished")
     return pictureDto;
   }
 

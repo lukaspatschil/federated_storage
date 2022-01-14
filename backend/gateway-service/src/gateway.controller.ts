@@ -54,7 +54,7 @@ export class GatewayController {
     type: String,
   })
   createOneSensorData(@Body() sensordata: CreateSensorDataDto) {
-    this.myLogger("createOneSensorData", "start - Params: " + JSON.stringify(sensordata))
+    this.myLogger("createOneSensorData", "start")
     const data = this.gatewayService.createOneSensorData(sensordata)
     this.myLogger("createOneSensorData", "finished - data: " + JSON.stringify(data))
     return data
@@ -144,7 +144,7 @@ export class GatewayController {
   async readPictureEndpointById(@Param() params) {
     this.myLogger("readPictureEndpointById", "start - Params: " + JSON.stringify(params))
     const data = this.gatewayService.readPictureEndpointById(params)
-    this.myLogger("readPictureEndpointById", "finished - data: " + JSON.stringify(data))
+    this.myLogger("readPictureEndpointById", "finished")
     return data
   }
 
