@@ -10,5 +10,5 @@ service SensorDataService {
   rpc GetAllSensorData(Empty) returns (SensorDataArray) {}
   rpc GetPictureById(Id) returns (Picture) {}
   rpc RemoveSensorDataById(Id) returns (Empty) {}
-  rpc UpdateSensorDataById(stream UpdateSensorData) returns (Empty) {}
+  rpc UpdateSensorDataById(stream SensorDataUpdate) returns (Empty) {}
 }

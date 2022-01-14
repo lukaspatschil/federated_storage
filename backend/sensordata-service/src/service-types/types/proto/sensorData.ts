@@ -10,6 +10,7 @@ import {
   Empty,
   SensorDataCreation,
   Id,
+  SensorDataUpdate,
 } from "./shared";
 
 export const protobufPackage = "sensorData";
@@ -26,6 +27,10 @@ export interface SensorDataServiceClient {
   getPictureById(request: Id): Observable<Picture>;
 
   removeSensorDataById(request: Id): Observable<Empty>;
+
+  updateSensorDataById(
+    request: Observable<SensorDataUpdate>
+  ): Observable<Empty>;
 }
 
 export interface SensorDataServiceController {
@@ -44,6 +49,10 @@ export interface SensorDataServiceController {
   getPictureById(request: Id): Promise<Picture> | Observable<Picture> | Picture;
 
   removeSensorDataById(request: Id): Promise<Empty> | Observable<Empty> | Empty;
+
+  updateSensorDataById(
+    request: Observable<SensorDataUpdate>
+  ): Promise<Empty> | Observable<Empty> | Empty;
 }
 
 export function SensorDataServiceControllerMethods() {
@@ -66,7 +75,7 @@ export function SensorDataServiceControllerMethods() {
         descriptor
       );
     }
-    const grpcStreamMethods: string[] = [];
+    const grpcStreamMethods: string[] = ["updateSensorDataById"];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,
