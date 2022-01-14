@@ -211,12 +211,11 @@ export class GatewayController {
     type: String,
   })
   updateSensorDataById(@Param() params, @Body() metadata: MetadataDto) {
-    this.myLogger("updateSensorDataById", "start - Params: " + JSON.stringify(params) + "Metadata: " + JSON.stringify(metadata))
+    this.myLogger("updateSensorDataById", "start - Params: " + JSON.stringify(params) + " - Metadata: " + JSON.stringify(metadata))
     const data = this.gatewayService.updateSensorDataById(params, metadata)
     this.myLogger("updateSensorDataById", "finished - data: " + JSON.stringify(data))
     return data
   }
-
 
   private myLogger(functionname: String, message: String){
     this.logger.log("GatewayController - " + functionname + ": " + message)
