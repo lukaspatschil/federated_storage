@@ -66,10 +66,12 @@ export class AppController implements SensorDataServiceController {
 
       const pictureWithoutData = { mimetype, hash };
 
-      this.sensorDataStorage.createSensorData({
+      this.sensorDataStorage
+        .createSensorData({
           metadata: sensorDataCreation.metadata,
           picture: pictureWithoutData,
-        }).subscribe((sensorData) => {
+        })
+        .subscribe((sensorData) => {
           // ATTENTION: This may not work with multiple pictures, especially regarding concurrency
           const lastPicture =
             sensorData.pictures[sensorData.pictures.length - 1];
@@ -91,7 +93,6 @@ export class AppController implements SensorDataServiceController {
           ];
 
           forkJoin(createPictures$).subscribe(() => {
-
             sensorDataSubject.next(sensorData);
             sensorDataSubject.complete();
             this.logger.log('createSensorData(): finished');
