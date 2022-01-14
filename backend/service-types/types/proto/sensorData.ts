@@ -4,10 +4,10 @@ import { util, configure } from "protobufjs/minimal";
 import * as Long from "long";
 import { Observable } from "rxjs";
 import {
-  Empty,
   SensorData,
   SensorDataArray,
   Picture,
+  Empty,
   Id,
   SensorDataCreation,
 } from "./shared";
@@ -17,7 +17,9 @@ export const protobufPackage = "sensorData";
 export const SENSOR_DATA_PACKAGE_NAME = "sensorData";
 
 export interface SensorDataServiceClient {
-  createSensorData(request: Observable<SensorDataCreation>): Observable<Empty>;
+  createSensorData(
+    request: Observable<SensorDataCreation>
+  ): Observable<SensorData>;
 
   getSensorDataById(request: Id): Observable<SensorData>;
 
@@ -31,7 +33,7 @@ export interface SensorDataServiceClient {
 export interface SensorDataServiceController {
   createSensorData(
     request: Observable<SensorDataCreation>
-  ): Promise<Empty> | Observable<Empty> | Empty;
+  ): Promise<SensorData> | Observable<SensorData> | SensorData;
 
   getSensorDataById(
     request: Id
