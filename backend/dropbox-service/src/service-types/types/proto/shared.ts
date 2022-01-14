@@ -1,8 +1,8 @@
 /* eslint-disable */
-import { util, configure } from "protobufjs/minimal";
-import * as Long from "long";
+import { util, configure } from 'protobufjs/minimal';
+import * as Long from 'long';
 
-export const protobufPackage = "";
+export const protobufPackage = '';
 
 export interface Empty {}
 
@@ -104,7 +104,7 @@ export interface SensorDataArray {
   sensorData: SensorData[];
 }
 
-export const _PACKAGE_NAME = "";
+export const _PACKAGE_NAME = '';
 
 // If you get a compile-error about 'Constructor<Long> and ... have no overlap',
 // add '--ts_proto_opt=esModuleInterop=true' as a flag when calling 'protoc'.

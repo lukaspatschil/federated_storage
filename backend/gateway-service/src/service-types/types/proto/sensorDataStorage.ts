@@ -1,8 +1,8 @@
 /* eslint-disable */
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { util, configure } from "protobufjs/minimal";
-import * as Long from "long";
-import { Observable } from "rxjs";
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { util, configure } from 'protobufjs/minimal';
+import * as Long from 'long';
+import { Observable } from 'rxjs';
 import {
   SensorData,
   SensorDataArray,
@@ -10,15 +10,15 @@ import {
   PictureWithoutData,
   SensorDataCreationWithoutPictureData,
   Id,
-} from "./shared";
+} from './shared';
 
-export const protobufPackage = "sensorDataStorage";
+export const protobufPackage = 'sensorDataStorage';
 
-export const SENSOR_DATA_STORAGE_PACKAGE_NAME = "sensorDataStorage";
+export const SENSOR_DATA_STORAGE_PACKAGE_NAME = 'sensorDataStorage';
 
 export interface SensorDataStorageServiceClient {
   createSensorData(
-    request: SensorDataCreationWithoutPictureData
+    request: SensorDataCreationWithoutPictureData,
   ): Observable<SensorData>;
 
   getSensorDataById(request: Id): Observable<SensorData>;
@@ -32,21 +32,21 @@ export interface SensorDataStorageServiceClient {
 
 export interface SensorDataStorageServiceController {
   createSensorData(
-    request: SensorDataCreationWithoutPictureData
+    request: SensorDataCreationWithoutPictureData,
   ): Promise<SensorData> | Observable<SensorData> | SensorData;
 
   getSensorDataById(
-    request: Id
+    request: Id,
   ): Promise<SensorData> | Observable<SensorData> | SensorData;
 
   getAllSensorData(
-    request: Empty
+    request: Empty,
   ): Promise<SensorDataArray> | Observable<SensorDataArray> | SensorDataArray;
 
   removeSensorDataById(request: Id): Promise<Empty> | Observable<Empty> | Empty;
 
   getPictureWithoutDataById(
-    request: Id
+    request: Id,
   ):
     | Promise<PictureWithoutData>
     | Observable<PictureWithoutData>
@@ -56,39 +56,39 @@ export interface SensorDataStorageServiceController {
 export function SensorDataStorageServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
-      "createSensorData",
-      "getSensorDataById",
-      "getAllSensorData",
-      "removeSensorDataById",
-      "getPictureWithoutDataById",
+      'createSensorData',
+      'getSensorDataById',
+      'getAllSensorData',
+      'removeSensorDataById',
+      'getPictureWithoutDataById',
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,
-        method
+        method,
       );
-      GrpcMethod("SensorDataStorageService", method)(
+      GrpcMethod('SensorDataStorageService', method)(
         constructor.prototype[method],
         method,
-        descriptor
+        descriptor,
       );
     }
     const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,
-        method
+        method,
       );
-      GrpcStreamMethod("SensorDataStorageService", method)(
+      GrpcStreamMethod('SensorDataStorageService', method)(
         constructor.prototype[method],
         method,
-        descriptor
+        descriptor,
       );
     }
   };
 }
 
-export const SENSOR_DATA_STORAGE_SERVICE_NAME = "SensorDataStorageService";
+export const SENSOR_DATA_STORAGE_SERVICE_NAME = 'SensorDataStorageService';
 
 // If you get a compile-error about 'Constructor<Long> and ... have no overlap',
 // add '--ts_proto_opt=esModuleInterop=true' as a flag when calling 'protoc'.
