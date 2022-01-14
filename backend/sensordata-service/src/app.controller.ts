@@ -8,6 +8,7 @@ import {
   IdWithMimetype,
   Picture,
   PictureWithoutData,
+  SensorData,
 } from './service-types/types/proto/shared';
 import {
   Empty,
@@ -53,7 +54,7 @@ export class AppController implements SensorDataServiceController {
   createSensorData(request: Observable<SensorDataCreation>) {
     this.logger.log('createSensorData(): started');
 
-    const sensorDataSubject = new Subject<Empty>();
+    const sensorDataSubject = new Subject<SensorData>();
 
     request.subscribe((sensorDataCreation) => {
       const { data, mimetype } = sensorDataCreation.picture;
