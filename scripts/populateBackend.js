@@ -61,22 +61,22 @@ async function sendRequest(meta) {
 
   console.log('Fetching metadata...');
   const body = {
-    'picture': {
-      'mimetype': mime.lookup(meta.filename),
-      'data': image
+    picture: {
+      mimetype: mime.lookup(meta.filename),
+      data: image
     },
-    'metadata': {
-      'name': meta.name,
-      'placeIdent': meta.place_ident,
-      'seqID': meta.seq_id,
-      'datetime': meta.datetime,
-      'frameNum': meta.frame_num,
-      'seqNumFrames': meta.seq_num_frames,
-      'filename': meta.filename,
-      'deviceID': meta.device_id,
-      'location': {
-        'longitude': meta.longitude,
-        'latitude': meta.latitude,
+    metadata: {
+      name: meta.name,
+      placeIdent: meta.place_ident,
+      seqID: meta.seq_id,
+      datetime: meta.datetime,
+      frameNum: meta.frame_num,
+      seqNumFrames: meta.seq_num_frames,
+      filename: meta.filename,
+      deviceID: meta.device_id,
+      location: {
+        longitude: meta.longitude,
+        latitude: meta.latitude,
       }
     }
   }

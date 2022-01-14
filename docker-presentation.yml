@@ -46,15 +46,12 @@ services:
   gateway-service:
     build:
       context: .
-      target: development
+      target: production
       dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=gateway-service
     hostname: gateway-service
-    volumes: 
-      - ./backend/gateway-service:/base/backend/gateway-service/
-      - ./backend/proto:/base/backend/proto/
-      - ./backend/service-types/:/base/backend/service-types/
+    volumes:
       - /base/node_modules
     ports:
       - 3000:3000
@@ -71,15 +68,12 @@ services:
   dropbox-service:
     build:
       context: .
-      target: development
+      target: production
       dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=dropbox-service
     hostname: dropbox-service
-    volumes: 
-      - ./backend/dropbox-service:/base/backend/dropbox-service/
-      - ./backend/proto:/base/backend/proto/
-      - ./backend/service-types/:/base/backend/service-types/
+    volumes:
       - /base/node_modules
     depends_on:
       - rabbitmq
@@ -93,15 +87,12 @@ services:
   logger-service:
     build:
       context: .
-      target: development
+      target: production
       dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=logger-service
     hostname: logger-service
-    volumes: 
-      - ./backend/logger-service:/base/backend/logger-service/
-      - ./backend/proto:/base/backend/proto/
-      - ./backend/service-types/:/base/backend/service-types/
+    volumes:
       - /base/node_modules
     depends_on:
       - rabbitmq
@@ -115,7 +106,7 @@ services:
   minio-service:
     build:
       context: .
-      target: development
+      target: production
       dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=minio-service
@@ -125,9 +116,6 @@ services:
     links:
       - minio-server
     volumes:
-      - ./backend/minio-service:/base/backend/minio-service/
-      - ./backend/proto:/base/backend/proto/
-      - ./backend/service-types/:/base/backend/service-types/
       - /base/node_modules
     env_file:
       - .develop.env
@@ -141,15 +129,12 @@ services:
   mongodb-service:
     build:
       context: .
-      target: development
+      target: production
       dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=mongodb-service
     hostname: mongodb-service
-    volumes: 
-      - ./backend/mongodb-service:/base/backend/mongodb-service/
-      - ./backend/proto:/base/backend/proto/
-      - ./backend/service-types/:/base/backend/service-types/
+    volumes:
       - /base/node_modules
     depends_on:
       - rabbitmq
@@ -164,15 +149,12 @@ services:
   sensordata-service:
     build:
       context: .
-      target: development
+      target: production
       dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=sensordata-service
     hostname: sensordata-service
-    volumes: 
-      - ./backend/sensordata-service:/base/backend/sensordata-service/
-      - ./backend/proto:/base/backend/proto/
-      - ./backend/service-types/:/base/backend/service-types/
+    volumes:
       - /base/node_modules
     depends_on:
       - rabbitmq

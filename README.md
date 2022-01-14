@@ -2,21 +2,22 @@
 
 # Advanced Internet Computing WS 2021 - Group 4 Topic 2
 
-This template is intended to serve as an *example* on how you might want to structure the README when submitting your project.
-
-**Important**: The specific subdirectories are *not* meant to be extended but to serve as an example on how to write a `Dockerfile` and a `docker-compose.yml` file. Your first task should be to replace them with your own.
-
 ## Team
 
 - Sebastian Fürndraht (11741163)
 - Simon Hofbauer (11701818)
-- Heribert Kremser (01529056)
 - Lukas Spatschil (11810356)
 - Lukas Wieser (11809647)
 
 ## Overview
 
-TODO
+This is the second topic of the Advanced Internet Computing WS 2021 - Group 4. It implements a simple federated storage infrastructure for IoT devices.
+
+It consists of a server and a client. The server is responsible for storing the data of the devices and the client is responsible for sending the data to the server and interacting with the existing data.
+
+Cors is disabled in order to allow IoT devices to access the server.
+
+DON'T USE IN PRODUCTION SINCE THERE ARE NO SECURITY FEATURES IMPLEMENTED!
 
 ## Architecture
 
@@ -26,11 +27,11 @@ TODO
 
 ### Frontend app
 
-TODO
+The frontend app is a web application that is used to interact with the backend. It is used to display the data on a map and lets the user use all CRUD operations.
 
 ### Middleware
 
-TODO
+The middleware includes everything which is happening in the backend excluding the database services.
 
 #### Gateway service
 
@@ -82,7 +83,7 @@ When installing a new dependency use the command `npm install dependency -w serv
 
 #### Docker
 
-In order to start all services run `docker-compose up` in order to start the application in development mode.
+In order to start all services run `docker-compose up` in order to start the application in development mode (expect for the frontend container which relies on nginx and production mode and needs to be rebuild or started with `ng serve`).
 
 To stop the containers run `docker-compose stop` or delete them by running `docker-compose down`.
 
@@ -100,10 +101,24 @@ With `npm run generate:protoc` you can generate TS declarations of the proto fil
 
 With `npm run generate:types` you copy all the interfaces and types in backend/service-types to every service
 
+### Presentation
+
+This is a special mode which is used to present the application to the students. It is not intended to be used for development or production. It starts the application in production mode but also starts the MongoDB, MinIO and RabbitMQ containers.
+
+#### Docker
+
+All containers are started in production mode. Any changes made after building will not affect the containers.
+
+The containers are started / build with `docker-compose -f docker-presentation.yml up`.
+
 ### Production
 
-TODO
+This is not implemented since there is no AWS available. Thx for your interest.
 
 ## How to debug
 
-TODO
+The application will log everything to the central logger which writes it into a file. It also logs to the console.
+
+The frontend can be debugged with the Chrome DevTools.
+
+You can also debug manually by setting break points in the code and executing it on your local machine instead of docker. This is not recommended or supported.
