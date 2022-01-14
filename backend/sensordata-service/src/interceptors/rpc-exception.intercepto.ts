@@ -22,20 +22,20 @@ export class RpcExceptionInterceptor implements NestInterceptor {
         );
 
         if (err?.code && err.code === status.NOT_FOUND) {
-          new RpcException({
+          throw new RpcException({
             code: status.NOT_FOUND,
             message: err.details,
           });
         }
 
         if (err?.code && err.code === status.INTERNAL) {
-          new RpcException({
+          throw new RpcException({
             code: status.INTERNAL,
             message: err.details,
           });
         }
 
-        throw err;
+        throw new RpcException('unintentional RpcException');
       }),
     );
   }

@@ -6,18 +6,16 @@ import { Observable } from 'rxjs';
 import {
   Empty,
   PictureData,
-  IdWithMimetype,
   PictureCreationById,
-} from './shared';
+  IdWithMimetype,
+} from "./shared";
 
 export const protobufPackage = 'pictureStorage';
 
 export const PICTURE_STORAGE_PACKAGE_NAME = 'pictureStorage';
 
 export interface PictureStorageServiceClient {
-  createPictureById(
-    request: Observable<PictureCreationById>,
-  ): Observable<Empty>;
+  createPictureById(request: PictureCreationById): Observable<Empty>;
 
   getPictureById(request: IdWithMimetype): Observable<PictureData>;
 
@@ -26,10 +24,12 @@ export interface PictureStorageServiceClient {
 
 export interface PictureStorageServiceController {
   createPictureById(
-    request: Observable<PictureCreationById>,
+    request: PictureCreationById
   ): Promise<Empty> | Observable<Empty> | Empty;
 
-  getPictureById(request: IdWithMimetype): Observable<PictureData>;
+  getPictureById(
+    request: IdWithMimetype
+  ): Promise<PictureData> | Observable<PictureData> | PictureData;
 
   removePictureById(
     request: IdWithMimetype,
@@ -38,7 +38,11 @@ export interface PictureStorageServiceController {
 
 export function PictureStorageServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ['getPictureById', 'removePictureById'];
+    const grpcMethods: string[] = [
+      "createPictureById",
+      "getPictureById",
+      "removePictureById",
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,
@@ -50,7 +54,7 @@ export function PictureStorageServiceControllerMethods() {
         descriptor,
       );
     }
-    const grpcStreamMethods: string[] = ['createPictureById'];
+    const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,

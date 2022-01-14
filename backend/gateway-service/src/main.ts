@@ -1,13 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AmqpLoggerService } from './amqp-logger/amqp-logger.service';
-import { AppModule } from './app.module';
+import { GatewayModule } from './gateway.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { RpcExcpetionInterceptor } from './interceptors/rpc-exception.intercepto';
 import { json, urlencoded } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create(GatewayModule, {
     logger: false,
   });
 

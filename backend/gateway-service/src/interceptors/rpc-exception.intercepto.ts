@@ -18,7 +18,7 @@ export class RpcExcpetionInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       catchError((err) => {
-        const logger = new Logger('gateway-service');
+        const logger = new Logger(context.getClass().name);
         logger.error(
           'An error was cougth by interceptor: ' + JSON.stringify(err),
         );
@@ -28,10 +28,10 @@ export class RpcExcpetionInterceptor implements NestInterceptor {
         }
 
         if (err?.code && err.code === status.INTERNAL) {
-          new InternalServerErrorException();
+          throw new InternalServerErrorException();
         }
 
-        throw err;
+        throw new InternalServerErrorException();
       }),
     );
   }
