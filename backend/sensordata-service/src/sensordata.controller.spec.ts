@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AppController } from './app.controller';
+import { SensordataController } from './sensordata.controller';
 import { SensordataService } from './sensordata.service';
 
 describe('AppController', () => {
-  let appController: AppController;
+  let appController: SensordataController;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
+      controllers: [SensordataController],
       providers: [SensordataService],
     }).compile();
 
-    appController = app.get<AppController>(AppController);
+    appController = app.get<SensordataController>(SensordataController);
   });
 
   describe('root', () => {

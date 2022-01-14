@@ -34,7 +34,7 @@ import { SensordataService } from './sensordata.service';
 
 @Controller()
 @SensorDataServiceControllerMethods()
-export class AppController implements SensorDataServiceController {
+export class SensordataController implements SensorDataServiceController {
 
     constructor(private readonly sensordataService: SensordataService) {
     }
