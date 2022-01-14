@@ -19,7 +19,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { MetadataDto } from './dto/metadata/Metadata.dto';
+import { UpdateMetadataDto } from './dto/metadata/UpdateMetadata.dto';
 import { SensorDataDto } from './dto/sensordata/SensorData.dto';
 import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
 import { PictureDto } from './dto/picture/Picture.dto';
@@ -37,7 +37,7 @@ export class GatewayController {
   @ApiOperation({ summary: 'create one sensordata entry' })
   @ApiCreatedResponse({
     description: 'Created',
-    type: null,
+    type: undefined,
   })
   @ApiBadRequestResponse({
     description: 'Validation Error',
@@ -221,7 +221,7 @@ export class GatewayController {
     description: 'ID not found',
     type: String,
   })
-  updateSensorDataById(@Param() params, @Body() metadata: MetadataDto) {
+  updateSensorDataById(@Param() params, @Body() metadata: UpdateSensorDataDto) {
     this.myLogger(
       'updateSensorDataById',
       'start - Params: ' +

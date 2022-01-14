@@ -1,12 +1,15 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { MetadataDto } from './dto/metadata/Metadata.dto';
+import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
 import { PictureDto } from './dto/picture/Picture.dto';
 import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
 import { Replica } from './service-types/types';
 import { SensorDataServiceClient } from './service-types/types/proto/sensorData';
-import { SensorDataCreation } from './service-types/types/proto/shared';
+import {
+  SensorDataCreation,
+  SensorDataUpdate,
+} from './service-types/types/proto/shared';
 
 @Injectable()
 export class GatewayService {
@@ -110,15 +113,40 @@ export class GatewayService {
     return data;
   }
 
-  updateSensorDataById(params, metadata: MetadataDto) {
+  updateSensorDataById(params, updateSensordataDto: UpdateSensorDataDto) {
     this.myLogger(
       'updateSensorDataById',
       'start - inputData:' +
         JSON.stringify(params) +
         ' - Metadata: ' +
-        JSON.stringify(metadata),
+        JSON.stringify(updateSensordataDto),
     );
-    //this.myLogger("deleteOnePictureById", "finished - data: " + JSON.stringify(data))
+    const updateSensordata: SensorDataUpdate = {
+      id: params.id,
+      picture: updateSensordataDto?.picture
+        ? {
+            mimetype: updateSensordataDto.picture.mimetype,
+            data: Buffer.from(updateSensordataDto.picture.data, 'base64'),
+          }
+        : undefined,
+      metadata: {
+        name: updateSensordataDto?.metadata?.name,
+        placeIdent: updateSensordataDto?.metadata?.placeIdent,
+        seqId: updateSensordataDto?.metadata?.seqID,
+        datetime: updateSensordataDto?.metadata?.datetime?.toISOString(),
+        frameNum: updateSensordataDto?.metadata?.frameNum,
+        seqNumFrames: updateSensordataDto?.metadata?.seqNumFrames,
+        filename: updateSensordataDto?.metadata?.filename,
+        deviceID: updateSensordataDto?.metadata?.deviceID,
+        location: updateSensordataDto?.metadata?.location,
+        tagsWrapper: updateSensordataDto?.metadata?.tags
+          ? { tags: updateSensordataDto?.metadata?.tags }
+          : undefined,
+      },
+    };
+
+    this.logger.log(updateSensordata?.metadata?.name);
+    return this.sensorDataService.updateSensorDataById(of(updateSensordata));
   }
 
   private myLogger(functionname: string, message: string) {

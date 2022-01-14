@@ -9,6 +9,7 @@ import {
   Empty,
   Id,
   SensorDataCreation,
+  SensorDataUpdate,
 } from './service-types/types/proto/shared';
 import { PictureStorageServiceClient } from './service-types/types/proto/pictureStorage';
 import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
@@ -216,6 +217,11 @@ export class SensordataService {
 
     await firstValueFrom(this.sensorDataStorage.removeSensorDataById(request));
     return {};
+  }
+
+  async updateSensorDataById(sensorDataUpdate: SensorDataUpdate) {
+    this.logger.log('updateSensorData(): started');
+    // TODO: implement with update Method in SensorDataStorage
   }
 
   private replicate(

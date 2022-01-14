@@ -16,7 +16,6 @@ message Location {
     double latitude = 2;
 }
 
-
 message MetaDataCreation {
     string name = 1;
     string placeIdent = 2;
@@ -42,6 +41,22 @@ message MetaData {
     repeated string tags = 10;
 }
 
+message MetaDataUpdate {
+    optional string name = 1;
+    optional string placeIdent = 2;
+    optional string seqId = 3;
+    optional string datetime = 4;
+    optional int32 frameNum = 5;
+    optional int32 seqNumFrames = 6;
+    optional string filename = 7;
+    optional string deviceID = 8;
+    Location location = 9;
+    TagsWrapper tagsWrapper = 10;
+}
+
+message TagsWrapper {
+    repeated string tags = 1;
+}
 
 message PictureCreation {
     string mimetype = 1;
@@ -82,7 +97,6 @@ message Picture {
     string replica = 5;
 }
 
-
 message SensorDataCreation {
     PictureCreation picture = 1;
     MetaDataCreation metadata = 2;
@@ -97,6 +111,18 @@ message SensorData {
     string id = 1;
     repeated PictureWithoutData pictures = 2;
     MetaData metadata = 3;
+}
+
+message SensorDataUpdate {
+    string id = 1;
+    PictureCreation picture = 2;
+    MetaDataUpdate metadata = 3;
+}
+
+message SensorDataWithoutPictureDataUpdate {
+    string id = 1;
+    PictureCreationWithoutData picture = 2;
+    MetaDataUpdate metadata = 3;
 }
 
 message SensorDataArray {
