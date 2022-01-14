@@ -137,6 +137,14 @@ export class AppController {
     const res = await firstValueFrom(
       this.sensorDataService.getAllSensorData({}),
     );
+    this.logger.log('Gateway getAllSensorData: ' + JSON.stringify(res));
+    if (res.sensorData === undefined) {
+      this.logger.log(
+        'Gateway getAllSensorData - object is empty, returning empty list',
+      );
+      return [];
+    } else {
+    }
     return res.sensorData;
   }
 

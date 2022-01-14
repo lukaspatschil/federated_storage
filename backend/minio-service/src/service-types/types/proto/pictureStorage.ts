@@ -1,22 +1,22 @@
 /* eslint-disable */
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { util, configure } from "protobufjs/minimal";
-import * as Long from "long";
-import { Observable } from "rxjs";
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { util, configure } from 'protobufjs/minimal';
+import * as Long from 'long';
+import { Observable } from 'rxjs';
 import {
   Empty,
   PictureData,
   IdWithMimetype,
   PictureCreationById,
-} from "./shared";
+} from './shared';
 
-export const protobufPackage = "pictureStorage";
+export const protobufPackage = 'pictureStorage';
 
-export const PICTURE_STORAGE_PACKAGE_NAME = "pictureStorage";
+export const PICTURE_STORAGE_PACKAGE_NAME = 'pictureStorage';
 
 export interface PictureStorageServiceClient {
   createPictureById(
-    request: Observable<PictureCreationById>
+    request: Observable<PictureCreationById>,
   ): Observable<Empty>;
 
   getPictureById(request: IdWithMimetype): Observable<PictureData>;
@@ -26,46 +26,46 @@ export interface PictureStorageServiceClient {
 
 export interface PictureStorageServiceController {
   createPictureById(
-    request: Observable<PictureCreationById>
+    request: Observable<PictureCreationById>,
   ): Promise<Empty> | Observable<Empty> | Empty;
 
   getPictureById(request: IdWithMimetype): Observable<PictureData>;
 
   removePictureById(
-    request: IdWithMimetype
+    request: IdWithMimetype,
   ): Promise<Empty> | Observable<Empty> | Empty;
 }
 
 export function PictureStorageServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["getPictureById", "removePictureById"];
+    const grpcMethods: string[] = ['getPictureById', 'removePictureById'];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,
-        method
+        method,
       );
-      GrpcMethod("PictureStorageService", method)(
+      GrpcMethod('PictureStorageService', method)(
         constructor.prototype[method],
         method,
-        descriptor
+        descriptor,
       );
     }
-    const grpcStreamMethods: string[] = ["createPictureById"];
+    const grpcStreamMethods: string[] = ['createPictureById'];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,
-        method
+        method,
       );
-      GrpcStreamMethod("PictureStorageService", method)(
+      GrpcStreamMethod('PictureStorageService', method)(
         constructor.prototype[method],
         method,
-        descriptor
+        descriptor,
       );
     }
   };
 }
 
-export const PICTURE_STORAGE_SERVICE_NAME = "PictureStorageService";
+export const PICTURE_STORAGE_SERVICE_NAME = 'PictureStorageService';
 
 // If you get a compile-error about 'Constructor<Long> and ... have no overlap',
 // add '--ts_proto_opt=esModuleInterop=true' as a flag when calling 'protoc'.
