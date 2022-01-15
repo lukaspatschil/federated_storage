@@ -4,11 +4,11 @@ import { AmqpLoggerService } from './amqp-logger/amqp-logger.service';
 import { SensordataModule } from './sensordata.module';
 import { NestFactory } from '@nestjs/core';
 import { join } from 'path';
-import { RpcExceptionInterceptor } from './interceptors/rpc-exception.intercepto';
+import { ExceptionInterceptor } from './interceptors/exception.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-      SensordataModule,
+    SensordataModule,
     {
       transport: Transport.GRPC,
       options: {
@@ -19,7 +19,7 @@ async function bootstrap() {
     },
   );
 
-  app.useGlobalInterceptors(new RpcExceptionInterceptor());
+  app.useGlobalInterceptors(new ExceptionInterceptor());
 
   app.useLogger(app.get(AmqpLoggerService));
   app.listen();
