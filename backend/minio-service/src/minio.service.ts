@@ -34,7 +34,7 @@ export class MinioService implements OnModuleInit {
 
   getPictureById(request: Id): Promise<PictureData> {
     return new Promise<PictureData>((resolve, reject) => {
-      const bufs = []
+      const bufs : any = []
       this.minioClient.getObject(
           this.bucketName,
           request.id,
