@@ -19,15 +19,15 @@ export class RpcExcpetionInterceptor implements NestInterceptor {
     return next.handle().pipe(
       catchError((err) => {
         const logger = new Logger(context.getClass().name);
-        logger.error(
-          'An error was cougth by interceptor: ' + JSON.stringify(err),
-        );
 
-        if (err?.code && err.code === status.NOT_FOUND) {
+        logger.error('An error was cougth by interceptor: ' + err);
+        logger.error(JSON.stringify(err));
+
+        if (err?.code === status.NOT_FOUND) {
           throw new NotFoundException();
         }
 
-        if (err?.code && err.code === status.INTERNAL) {
+        if (err?.code === status.INTERNAL) {
           throw new InternalServerErrorException();
         }
 
