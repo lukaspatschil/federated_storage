@@ -19,7 +19,6 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { UpdateMetadataDto } from './dto/metadata/UpdateMetadata.dto';
 import { SensorDataDto } from './dto/sensordata/SensorData.dto';
 import { CreateSensorDataDto } from './dto/sensordata/CreateSensorData.dto';
 import { PictureDto } from './dto/picture/Picture.dto';
