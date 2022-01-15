@@ -126,6 +126,12 @@ export class MongoDBService {
   private mapCreateSensorDataToSensorData(
     data: SensorDataCreationWithoutPictureData,
   ) {
+    if(data === undefined || data.metadata === undefined || data.metadata.location === undefined){
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: 'mongodb response not well formatted'
+      })
+    }
     return {
       pictures: [data.picture],
       metadata: {
