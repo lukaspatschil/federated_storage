@@ -3,7 +3,9 @@ import { firstValueFrom, forkJoin } from 'rxjs';
 import {
   IdWithMimetype,
   Picture,
+  PictureCreationWithoutData,
   PictureWithoutData,
+  SensorDataCreationWithoutPictureData,
 } from './service-types/types/proto/shared';
 import {
   Empty,
@@ -50,14 +52,21 @@ export class SensordataService {
   async createSensorData(sensorDataCreation: SensorDataCreation) {
     this.logger.log('sensorDataService - createSensorData(): started');
 
+    if(sensorDataCreation.picture === undefined){
+      throw new RpcException({
+        code: status.INVALID_ARGUMENT,
+        message: 'inputData not correctly formed'
+      })
+    }
+
     const { data, mimetype } = sensorDataCreation.picture;
 
     const hash = crypto
       .createHash('sha256')
-      .update(sensorDataCreation.picture.data)
+      .update(data)
       .digest('hex');
 
-    const pictureWithoutData = { mimetype, hash };
+    const pictureWithoutData: PictureCreationWithoutData = { mimetype: mimetype, hash: hash };
     const sensorData = await firstValueFrom(
       this.sensorDataStorage.createSensorData({
         metadata: sensorDataCreation.metadata,
@@ -128,8 +137,8 @@ export class SensordataService {
       id: pictureWithoutData.id,
       createdAt: pictureWithoutData.createdAt,
       mimetype: pictureWithoutData.mimetype,
-      data: null,
-      replica: null,
+      data: Buffer.from(""),
+      replica: Replica.MISSING,
     };
     if (resultD.status === 'rejected' && resultM.status === 'rejected') {
       //both were rejected
@@ -271,7 +280,11 @@ export class SensordataService {
       this.logger.log(
         'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty',
       );
-      return [Replica.MISSING, null];
+
+      throw new RpcException({
+        code: status.DATA_LOSS,
+        message: 'not possible to determine correct image data'
+      })
     }
   }
 

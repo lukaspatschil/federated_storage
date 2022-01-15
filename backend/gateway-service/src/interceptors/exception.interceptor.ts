@@ -1,5 +1,4 @@
 import {
-  BadGatewayException,
   CallHandler,
   ExecutionContext,
   Injectable,
@@ -14,20 +13,24 @@ import { catchError } from 'rxjs/operators';
 import { status } from '@grpc/grpc-js';
 
 @Injectable()
-export class RpcExcpetionInterceptor implements NestInterceptor {
+export class ExcpetionInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       catchError((err) => {
         const logger = new Logger(context.getClass().name);
-        logger.error(
-          'An error was cougth by interceptor: ' + JSON.stringify(err),
-        );
 
-        if (err?.code && err.code === status.NOT_FOUND) {
+        logger.error('An error was caught by interceptor: ' + err);
+        logger.error(JSON.stringify(err));
+
+        if (err?.code === status.NOT_FOUND) {
           throw new NotFoundException();
         }
 
-        if (err?.code && err.code === status.INTERNAL) {
+        if (err?.code === status.DATA_LOSS) {
+          throw new InternalServerErrorException('Data is corrupted');
+        }
+
+        if (err?.code === status.INTERNAL) {
           throw new InternalServerErrorException();
         }
 

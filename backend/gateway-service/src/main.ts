@@ -3,7 +3,7 @@ import { AmqpLoggerService } from './amqp-logger/amqp-logger.service';
 import { GatewayModule } from './gateway.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { RpcExcpetionInterceptor } from './interceptors/rpc-exception.intercepto';
+import { ExcpetionInterceptor } from './interceptors/exception.interceptor';
 import { json, urlencoded } from 'express';
 
 async function bootstrap() {
@@ -11,7 +11,7 @@ async function bootstrap() {
     logger: false,
   });
 
-  app.useGlobalInterceptors(new RpcExcpetionInterceptor());
+  app.useGlobalInterceptors(new ExcpetionInterceptor());
 
   const config = new DocumentBuilder()
     .setTitle('Federated Storage Infrastructure for IoT Sensor Data')
