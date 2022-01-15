@@ -18,7 +18,7 @@ export class RpcExceptionInterceptor implements NestInterceptor {
       catchError((err) => {
         const logger = new Logger(context.getClass().name);
 
-        logger.error('An error was cougth by interceptor: ' + err);
+        logger.error('An error was caught by interceptor: ' + err);
         if (err instanceof RpcException) {
           logger.error(JSON.stringify(err.getError()));
         } else {
