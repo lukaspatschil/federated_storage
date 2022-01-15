@@ -36,6 +36,13 @@ export class ExceptionInterceptor implements NestInterceptor {
           });
         }
 
+        if (err?.code === status.DATA_LOSS && err?.details) {
+          throw new RpcException({
+            code: status.DATA_LOSS,
+            message: err.details,
+          });
+        }
+
         if (err?.code === status.INTERNAL && err?.details) {
           throw new RpcException({
             code: status.INTERNAL,

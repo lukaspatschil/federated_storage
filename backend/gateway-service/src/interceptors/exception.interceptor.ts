@@ -26,6 +26,10 @@ export class ExcpetionInterceptor implements NestInterceptor {
           throw new NotFoundException();
         }
 
+        if (err?.code === status.DATA_LOSS) {
+          throw new InternalServerErrorException('Data is corrupted');
+        }
+
         if (err?.code === status.INTERNAL) {
           throw new InternalServerErrorException();
         }
