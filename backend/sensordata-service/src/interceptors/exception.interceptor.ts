@@ -12,7 +12,7 @@ import { status } from '@grpc/grpc-js';
 import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
-export class RpcExceptionInterceptor implements NestInterceptor {
+export class ExceptionInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       catchError((err) => {

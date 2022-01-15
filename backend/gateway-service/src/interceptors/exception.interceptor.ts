@@ -13,7 +13,7 @@ import { catchError } from 'rxjs/operators';
 import { status } from '@grpc/grpc-js';
 
 @Injectable()
-export class RpcExcpetionInterceptor implements NestInterceptor {
+export class ExcpetionInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       catchError((err) => {
