@@ -16,26 +16,34 @@ export class RpcExceptionInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       catchError((err) => {
-        const logger = new Logger('sensordata-service');
-        logger.error(
-          'An error was cougth by interceptor: ' + JSON.stringify(err),
-        );
+        const logger = new Logger(context.getClass().name);
 
-        if (err?.code && err.code === status.NOT_FOUND) {
+        logger.error('An error was cougth by interceptor: ' + err);
+        if (err instanceof RpcException) {
+          logger.error(JSON.stringify(err.getError()));
+        } else {
+          logger.error(JSON.stringify(err));
+        }
+
+        if (err instanceof RpcException) {
+          throw err;
+        }
+
+        if (err?.code === status.NOT_FOUND && err?.details) {
           throw new RpcException({
             code: status.NOT_FOUND,
             message: err.details,
           });
         }
 
-        if (err?.code && err.code === status.INTERNAL) {
+        if (err?.code === status.INTERNAL && err?.details) {
           throw new RpcException({
             code: status.INTERNAL,
             message: err.details,
           });
         }
 
-        throw new RpcException('unintentional RpcException');
+        throw new RpcException('Unspecified Exception');
       }),
     );
   }
