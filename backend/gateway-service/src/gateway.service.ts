@@ -146,7 +146,13 @@ export class GatewayService {
     };
 
     this.logger.log(updateSensordata?.metadata?.name);
-    return this.sensorDataService.updateSensorDataById(of(updateSensordata));
+
+    const data = this.sensorDataService.updateSensorDataById(updateSensordata);
+    this.myLogger(
+      'createOneSensorData',
+      'finished - data: ' + JSON.stringify(data),
+    );
+    return data;
   }
 
   private myLogger(functionname: string, message: string) {

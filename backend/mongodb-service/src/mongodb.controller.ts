@@ -60,10 +60,9 @@ export class MongoDBController implements SensorDataStorageServiceController {
 
   updateSensorDataById(
     request: SensorDataWithoutPictureDataUpdate,
-  ): Promise<SensorData> {
+  ): Observable<SensorData> {
     this.logger.log(`Updating sensor data. ${JSON.stringify(request)}`);
 
-    // TODO: call correct mongoose methods to update Database
-    // return from(this.mongodbService.createOne(request));
+    return from(this.mongodbService.updateOne(request));
   }
 }

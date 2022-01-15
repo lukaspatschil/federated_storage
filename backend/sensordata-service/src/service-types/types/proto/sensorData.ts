@@ -28,9 +28,7 @@ export interface SensorDataServiceClient {
 
   removeSensorDataById(request: Id): Observable<Empty>;
 
-  updateSensorDataById(
-    request: Observable<SensorDataUpdate>
-  ): Observable<Empty>;
+  updateSensorDataById(request: SensorDataUpdate): Observable<SensorData>;
 }
 
 export interface SensorDataServiceController {
@@ -51,8 +49,8 @@ export interface SensorDataServiceController {
   removeSensorDataById(request: Id): Promise<Empty> | Observable<Empty> | Empty;
 
   updateSensorDataById(
-    request: Observable<SensorDataUpdate>
-  ): Promise<Empty> | Observable<Empty> | Empty;
+    request: SensorDataUpdate
+  ): Promise<SensorData> | Observable<SensorData> | SensorData;
 }
 
 export function SensorDataServiceControllerMethods() {
@@ -63,6 +61,7 @@ export function SensorDataServiceControllerMethods() {
       "getAllSensorData",
       "getPictureById",
       "removeSensorDataById",
+      "updateSensorDataById",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
@@ -75,7 +74,7 @@ export function SensorDataServiceControllerMethods() {
         descriptor
       );
     }
-    const grpcStreamMethods: string[] = ["updateSensorDataById"];
+    const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,

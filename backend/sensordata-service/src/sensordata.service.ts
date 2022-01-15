@@ -231,9 +231,8 @@ export class SensordataService {
   async updateSensorDataById(sensorDataUpdate: SensorDataUpdate) {
     this.logger.log('updateSensorData(): started');
     // TODO: implement update Method in SensorDataStorage
-    // How to call sensorDataStorage.updateSensorDataById() without knowing if picture is defined
 
-    let pictureCreationWithoutData: PictureCreationWithoutData;
+    let pictureCreationWithoutData: PictureCreationWithoutData | undefined;
 
     if (sensorDataUpdate.picture !== undefined) {
       const { data, mimetype } = sensorDataUpdate.picture;
@@ -242,19 +241,17 @@ export class SensordataService {
         mimetype: mimetype,
         hash: hash,
       };
-      // TODO: implement create Method for Dropbox and Minio
-      const sensorData = await firstValueFrom(
-        this.sensorDataStorage.updateSensorDataById({
-          id: sensorDataUpdate.id,
-          metadata: sensorDataUpdate?.metadata
-            ? sensorDataUpdate.metadata
-            : undefined,
-          picture: pictureCreationWithoutData
-            ? pictureCreationWithoutData
-            : undefined,
-        }),
-      );
     }
+    // TODO: implement create Method for Dropbox and Minio
+    const sensorData = await firstValueFrom(
+      this.sensorDataStorage.updateSensorDataById({
+        id: sensorDataUpdate.id,
+        metadata: sensorDataUpdate?.metadata,
+        picture: pictureCreationWithoutData,
+      }),
+    );
+    this.logger.log('updateSensorData(): finished');
+    return sensorData;
   }
 
   private replicate(
