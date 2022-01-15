@@ -34,7 +34,7 @@ export class MinioService implements OnModuleInit {
 
   getPictureById(request: Id): Promise<PictureData> {
     return new Promise<PictureData>((resolve, reject) => {
-      const bufs = []
+      const bufs : any = []
       this.minioClient.getObject(
           this.bucketName,
           request.id,
@@ -112,17 +112,23 @@ export class MinioService implements OnModuleInit {
   private connectToMinio(): Minio.Client {
     this.logger.log('Connecting to Minio');
     const minioClient = new Minio.Client({
-      endPoint: this.configService.get<string>('MINIO_ENDPOINT'),
+      endPoint: String(this.configService.get<string>('MINIO_ENDPOINT')),
       port: Number(this.configService.get<string>('MINIO_PORT')),
       useSSL: false,
-      accessKey: this.configService.get<string>('MINIO_ACCESSKEY'),
-      secretKey: this.configService.get<string>('MINIO_SECRETKEY'),
+      accessKey: String(this.configService.get<string>('MINIO_ACCESSKEY')),
+      secretKey: String(this.configService.get<string>('MINIO_SECRETKEY')),
     });
     return minioClient;
   }
 
   private createNewBucket(): Promise<void> {
     const region = this.configService.get<string>('MINIO_REGION');
+    if(region === undefined){
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: 'Could not create new bucket (region undefined)'
+      })
+    }
     return new Promise((resolve, reject) => {
       this.minioClient.makeBucket(this.bucketName, region, (err) => {
         if (err) {
