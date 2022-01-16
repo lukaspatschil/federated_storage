@@ -242,7 +242,7 @@ export class SensordataService {
         hash: hash,
       };
     }
-    // TODO: implement create Method for Dropbox and Minio
+
     const sensorData = await firstValueFrom(
       this.sensorDataStorage.updateSensorDataById({
         id: sensorDataUpdate.id,
@@ -250,6 +250,30 @@ export class SensordataService {
         picture: pictureCreationWithoutData,
       }),
     );
+
+    const lastPicture = sensorData.pictures[sensorData.pictures.length - 1];
+
+    this.logger.log(
+      'createSensorData(): start saving pictures with id: ' + lastPicture.id,
+    );
+
+    if (
+      sensorDataUpdate?.picture?.mimetype !== undefined &&
+      sensorDataUpdate.picture?.data !== undefined
+    ) {
+      const createPictureById = {
+        id: lastPicture.id,
+        mimetype: sensorDataUpdate?.picture?.mimetype,
+        data: sensorDataUpdate.picture?.data,
+      };
+      await firstValueFrom(
+        forkJoin([
+          this.pictureStorageD.createPictureById(createPictureById),
+          this.pictureStorageM.createPictureById(createPictureById),
+        ]),
+      );
+    }
+
     this.logger.log('updateSensorData(): finished');
     return sensorData;
   }

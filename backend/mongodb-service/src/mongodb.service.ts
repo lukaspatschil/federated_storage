@@ -103,19 +103,7 @@ export class MongoDBService {
     this.logger.log(`Updating sensor data by id. ${data.id}`);
     const filter = { _id: data.id };
     const update = this.mapSensorDataUpdateToSensorData(data);
-    /*
-    const update = {
-      $push: {
-        pictures: {
-          mimetype: 'image/png',
-          hash: 'newfuckingpicture',
-        },
-      },
-      $set: {
-        'metadata.name': 'New fucking name',
-      },
-    };
-    */
+    this.logger.log(`Update object: ${JSON.stringify(update)}`);
     const response = await this.sensorDataModel.findOneAndUpdate(
       filter,
       update,
@@ -129,8 +117,6 @@ export class MongoDBService {
         message: `Data with id ${data.id} not found`,
       });
     }
-
-    this.logger.log('Hallo hier sind wir! ' + JSON.stringify(response));
 
     return this.mapSensorDataDocumentToSensorData(response) as any;
   }
@@ -221,7 +207,6 @@ export class MongoDBService {
         filename: data.metadata?.filename,
         deviceID: data.metadata?.deviceID,
         location: {
-          type: 'Point',
           coordinates: [
             data.metadata?.location?.longitude,
             data.metadata?.location?.latitude,
@@ -233,12 +218,12 @@ export class MongoDBService {
     const update = { $set: {}, $push: {} };
 
     for (const [key, value] of Object.entries(sensorData)) {
-      if (key === 'pictures' && value) {
-        for (const picture in value) {
-          for (const [pictureKey, pictureValue] of Object.entries(picture)) {
-            update.$push[`${key}.$.${pictureKey}`] = pictureValue;
-          }
+      if (key === 'pictures' && value[0]) {
+        const picture = {};
+        for (const [pictureKey, pictureValue] of Object.entries(value[0])) {
+          picture[pictureKey] = pictureValue;
         }
+        update.$push[`${key}`] = picture;
       }
 
       if (key === 'metadata' && value) {
