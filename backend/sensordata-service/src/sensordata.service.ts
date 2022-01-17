@@ -139,6 +139,7 @@ export class SensordataService {
       data: Buffer.from(""),
       replica: Replica.MISSING,
     };
+
     if (resultD.status === 'rejected' && resultM.status === 'rejected') {
       //both were rejected
       this.logger.log(
@@ -272,13 +273,24 @@ export class SensordataService {
     } else {
       // not possible to determine the correct image
       this.logger.log(
-        'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty',
+        'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty of id: ' + pictureData.id,
       );
 
-      throw new RpcException({
-        code: status.DATA_LOSS,
-        message: 'not possible to determine correct image data'
+      // get next picture data
+      const nextPicture = this.sensorDataStorage.getNextPictureByIdAndTimestamp({id: pictureData.id})
+
+      nextPicture.subscribe(async (res) => {
+        if (res === undefined) {
+          throw new RpcException({
+            code: status.INTERNAL,
+            message: "Could not find older files"
+          })
+        } else {
+          const data = await this.getPictureById({id: res.id})
+          return [Replica.MISSING, data.data]
+        }
       })
+      return [Replica.MISSING, Buffer.from("")]
     }
   }
 

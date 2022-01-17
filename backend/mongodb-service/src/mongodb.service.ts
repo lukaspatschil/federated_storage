@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   Empty,
   PictureWithoutData,
+  PictureWithoutDataArray,
   SensorData,
   SensorDataArray,
   SensorDataCreationWithoutPictureData,
@@ -48,6 +49,34 @@ export class MongoDBService {
     }
 
     return this.mapSensorDataDocumentToSensorData(data) as any;
+  }
+
+  async findNextPictureOfPicture(id: string): Promise<PictureWithoutData> {
+
+    this.logger.log(`Finding all pictures by picture id. ${id}`);
+
+    // returns sensordataDocument
+    const data = await this.sensorDataModel.findOne({
+      pictures: {
+        $elemMatch: { _id: id}
+      },
+    })
+
+    const currentImage = this.findOnePicture(id);
+
+    let latestPicture
+    currentImage.then(
+        (result) => {
+          // sort data by timestamp otherwise
+          latestPicture = data?.pictures
+              .sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime())
+              .filter((a) => a.createdAt < new Date(result.createdAt))?.[0];
+        }
+    )
+    return latestPicture as any;
+
+
+
   }
 
   async findOnePicture(id: string): Promise<PictureWithoutData> {

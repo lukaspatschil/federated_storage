@@ -9,6 +9,7 @@ import {
   Empty,
   Id,
   PictureWithoutData,
+  PictureWithoutDataArray,
   SensorData,
   SensorDataArray,
   SensorDataCreationWithoutPictureData,
@@ -21,6 +22,11 @@ export class MongoDBController implements SensorDataStorageServiceController {
 
   constructor(private readonly mongodbService: MongoDBService) {
     this.logger.log('MongoDBController created');
+  }
+
+  getNextPictureByIdAndTimestamp(request: Id): PictureWithoutData | Promise<PictureWithoutData> | Observable<PictureWithoutData> {
+    this.logger.log(`Find next picture of picture with id: ${JSON.stringify(request)}`);
+    return from(this.mongodbService.findNextPictureOfPicture(request.id))
   }
 
   createSensorData(
