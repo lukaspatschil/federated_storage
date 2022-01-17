@@ -13,6 +13,7 @@ import {
   SensorData,
   SensorDataArray,
   SensorDataCreationWithoutPictureData,
+  SensorDataWithoutPictureDataUpdate,
 } from './service-types/types/proto/shared';
 
 @Controller()
@@ -61,5 +62,13 @@ export class MongoDBController implements SensorDataStorageServiceController {
     );
 
     return this.mongodbService.findOnePicture(request.id);
+  }
+
+  updateSensorDataById(
+    request: SensorDataWithoutPictureDataUpdate,
+  ): Observable<SensorData> {
+    this.logger.log(`Updating sensor data. ${JSON.stringify(request)}`);
+
+    return from(this.mongodbService.updateOne(request));
   }
 }

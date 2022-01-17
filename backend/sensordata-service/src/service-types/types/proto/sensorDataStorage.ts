@@ -10,6 +10,7 @@ import {
   PictureWithoutData,
   SensorDataCreationWithoutPictureData,
   Id,
+  SensorDataWithoutPictureDataUpdate,
 } from "./shared";
 
 export const protobufPackage = "sensorDataStorage";
@@ -28,6 +29,10 @@ export interface SensorDataStorageServiceClient {
   removeSensorDataById(request: Id): Observable<Empty>;
 
   getPictureWithoutDataById(request: Id): Observable<PictureWithoutData>;
+
+  updateSensorDataById(
+    request: SensorDataWithoutPictureDataUpdate
+  ): Observable<SensorData>;
 
   getNextPictureByIdAndTimestamp(request: Id): Observable<PictureWithoutData>;
 }
@@ -54,6 +59,10 @@ export interface SensorDataStorageServiceController {
     | Observable<PictureWithoutData>
     | PictureWithoutData;
 
+  updateSensorDataById(
+    request: SensorDataWithoutPictureDataUpdate
+  ): Promise<SensorData> | Observable<SensorData> | SensorData;
+
   getNextPictureByIdAndTimestamp(
     request: Id
   ):
@@ -70,6 +79,7 @@ export function SensorDataStorageServiceControllerMethods() {
       "getAllSensorData",
       "removeSensorDataById",
       "getPictureWithoutDataById",
+      "updateSensorDataById",
       "getNextPictureByIdAndTimestamp",
     ];
     for (const method of grpcMethods) {

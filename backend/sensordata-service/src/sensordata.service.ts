@@ -11,6 +11,7 @@ import {
   Empty,
   Id,
   SensorDataCreation,
+  SensorDataUpdate,
 } from './service-types/types/proto/shared';
 import { PictureStorageServiceClient } from './service-types/types/proto/pictureStorage';
 import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
@@ -21,7 +22,7 @@ import { status } from '@grpc/grpc-js';
 
 @Injectable()
 export class SensordataService {
-  private logger = new Logger('sensordata-service controller');
+  private logger = new Logger(SensordataService.name);
 
   private pictureStorageM: PictureStorageServiceClient;
   private pictureStorageD: PictureStorageServiceClient;
@@ -51,21 +52,21 @@ export class SensordataService {
   async createSensorData(sensorDataCreation: SensorDataCreation) {
     this.logger.log('sensorDataService - createSensorData(): started');
 
-    if(sensorDataCreation.picture === undefined){
+    if (sensorDataCreation.picture === undefined) {
       throw new RpcException({
         code: status.INVALID_ARGUMENT,
-        message: 'inputData not correctly formed'
-      })
+        message: 'inputData not correctly formed',
+      });
     }
 
     const { data, mimetype } = sensorDataCreation.picture;
 
-    const hash = crypto
-      .createHash('sha256')
-      .update(data)
-      .digest('hex');
+    const hash = crypto.createHash('sha256').update(data).digest('hex');
 
-    const pictureWithoutData: PictureCreationWithoutData = { mimetype: mimetype, hash: hash };
+    const pictureWithoutData: PictureCreationWithoutData = {
+      mimetype: mimetype,
+      hash: hash,
+    };
     const sensorData = await firstValueFrom(
       this.sensorDataStorage.createSensorData({
         metadata: sensorDataCreation.metadata,
@@ -136,7 +137,7 @@ export class SensordataService {
       id: pictureWithoutData.id,
       createdAt: pictureWithoutData.createdAt,
       mimetype: pictureWithoutData.mimetype,
-      data: Buffer.from(""),
+      data: Buffer.from(''),
       replica: Replica.MISSING,
     };
 
@@ -145,10 +146,20 @@ export class SensordataService {
       this.logger.log(
         'sensorDataService - get picturedata by id: Dropbox and MinIO were rejected - Throwing Error and leaving',
       );
-      throw new RpcException({
+      /*throw new RpcException({
         code: status.INTERNAL,
         message: 'error when fetching images',
-      });
+      });*/
+      const pictureData: PictureWithoutData = {
+        mimetype: pictureWithoutData.mimetype,
+        hash: pictureWithoutData.hash,
+        id: pictureWithoutData.id,
+        createdAt: pictureWithoutData.createdAt
+      }
+      const [replicaStatus, data] = await this.tryToGetNextImage(pictureData)
+
+      picture.replica = replicaStatus
+      picture.data = data
     } else if (resultD.status === 'rejected' || resultM.status === 'rejected') {
       this.logger.log(
         'sensorDataService - get picturedata by id: Dropbox or MinIO were rejected - try to replicate data',
@@ -191,7 +202,7 @@ export class SensordataService {
       const pictureDataM = resultM.value;
       const pictureDataD = resultD.value;
 
-      const [replicaStatus, data] = this.replicate(
+      const [replicaStatus, data] = await this.replicate(
         pictureWithoutData,
         pictureDataM.data,
         pictureDataD.data,
@@ -228,44 +239,94 @@ export class SensordataService {
     return {};
   }
 
-  private replicate(
-    pictureData: PictureWithoutData,
-    pictureMinio: Buffer,
-    pictureDropbox: Buffer,
-  ): [Replica, Buffer] {
+  async updateSensorDataById(sensorDataUpdate: SensorDataUpdate) {
+    this.logger.log('updateSensorData(): started');
+    // TODO: implement update Method in SensorDataStorage
+
+    let pictureCreationWithoutData: PictureCreationWithoutData | undefined;
+
+    if (sensorDataUpdate.picture !== undefined) {
+      const { data, mimetype } = sensorDataUpdate.picture;
+      const hash = crypto.createHash('sha256').update(data).digest('hex');
+      pictureCreationWithoutData = {
+        mimetype: mimetype,
+        hash: hash,
+      };
+    }
+
+    const sensorData = await firstValueFrom(
+      this.sensorDataStorage.updateSensorDataById({
+        id: sensorDataUpdate.id,
+        metadata: sensorDataUpdate?.metadata,
+        picture: pictureCreationWithoutData,
+      }),
+    );
+
+    const lastPicture = sensorData.pictures[sensorData.pictures.length - 1];
+
+    this.logger.log(
+      'createSensorData(): start saving pictures with id: ' + lastPicture.id,
+    );
+
+    if (
+      sensorDataUpdate?.picture?.mimetype !== undefined &&
+      sensorDataUpdate.picture?.data !== undefined
+    ) {
+      const createPictureById = {
+        id: lastPicture.id,
+        mimetype: sensorDataUpdate?.picture?.mimetype,
+        data: sensorDataUpdate.picture?.data,
+      };
+      await firstValueFrom(
+        forkJoin([
+          this.pictureStorageD.createPictureById(createPictureById),
+          this.pictureStorageM.createPictureById(createPictureById),
+        ]),
+      );
+    }
+
+    this.logger.log('updateSensorData(): finished');
+    return sensorData;
+  }
+
+  private async replicate(
+      pictureData: PictureWithoutData,
+      pictureMinio: Buffer,
+      pictureDropbox: Buffer,
+  ): Promise<[Replica, Buffer]> {
     const hashMinio = crypto
-      .createHash('sha256')
-      .update(pictureMinio)
-      .digest('hex');
+        .createHash('sha256')
+        .update(pictureMinio)
+        .digest('hex');
     const hashDropbox = crypto
-      .createHash('sha256')
-      .update(pictureDropbox)
-      .digest('hex');
+        .createHash('sha256')
+        .update(pictureDropbox)
+        .digest('hex');
 
     if (pictureData.hash === hashMinio && pictureData.hash === hashDropbox) {
       this.logger.log(
-        'sensorDataService - get picturedata by id: replicate(): Status OK',
+          'sensorDataService - get picturedata by id: replicate(): Status OK',
       );
       return [Replica.OK, pictureMinio];
     } else if (
-      pictureData.hash === hashMinio ||
-      pictureData.hash === hashDropbox
+        pictureData.hash === hashMinio ||
+        pictureData.hash === hashDropbox
     ) {
       // replace faulty image
       this.logger.log(
-        'sensorDataService - get picturedata by id: replicate(): images need to be replaced',
+          'sensorDataService - get picturedata by id: replicate(): images need to be replaced',
       );
       if (pictureData.hash === hashMinio) {
         // replace dropbox
         this.logger.log(
-          'sensordata getPictureById() replicate(): Status REPLICATED: Dropbox file faulty',
+            'sensordata getPictureById() replicate(): Status REPLICATED: Dropbox file faulty',
         );
         this.replicateData(pictureData, pictureMinio, this.pictureStorageD);
         return [Replica.FAULTY, pictureMinio];
       } else {
         // replace Monio
         this.logger.log(
-          'sensorDataService - get picturedata by id: replicate(): Status REPLICATED: MinIO file faulty',
+            'sensorDataService - get picturedata by id: replicate(): Status REPLICATED: MinIO file faulty',
         );
         this.replicateData(pictureData, pictureDropbox, this.pictureStorageM);
         return [Replica.FAULTY, pictureDropbox];
@@ -273,25 +334,57 @@ export class SensordataService {
     } else {
       // not possible to determine the correct image
       this.logger.log(
-        'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty of id: ' + pictureData.id,
+          'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty of id: ' + pictureData.id,
       );
 
-      // get next picture data
-      const nextPicture = this.sensorDataStorage.getNextPictureByIdAndTimestamp({id: pictureData.id})
+      const [state, buf] = await this.tryToGetNextImage(pictureData);
 
-      nextPicture.subscribe(async (res) => {
-        if (res === undefined) {
-          throw new RpcException({
-            code: status.INTERNAL,
-            message: "Could not find older files"
-          })
-        } else {
-          const data = await this.getPictureById({id: res.id})
-          return [Replica.MISSING, data.data]
-        }
-      })
-      return [Replica.MISSING, Buffer.from("")]
+      return [state, buf]
+
     }
+  }
+
+  private async tryToGetNextImage(pictureData: PictureWithoutData): Promise<[Replica, Buffer]> {
+    // get next picture data
+
+    this.logger.log("fetching next image " + JSON.stringify(pictureData))
+
+    const nextPicture = await firstValueFrom(this.sensorDataStorage.getNextPictureByIdAndTimestamp({id: pictureData.id}))
+
+    if (nextPicture === undefined) {
+      throw new RpcException({
+        code: status.DATA_LOSS,
+        message: 'not possible to determine former image data',
+      });
+    }
+
+    this.logger.log("value of next data" + JSON.stringify(nextPicture))
+
+    const picture = await this.getPictureById({id: nextPicture.id})
+    return [Replica.MISSING, picture.data]
+    /*nextPicture.subscribe(async (res) => {
+      this.logger.log("next image id: " + res.id)
+      if (res === undefined) {
+        this.logger.log("getNextPictureByIdAndTimestamp return is undefined")
+        throw new RpcException({
+          code: status.INTERNAL,
+          message: "Could not find older files"
+        })
+      } else {
+        this.getPictureById({id: res.id}).then((res) => {
+              return [Replica.MISSING, res.data]
+            }
+        )
+        const data = await this.getPictureById({id: res.id})
+        return [Replica.MISSING, data.data]
+      }
+    })*/
+
+    /*throw new RpcException({
+      code: status.DATA_LOSS,
+      message: 'not possible to determine correct image data',
+    });*/
+
   }
 
   private replicateData(
