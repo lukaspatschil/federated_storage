@@ -133,7 +133,7 @@ export class GatewayService {
         name: updateSensordataDto?.metadata?.name,
         placeIdent: updateSensordataDto?.metadata?.placeIdent,
         seqId: updateSensordataDto?.metadata?.seqID,
-        datetime: updateSensordataDto?.metadata?.datetime?.toISOString(),
+        datetime: String(updateSensordataDto?.metadata?.datetime),
         frameNum: updateSensordataDto?.metadata?.frameNum,
         seqNumFrames: updateSensordataDto?.metadata?.seqNumFrames,
         filename: updateSensordataDto?.metadata?.filename,
