@@ -115,7 +115,7 @@ export class DetailsComponent implements OnInit {
         const metadataDto: Partial<MetadataDto> = { ...dirtyValues };
 
         if (this.latitude?.dirty  || this.longitude?.dirty) {
-          metadataDto.location = new LocationDto(this.latitude?.value, this.longitude?.value);
+          metadataDto.location = new LocationDto(this.longitude?.value, this.latitude?.value);
         }
         if (this.datetime?.dirty || this.time?.dirty) {
           const date = new Date(
