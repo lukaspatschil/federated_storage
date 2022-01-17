@@ -193,6 +193,7 @@ export class MongoDBService {
         message: 'mongodb response not well formatted',
       });
     }
+    this.logger.log('Update data: ' + JSON.stringify(data));
     const sensorData = {
       pictures: [data.picture],
       metadata: {

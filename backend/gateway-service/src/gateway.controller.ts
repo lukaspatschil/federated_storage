@@ -226,8 +226,8 @@ export class GatewayController {
       'updateSensorDataById',
       'start - Params: ' +
         JSON.stringify(params) +
-        ' - Metadata: ' +
-        JSON.stringify(metadata),
+        ' - Id: ' +
+        JSON.stringify(params.id),
     );
     const data = this.gatewayService.updateSensorDataById(params, metadata);
     this.myLogger(

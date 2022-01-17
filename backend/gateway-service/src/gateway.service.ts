@@ -10,6 +10,7 @@ import {
   SensorDataCreation,
   SensorDataUpdate,
 } from './service-types/types/proto/shared';
+import { Metadata } from '@grpc/grpc-js';
 
 @Injectable()
 export class GatewayService {
@@ -118,8 +119,8 @@ export class GatewayService {
       'updateSensorDataById',
       'start - inputData:' +
         JSON.stringify(params) +
-        ' - Metadata: ' +
-        JSON.stringify(updateSensordataDto),
+        ' - Id: ' +
+        JSON.stringify(params.id),
     );
     const updateSensordata: SensorDataUpdate = {
       id: params.id,
@@ -133,7 +134,9 @@ export class GatewayService {
         name: updateSensordataDto?.metadata?.name,
         placeIdent: updateSensordataDto?.metadata?.placeIdent,
         seqId: updateSensordataDto?.metadata?.seqID,
-        datetime: String(updateSensordataDto?.metadata?.datetime),
+        datetime: updateSensordataDto?.metadata?.datetime
+          ? String(updateSensordataDto?.metadata?.datetime)
+          : undefined,
         frameNum: updateSensordataDto?.metadata?.frameNum,
         seqNumFrames: updateSensordataDto?.metadata?.seqNumFrames,
         filename: updateSensordataDto?.metadata?.filename,
