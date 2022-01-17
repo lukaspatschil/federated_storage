@@ -3,7 +3,11 @@ import {
   SensorDataServiceController,
   SensorDataServiceControllerMethods,
 } from './service-types/types/proto/sensorData';
-import { Id, SensorDataCreation } from './service-types/types/proto/shared';
+import {
+  Id,
+  SensorDataCreation,
+  SensorDataUpdate,
+} from './service-types/types/proto/shared';
 import { SensordataService } from './sensordata.service';
 
 @Controller()
@@ -29,5 +33,9 @@ export class SensordataController implements SensorDataServiceController {
 
   async removeSensorDataById(request: Id) {
     return this.sensordataService.removeSensorDataById(request);
+  }
+
+  async updateSensorDataById(sensorDataUpdate: SensorDataUpdate) {
+    return this.sensordataService.updateSensorDataById(sensorDataUpdate);
   }
 }

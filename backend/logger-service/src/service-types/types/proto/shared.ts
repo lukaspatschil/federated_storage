@@ -45,6 +45,23 @@ export interface MetaData {
   tags: string[];
 }
 
+export interface MetaDataUpdate {
+  name?: string | undefined;
+  placeIdent?: string | undefined;
+  seqId?: string | undefined;
+  datetime?: string | undefined;
+  frameNum?: number | undefined;
+  seqNumFrames?: number | undefined;
+  filename?: string | undefined;
+  deviceID?: string | undefined;
+  location: Location | undefined;
+  tagsWrapper: TagsWrapper | undefined;
+}
+
+export interface TagsWrapper {
+  tags: string[];
+}
+
 export interface PictureCreation {
   mimetype: string;
   data: Buffer;
@@ -98,6 +115,18 @@ export interface SensorData {
   id: string;
   pictures: PictureWithoutData[];
   metadata: MetaData | undefined;
+}
+
+export interface SensorDataUpdate {
+  id: string;
+  picture: PictureCreation | undefined;
+  metadata: MetaDataUpdate | undefined;
+}
+
+export interface SensorDataWithoutPictureDataUpdate {
+  id: string;
+  picture: PictureCreationWithoutData | undefined;
+  metadata: MetaDataUpdate | undefined;
 }
 
 export interface SensorDataArray {

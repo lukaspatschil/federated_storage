@@ -10,6 +10,7 @@ import {
   PictureWithoutData,
   SensorDataCreationWithoutPictureData,
   Id,
+  SensorDataWithoutPictureDataUpdate,
 } from "./shared";
 
 export const protobufPackage = "sensorDataStorage";
@@ -28,6 +29,10 @@ export interface SensorDataStorageServiceClient {
   removeSensorDataById(request: Id): Observable<Empty>;
 
   getPictureWithoutDataById(request: Id): Observable<PictureWithoutData>;
+
+  updateSensorDataById(
+    request: SensorDataWithoutPictureDataUpdate
+  ): Observable<SensorData>;
 }
 
 export interface SensorDataStorageServiceController {
@@ -51,6 +56,10 @@ export interface SensorDataStorageServiceController {
     | Promise<PictureWithoutData>
     | Observable<PictureWithoutData>
     | PictureWithoutData;
+
+  updateSensorDataById(
+    request: SensorDataWithoutPictureDataUpdate
+  ): Promise<SensorData> | Observable<SensorData> | SensorData;
 }
 
 export function SensorDataStorageServiceControllerMethods() {
@@ -61,6 +70,7 @@ export function SensorDataStorageServiceControllerMethods() {
       "getAllSensorData",
       "removeSensorDataById",
       "getPictureWithoutDataById",
+      "updateSensorDataById",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(

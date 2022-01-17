@@ -11,6 +11,7 @@ import {
   Empty,
   Id,
   SensorDataCreation,
+  SensorDataUpdate,
 } from './service-types/types/proto/shared';
 import { PictureStorageServiceClient } from './service-types/types/proto/pictureStorage';
 import { SensorDataStorageServiceClient } from './service-types/types/proto/sensorDataStorage';
@@ -51,21 +52,21 @@ export class SensordataService {
   async createSensorData(sensorDataCreation: SensorDataCreation) {
     this.logger.log('sensorDataService - createSensorData(): started');
 
-    if(sensorDataCreation.picture === undefined){
+    if (sensorDataCreation.picture === undefined) {
       throw new RpcException({
         code: status.INVALID_ARGUMENT,
-        message: 'inputData not correctly formed'
-      })
+        message: 'inputData not correctly formed',
+      });
     }
 
     const { data, mimetype } = sensorDataCreation.picture;
 
-    const hash = crypto
-      .createHash('sha256')
-      .update(data)
-      .digest('hex');
+    const hash = crypto.createHash('sha256').update(data).digest('hex');
 
-    const pictureWithoutData: PictureCreationWithoutData = { mimetype: mimetype, hash: hash };
+    const pictureWithoutData: PictureCreationWithoutData = {
+      mimetype: mimetype,
+      hash: hash,
+    };
     const sensorData = await firstValueFrom(
       this.sensorDataStorage.createSensorData({
         metadata: sensorDataCreation.metadata,
@@ -136,7 +137,7 @@ export class SensordataService {
       id: pictureWithoutData.id,
       createdAt: pictureWithoutData.createdAt,
       mimetype: pictureWithoutData.mimetype,
-      data: Buffer.from(""),
+      data: Buffer.from(''),
       replica: Replica.MISSING,
     };
     if (resultD.status === 'rejected' && resultM.status === 'rejected') {
@@ -227,6 +228,56 @@ export class SensordataService {
     return {};
   }
 
+  async updateSensorDataById(sensorDataUpdate: SensorDataUpdate) {
+    this.logger.log('updateSensorData(): started');
+    // TODO: implement update Method in SensorDataStorage
+
+    let pictureCreationWithoutData: PictureCreationWithoutData | undefined;
+
+    if (sensorDataUpdate.picture !== undefined) {
+      const { data, mimetype } = sensorDataUpdate.picture;
+      const hash = crypto.createHash('sha256').update(data).digest('hex');
+      pictureCreationWithoutData = {
+        mimetype: mimetype,
+        hash: hash,
+      };
+    }
+
+    const sensorData = await firstValueFrom(
+      this.sensorDataStorage.updateSensorDataById({
+        id: sensorDataUpdate.id,
+        metadata: sensorDataUpdate?.metadata,
+        picture: pictureCreationWithoutData,
+      }),
+    );
+
+    const lastPicture = sensorData.pictures[sensorData.pictures.length - 1];
+
+    this.logger.log(
+      'createSensorData(): start saving pictures with id: ' + lastPicture.id,
+    );
+
+    if (
+      sensorDataUpdate?.picture?.mimetype !== undefined &&
+      sensorDataUpdate.picture?.data !== undefined
+    ) {
+      const createPictureById = {
+        id: lastPicture.id,
+        mimetype: sensorDataUpdate?.picture?.mimetype,
+        data: sensorDataUpdate.picture?.data,
+      };
+      await firstValueFrom(
+        forkJoin([
+          this.pictureStorageD.createPictureById(createPictureById),
+          this.pictureStorageM.createPictureById(createPictureById),
+        ]),
+      );
+    }
+
+    this.logger.log('updateSensorData(): finished');
+    return sensorData;
+  }
+
   private replicate(
     pictureData: PictureWithoutData,
     pictureMinio: Buffer,
@@ -277,8 +328,8 @@ export class SensordataService {
 
       throw new RpcException({
         code: status.DATA_LOSS,
-        message: 'not possible to determine correct image data'
-      })
+        message: 'not possible to determine correct image data',
+      });
     }
   }
 
