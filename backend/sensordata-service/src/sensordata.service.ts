@@ -336,9 +336,7 @@ export class SensordataService {
       this.logger.log(
           'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty of id: ' + pictureData.id,
       );
-
       const [state, buf] = await this.tryToGetNextImage(pictureData);
-
       return [state, buf]
 
     }
@@ -347,11 +345,8 @@ export class SensordataService {
   private async tryToGetNextImage(pictureData: PictureWithoutData): Promise<[Replica, Buffer]> {
 
     this.logger.log("fetching next image of current image: " + JSON.stringify(pictureData))
-
     const nextPicture = await firstValueFrom(this.sensorDataStorage.getNextPictureByIdAndTimestamp({id: pictureData.id}))
-
     this.logger.log("value of next picture data: " + JSON.stringify(nextPicture))
-
     const picture = await this.getPictureById({id: nextPicture.id})
     return [Replica.MISSING, picture.data]
   }
