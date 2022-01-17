@@ -347,44 +347,14 @@ export class SensordataService {
   private async tryToGetNextImage(pictureData: PictureWithoutData): Promise<[Replica, Buffer]> {
     // get next picture data
 
-    this.logger.log("fetching next image " + JSON.stringify(pictureData))
+    this.logger.log("fetching next image of current image: " + JSON.stringify(pictureData))
 
     const nextPicture = await firstValueFrom(this.sensorDataStorage.getNextPictureByIdAndTimestamp({id: pictureData.id}))
 
-    if (nextPicture === undefined) {
-      throw new RpcException({
-        code: status.DATA_LOSS,
-        message: 'not possible to determine former image data',
-      });
-    }
-
-    this.logger.log("value of next data" + JSON.stringify(nextPicture))
+    this.logger.log("value of next picture data: " + JSON.stringify(nextPicture))
 
     const picture = await this.getPictureById({id: nextPicture.id})
     return [Replica.MISSING, picture.data]
-    /*nextPicture.subscribe(async (res) => {
-      this.logger.log("next image id: " + res.id)
-      if (res === undefined) {
-        this.logger.log("getNextPictureByIdAndTimestamp return is undefined")
-        throw new RpcException({
-          code: status.INTERNAL,
-          message: "Could not find older files"
-        })
-      } else {
-        this.getPictureById({id: res.id}).then((res) => {
-              return [Replica.MISSING, res.data]
-            }
-        )
-        const data = await this.getPictureById({id: res.id})
-        return [Replica.MISSING, data.data]
-      }
-    })*/
-
-    /*throw new RpcException({
-      code: status.DATA_LOSS,
-      message: 'not possible to determine correct image data',
-    });*/
-
   }
 
   private replicateData(

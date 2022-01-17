@@ -90,6 +90,13 @@ export class MongoDBService {
 
 
     this.logger.log("Upcoming id: " + JSON.stringify(latestPicture))
+
+    if(latestPicture == undefined){
+      throw new RpcException({
+        code: status.NOT_FOUND,
+        message: 'not possible to determine former image data',
+      })
+    }
     return latestPicture as any;
 
 
