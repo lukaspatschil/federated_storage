@@ -84,8 +84,12 @@ export class SensorDataService {
     });
   }
 
-  updateSensorData() {
+  updateSensorData(id: string, sensorData: CreateSensorDataDto) {
     // Update in cache on success
+    this.http.put(`${this.API_URL}/${id}`, sensorData).subscribe((data) => {
+      console.log('Updated' + JSON.stringify(data));
+      this.updateWholeSensorData();
+    });
   }
 
   updateWholeSensorData() {

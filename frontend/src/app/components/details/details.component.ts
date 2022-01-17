@@ -5,14 +5,19 @@ import {
   FormGroup,
   Validators
 } from '@angular/forms';
+import { CreateSensorDataDto } from 'src/app/dtos/CreateSensorData.dto';
+import { LocationDto } from 'src/app/dtos/Location.dto';
+import { MetadataDto } from 'src/app/dtos/Metadata.dto';
 import { PictureDto } from 'src/app/dtos/Picture.dto';
 import { SensorDataDto } from 'src/app/dtos/SensorData.dto';
 import { PictureService } from 'src/app/services/picture.service';
+import { SensorDataService } from 'src/app/services/sensorData.service';
+import { requiredFileType } from 'src/app/validators/requiredFileType';
 
 @Component({
   selector: 'app-details',
   templateUrl: './details.component.html',
-  styleUrls: []
+  styleUrls: ['./details.component.scss']
 })
 export class DetailsComponent implements OnInit {
   @Input()
@@ -26,7 +31,8 @@ export class DetailsComponent implements OnInit {
 
   constructor(
     private readonly formBuilder: FormBuilder,
-    private readonly pictureService: PictureService
+    private readonly pictureService: PictureService,
+    private readonly sensorDataService: SensorDataService
   ) {}
 
   ngOnInit(): void {
@@ -75,7 +81,8 @@ export class DetailsComponent implements OnInit {
         this.displayedMetaData?.metadata?.location?.longitude,
         [Validators.required, Validators.min(-180), Validators.max(180)]
       ],
-      tags: [this.displayedMetaData?.metadata?.tags, []]
+      tags: [this.displayedMetaData?.metadata?.tags.toString(), []],
+      newPicture: [undefined, [requiredFileType]]
     });
 
     this.displayed = 'metadata';
@@ -99,7 +106,44 @@ export class DetailsComponent implements OnInit {
   }
 
   save() {
-    throw new Error('Not implemented');
+    if (this.sensorDataForm.valid) {
+      const dirtyValues = this.getDirtyValues(this.sensorDataForm);
+
+      if (Object.values(dirtyValues).length) {
+        delete dirtyValues['newPicture'];
+
+        const metadataDto: Partial<MetadataDto> = { ...dirtyValues };
+
+        if (this.latitude?.dirty  || this.longitude?.dirty) {
+          metadataDto.location = new LocationDto(this.latitude?.value, this.longitude?.value);
+        }
+        if (this.datetime?.dirty || this.time?.dirty) {
+          const date = new Date(
+            this.datetime?.value.year,
+            this.datetime?.value.month - 1,
+            this.datetime?.value.day,
+            this.time?.value.hour,
+            this.time?.value.minute,
+            this.time?.value.second
+          );
+          metadataDto.datetime = date;
+        }
+        if (this.tags?.dirty) {
+          metadataDto.tags = this.tags?.value.trim().split(',').map((tag: string) => tag.trim());
+        }
+
+        const updateSensorData = new CreateSensorDataDto(
+          this.newPicture?.dirty ? this.newPicture?.value : undefined,
+          Object.values(dirtyValues).length ? metadataDto : undefined
+        );
+
+        this.sensorDataService.updateSensorData(this.displayedMetaData.id, updateSensorData);
+        this.close();
+      }
+
+    } else {
+      throw new Error('Form is not valid!\nNice try!');
+    }
   }
 
   get name(): AbstractControl | null {
@@ -148,5 +192,28 @@ export class DetailsComponent implements OnInit {
 
   get tags(): AbstractControl | null {
     return this.sensorDataForm.get('tags');
+  }
+
+  get newPicture(): AbstractControl | null {
+    return this.sensorDataForm.get('newPicture');
+  }
+
+  clearPicture() {
+    this.newPicture?.patchValue(undefined);
+  }
+
+  getDirtyValues(form: FormGroup): {[key: string]: any} {
+    const dirtyValues: {[key: string]: any} = {};
+
+    Object.keys(form.controls)
+        .forEach(key => {
+            const currentControl = form.controls[key];
+
+            if (currentControl.dirty) {
+              dirtyValues[key] = currentControl.value;
+            }
+        });
+
+    return dirtyValues;
   }
 }
