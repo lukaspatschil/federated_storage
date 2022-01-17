@@ -45,7 +45,7 @@ export class CreateComponent implements OnInit {
         '',
         [Validators.required, Validators.min(-180), Validators.max(180)]
       ],
-      picture: ['', [Validators.required, requiredFileType()]]
+      picture: [undefined, [Validators.required, requiredFileType()]]
     });
   }
 
@@ -138,8 +138,6 @@ export class CreateComponent implements OnInit {
   }
 
   clearPicture(): void {
-    this.sensorDataForm.patchValue({
-      picture: ''
-    });
+    this.picture?.patchValue(undefined);
   }
 }
