@@ -345,7 +345,6 @@ export class SensordataService {
   }
 
   private async tryToGetNextImage(pictureData: PictureWithoutData): Promise<[Replica, Buffer]> {
-    // get next picture data
 
     this.logger.log("fetching next image of current image: " + JSON.stringify(pictureData))
 
