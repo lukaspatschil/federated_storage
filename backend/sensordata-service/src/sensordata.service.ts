@@ -154,12 +154,12 @@ export class SensordataService {
         mimetype: pictureWithoutData.mimetype,
         hash: pictureWithoutData.hash,
         id: pictureWithoutData.id,
-        createdAt: pictureWithoutData.createdAt
-      }
-      const [replicaStatus, data] = await this.tryToGetNextImage(pictureData)
+        createdAt: pictureWithoutData.createdAt,
+      };
+      const [replicaStatus, data] = await this.tryToGetNextImage(pictureData);
 
-      picture.replica = replicaStatus
-      picture.data = data
+      picture.replica = replicaStatus;
+      picture.data = data;
     } else if (resultD.status === 'rejected' || resultM.status === 'rejected') {
       this.logger.log(
         'sensorDataService - get picturedata by id: Dropbox or MinIO were rejected - try to replicate data',
@@ -290,43 +290,43 @@ export class SensordataService {
   }
 
   private async replicate(
-      pictureData: PictureWithoutData,
-      pictureMinio: Buffer,
-      pictureDropbox: Buffer,
+    pictureData: PictureWithoutData,
+    pictureMinio: Buffer,
+    pictureDropbox: Buffer,
   ): Promise<[Replica, Buffer]> {
     const hashMinio = crypto
-        .createHash('sha256')
-        .update(pictureMinio)
-        .digest('hex');
+      .createHash('sha256')
+      .update(pictureMinio)
+      .digest('hex');
     const hashDropbox = crypto
-        .createHash('sha256')
-        .update(pictureDropbox)
-        .digest('hex');
+      .createHash('sha256')
+      .update(pictureDropbox)
+      .digest('hex');
 
     if (pictureData.hash === hashMinio && pictureData.hash === hashDropbox) {
       this.logger.log(
-          'sensorDataService - get picturedata by id: replicate(): Status OK',
+        'sensorDataService - get picturedata by id: replicate(): Status OK',
       );
       return [Replica.OK, pictureMinio];
     } else if (
-        pictureData.hash === hashMinio ||
-        pictureData.hash === hashDropbox
+      pictureData.hash === hashMinio ||
+      pictureData.hash === hashDropbox
     ) {
       // replace faulty image
       this.logger.log(
-          'sensorDataService - get picturedata by id: replicate(): images need to be replaced',
+        'sensorDataService - get picturedata by id: replicate(): images need to be replaced',
       );
       if (pictureData.hash === hashMinio) {
         // replace dropbox
         this.logger.log(
-            'sensordata getPictureById() replicate(): Status REPLICATED: Dropbox file faulty',
+          'sensordata getPictureById() replicate(): Status REPLICATED: Dropbox file faulty',
         );
         this.replicateData(pictureData, pictureMinio, this.pictureStorageD);
         return [Replica.FAULTY, pictureMinio];
       } else {
         // replace Monio
         this.logger.log(
-            'sensorDataService - get picturedata by id: replicate(): Status REPLICATED: MinIO file faulty',
+          'sensorDataService - get picturedata by id: replicate(): Status REPLICATED: MinIO file faulty',
         );
         this.replicateData(pictureData, pictureDropbox, this.pictureStorageM);
         return [Replica.FAULTY, pictureDropbox];
@@ -334,21 +334,30 @@ export class SensordataService {
     } else {
       // not possible to determine the correct image
       this.logger.log(
-          'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty of id: ' + pictureData.id,
+        'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty of id: ' +
+          pictureData.id,
       );
       const [state, buf] = await this.tryToGetNextImage(pictureData);
-      return [state, buf]
-
+      return [state, buf];
     }
   }
 
-  private async tryToGetNextImage(pictureData: PictureWithoutData): Promise<[Replica, Buffer]> {
-
-    this.logger.log("fetching next image of current image: " + JSON.stringify(pictureData))
-    const nextPicture = await firstValueFrom(this.sensorDataStorage.getNextPictureByIdAndTimestamp({id: pictureData.id}))
-    this.logger.log("value of next picture data: " + JSON.stringify(nextPicture))
-    const picture = await this.getPictureById({id: nextPicture.id})
-    return [Replica.MISSING, picture.data]
+  private async tryToGetNextImage(
+    pictureData: PictureWithoutData,
+  ): Promise<[Replica, Buffer]> {
+    this.logger.log(
+      'fetching next image of current image: ' + JSON.stringify(pictureData),
+    );
+    const nextPicture = await firstValueFrom(
+      this.sensorDataStorage.getNextPictureByIdAndTimestamp({
+        id: pictureData.id,
+      }),
+    );
+    this.logger.log(
+      'value of next picture data: ' + JSON.stringify(nextPicture),
+    );
+    const picture = await this.getPictureById({ id: nextPicture.id });
+    return [Replica.MISSING, picture.data];
   }
 
   private replicateData(
