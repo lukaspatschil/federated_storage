@@ -36,7 +36,7 @@ export class GatewayService {
       metadata: {
         name: sensordata.metadata.name,
         placeIdent: sensordata.metadata.placeIdent,
-        seqId: sensordata.metadata.seqID,
+        seqId: sensordata.metadata.seqId,
         datetime: String(sensordata.metadata.datetime),
         frameNum: sensordata.metadata.frameNum,
         seqNumFrames: sensordata.metadata.seqNumFrames,
@@ -133,7 +133,7 @@ export class GatewayService {
       metadata: {
         name: updateSensordataDto?.metadata?.name,
         placeIdent: updateSensordataDto?.metadata?.placeIdent,
-        seqId: updateSensordataDto?.metadata?.seqID,
+        seqId: updateSensordataDto?.metadata?.seqId,
         datetime: updateSensordataDto?.metadata?.datetime
           ? String(updateSensordataDto?.metadata?.datetime)
           : undefined,

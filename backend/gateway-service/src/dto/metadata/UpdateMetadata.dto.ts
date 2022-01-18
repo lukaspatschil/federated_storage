@@ -27,7 +27,7 @@ export class UpdateMetadataDto {
   })
   @IsOptional()
   @IsString()
-  seqID?: string;
+  seqId?: string;
 
   @ApiProperty({
     description: 'datetime of the captured image',
