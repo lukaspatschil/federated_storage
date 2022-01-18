@@ -16,7 +16,7 @@ export class SensorDataDto {
     return (
       a.id === b.id &&
       a.pictures.every((picture, index) =>
-        ShortPictureDto.equals(picture, b.pictures[index])
+        b.pictures?.[index] && ShortPictureDto.equals(picture, b.pictures[index])
       ) &&
       MetadataDto.equals(a.metadata, b.metadata)
     );
