@@ -29,7 +29,7 @@ export class CreateMetadataDto {
   })
   @IsString()
   @IsNotEmpty()
-  seqID: string;
+  seqId: string;
 
   @ApiProperty({
     description: 'datetime of the captured image',
