@@ -1,4 +1,4 @@
-import { LOG_LEVEL } from '../enums/logLevels.enum';
+import { LOG_LEVEL } from "../enums/logLevels.enum";
 
 export interface LogEntry {
   serviceName: string;

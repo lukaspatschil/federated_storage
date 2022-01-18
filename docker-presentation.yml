@@ -1,0 +1,190 @@
+version: "3.2"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+        - 5672:5672
+        - 15672:15672
+    env_file:
+     - ./.develop.env
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - backend
+
+  minio-server:
+    container_name: minio-server
+    hostname: minio-server
+    image: minio/minio:RELEASE.2021-04-22T15-44-28Z.hotfix.e16e75ce3
+    networks:
+      - minio_internal
+    ports:
+      - 9000:9000
+    volumes:
+      - minio-data:/data
+    env_file:
+      - ./.develop.env
+    command: server /data
+    labels:
+      - "traefik.enable=false"
+    restart: always
+    
+  mongodb:
+    image: mongo:5.0.4
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+      - MONGO_INITDB_DATABASE=nestjs
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - mongodb_internal
+
+  gateway-service:
+    build:
+      context: .
+      target: production
+      dockerfile: ./backend/Dockerfile
+      args:
+        - BUILD_CONTEXT=gateway-service
+    hostname: gateway-service
+    volumes:
+      - /base/node_modules
+    ports:
+      - 3000:3000
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
+    networks:
+      - backend
+      - frontend
+
+  dropbox-service:
+    build:
+      context: .
+      target: production
+      dockerfile: ./backend/Dockerfile
+      args:
+        - BUILD_CONTEXT=dropbox-service
+    hostname: dropbox-service
+    volumes:
+      - /base/node_modules
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
+    networks:
+      - backend
+
+  logger-service:
+    build:
+      context: .
+      target: production
+      dockerfile: ./backend/Dockerfile
+      args:
+        - BUILD_CONTEXT=logger-service
+    hostname: logger-service
+    volumes:
+      - /base/node_modules
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
+    networks:
+      - backend
+
+  minio-service:
+    build:
+      context: .
+      target: production
+      dockerfile: ./backend/Dockerfile
+      args:
+        - BUILD_CONTEXT=minio-service
+    hostname: minio-service
+    depends_on:
+      - minio-server
+    links:
+      - minio-server
+    volumes:
+      - /base/node_modules
+    env_file:
+      - .develop.env
+    networks:
+      - minio_internal
+      - backend
+    environment:
+      WAIT_HOSTS: rabbitmq:5672, minio-server:9000
+
+
+  mongodb-service:
+    build:
+      context: .
+      target: production
+      dockerfile: ./backend/Dockerfile
+      args:
+        - BUILD_CONTEXT=mongodb-service
+    hostname: mongodb-service
+    volumes:
+      - /base/node_modules
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
+    networks:
+      - backend
+      - mongodb_internal
+
+  sensordata-service:
+    build:
+      context: .
+      target: production
+      dockerfile: ./backend/Dockerfile
+      args:
+        - BUILD_CONTEXT=sensordata-service
+    hostname: sensordata-service
+    volumes:
+      - /base/node_modules
+    depends_on:
+      - rabbitmq
+    environment:
+      WAIT_HOSTS: rabbitmq:5672
+    env_file:
+      - ./.develop.env
+    networks:
+      - backend
+  
+  webclient:
+    build: ./frontend
+    volumes:
+        - ./frontend:/usr/src/app
+        - /usr/src/app/node_modules
+    ports:
+        - 8080:80
+    networks:
+      - frontend
+
+volumes:
+  mongodb_data_container:
+  minio-data:
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge
+  minio_internal:
+    driver: bridge
+  mongodb_internal:
+    driver: bridge

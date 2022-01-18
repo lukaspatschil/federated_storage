@@ -11,8 +11,6 @@ export class LoggerController {
 
   @MessagePattern({ cmd: 'log' })
   log(@Payload() logEntry: LogEntry) {
-    this.logger.log(`New message reviced. ${JSON.stringify(logEntry)}`);
-
     this.loggerService.writeToFile(logEntry);
   }
 }

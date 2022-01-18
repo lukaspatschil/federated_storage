@@ -1,0 +1,15 @@
+<div class="list-group">
+  <div class="d-flex" *ngFor="let entry of data">
+    <button
+      class="list-group-item list-group-item-action"
+      type="button"
+      (click)="open(entry.id)"
+    >
+      <span>{{ entry.metadata.name }}</span>
+    </button>
+    <button class="btn btn-danger float-right" (click)="delete(entry.id)">
+      X
+    </button>
+  </div>
+  <div class="h-100 d-flex justify-content-center" *ngIf="!data?.length">There are no entries</div>
+</div>

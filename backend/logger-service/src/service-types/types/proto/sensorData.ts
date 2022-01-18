@@ -4,12 +4,13 @@ import { util, configure } from "protobufjs/minimal";
 import * as Long from "long";
 import { Observable } from "rxjs";
 import {
-  Empty,
   SensorData,
   SensorDataArray,
   Picture,
-  Id,
+  Empty,
   SensorDataCreation,
+  Id,
+  SensorDataUpdate,
 } from "./shared";
 
 export const protobufPackage = "sensorData";
@@ -17,7 +18,7 @@ export const protobufPackage = "sensorData";
 export const SENSOR_DATA_PACKAGE_NAME = "sensorData";
 
 export interface SensorDataServiceClient {
-  createSensorData(request: Observable<SensorDataCreation>): Observable<Empty>;
+  createSensorData(request: SensorDataCreation): Observable<SensorData>;
 
   getSensorDataById(request: Id): Observable<SensorData>;
 
@@ -26,12 +27,14 @@ export interface SensorDataServiceClient {
   getPictureById(request: Id): Observable<Picture>;
 
   removeSensorDataById(request: Id): Observable<Empty>;
+
+  updateSensorDataById(request: SensorDataUpdate): Observable<SensorData>;
 }
 
 export interface SensorDataServiceController {
   createSensorData(
-    request: Observable<SensorDataCreation>
-  ): Promise<Empty> | Observable<Empty> | Empty;
+    request: SensorDataCreation
+  ): Promise<SensorData> | Observable<SensorData> | SensorData;
 
   getSensorDataById(
     request: Id
@@ -41,18 +44,24 @@ export interface SensorDataServiceController {
     request: Empty
   ): Promise<SensorDataArray> | Observable<SensorDataArray> | SensorDataArray;
 
-  getPictureById(request: Id): Observable<Picture>;
+  getPictureById(request: Id): Promise<Picture> | Observable<Picture> | Picture;
 
   removeSensorDataById(request: Id): Promise<Empty> | Observable<Empty> | Empty;
+
+  updateSensorDataById(
+    request: SensorDataUpdate
+  ): Promise<SensorData> | Observable<SensorData> | SensorData;
 }
 
 export function SensorDataServiceControllerMethods() {
   return function (constructor: Function) {
     const grpcMethods: string[] = [
+      "createSensorData",
       "getSensorDataById",
       "getAllSensorData",
       "getPictureById",
       "removeSensorDataById",
+      "updateSensorDataById",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
@@ -65,7 +74,7 @@ export function SensorDataServiceControllerMethods() {
         descriptor
       );
     }
-    const grpcStreamMethods: string[] = ["createSensorData"];
+    const grpcStreamMethods: string[] = [];
     for (const method of grpcStreamMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(
         constructor.prototype,

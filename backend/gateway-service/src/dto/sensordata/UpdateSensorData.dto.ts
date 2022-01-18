@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { CreatePictureDto } from '../picture/CreatePicture.dto';
-import { UpdateMetadata } from '../metadata/UpdateMetadata.dto';
-import { IsNotEmptyObject, IsOptional, ValidateNested } from 'class-validator';
+import { UpdateMetadataDto } from '../metadata/UpdateMetadata.dto';
+import { IsOptional, ValidateNested } from 'class-validator';
 
 export class UpdateSensorDataDto {
   @ApiProperty({
@@ -9,10 +9,10 @@ export class UpdateSensorDataDto {
   })
   @ValidateNested()
   @IsOptional()
-  picture: CreatePictureDto;
+  picture?: CreatePictureDto;
 
   @ApiProperty()
   @ValidateNested()
-  @IsNotEmptyObject()
-  metadata: UpdateMetadata;
+  @IsOptional()
+  metadata?: UpdateMetadataDto;
 }

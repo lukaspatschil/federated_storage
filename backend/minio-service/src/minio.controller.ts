@@ -19,17 +19,15 @@ export class MinioController implements PictureStorageServiceController {
 
   constructor(private readonly minioService: MinioService) {}
 
-  getPictureById(request: Id): Observable<PictureData> {
+  getPictureById(request: Id): Promise<PictureData> {
     return this.minioService.getPictureById(request);
   }
 
-  removePictureById(request: Id): Observable<Empty> {
+  removePictureById(request: Id): Promise<Empty> {
     return this.minioService.removePictureById(request);
   }
 
-  createPictureById(
-    request: Observable<PictureCreationById>,
-  ): Observable<Empty> {
+  createPictureById(request: PictureCreationById): Promise<Empty> {
     return this.minioService.createPictureById(request);
   }
 }

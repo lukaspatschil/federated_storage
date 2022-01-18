@@ -2,7 +2,7 @@ import { Controller, Logger } from '@nestjs/common';
 import { from, Observable } from 'rxjs';
 import { MongoDBService } from './mongodb.service';
 import {
-  SensorDataStorageServiceClient,
+  SensorDataStorageServiceController,
   SensorDataStorageServiceControllerMethods,
 } from './service-types/types/proto/sensorDataStorage';
 import {
@@ -12,11 +12,12 @@ import {
   SensorData,
   SensorDataArray,
   SensorDataCreationWithoutPictureData,
+  SensorDataWithoutPictureDataUpdate,
 } from './service-types/types/proto/shared';
 
 @Controller()
 @SensorDataStorageServiceControllerMethods()
-export class MongoDBController implements SensorDataStorageServiceClient {
+export class MongoDBController implements SensorDataStorageServiceController {
   private readonly logger = new Logger(MongoDBController.name);
 
   constructor(private readonly mongodbService: MongoDBService) {
@@ -49,11 +50,19 @@ export class MongoDBController implements SensorDataStorageServiceClient {
     return from(this.mongodbService.deleteOne(request.id));
   }
 
-  getPictureWithoutDataById(request: Id): Observable<PictureWithoutData> {
+  getPictureWithoutDataById(request: Id): Promise<PictureWithoutData> {
     this.logger.log(
       `Retrieving picture data by id. ${JSON.stringify(request)}`,
     );
 
-    return from(this.mongodbService.findOnePicture(request.id));
+    return this.mongodbService.findOnePicture(request.id);
+  }
+
+  updateSensorDataById(
+    request: SensorDataWithoutPictureDataUpdate,
+  ): Observable<SensorData> {
+    this.logger.log(`Updating sensor data. ${JSON.stringify(request)}`);
+
+    return from(this.mongodbService.updateOne(request));
   }
 }

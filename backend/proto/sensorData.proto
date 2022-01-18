@@ -5,9 +5,10 @@ import "shared.proto";
 package sensorData;
 
 service SensorDataService {
-  rpc CreateSensorData(stream SensorDataCreation)  returns (Empty) {}
+  rpc CreateSensorData(SensorDataCreation)  returns (SensorData) {}
   rpc GetSensorDataById(Id)  returns (SensorData) {}
   rpc GetAllSensorData(Empty) returns (SensorDataArray) {}
-  rpc GetPictureById(Id) returns (stream Picture) {}
+  rpc GetPictureById(Id) returns (Picture) {}
   rpc RemoveSensorDataById(Id) returns (Empty) {}
+  rpc UpdateSensorDataById(SensorDataUpdate) returns (SensorData) {}
 }

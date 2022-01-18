@@ -7,6 +7,7 @@ import {
   SensorData,
   SensorDataArray,
   SensorDataCreationWithoutPictureData,
+  SensorDataWithoutPictureDataUpdate,
 } from './service-types/types/proto/shared';
 import { PictureDocument } from './schema/Picture.schema';
 import { SensorDataDocument } from './schema/SensorData.schema';
@@ -96,6 +97,30 @@ export class MongoDBService {
     return {};
   }
 
+  async updateOne(
+    data: SensorDataWithoutPictureDataUpdate,
+  ): Promise<SensorData> {
+    this.logger.log(`Updating sensor data by id. ${data.id}`);
+    const filter = { _id: data.id };
+    const update = this.mapSensorDataUpdateToSensorData(data);
+    this.logger.log(`Update object: ${JSON.stringify(update)}`);
+    const response = await this.sensorDataModel.findOneAndUpdate(
+      filter,
+      update,
+      { new: true },
+    );
+
+    if (!response) {
+      this.logger.error('RPC Error');
+      throw new RpcException({
+        code: status.NOT_FOUND,
+        message: `Data with id ${data.id} not found`,
+      });
+    }
+
+    return this.mapSensorDataDocumentToSensorData(response) as any;
+  }
+
   private mapSensorDataDocumentToSensorData(data: SensorDataDocument) {
     return {
       id: data._id,
@@ -126,6 +151,16 @@ export class MongoDBService {
   private mapCreateSensorDataToSensorData(
     data: SensorDataCreationWithoutPictureData,
   ) {
+    if (
+      data === undefined ||
+      data.metadata === undefined ||
+      data.metadata.location === undefined
+    ) {
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: 'mongodb response not well formatted',
+      });
+    }
     return {
       pictures: [data.picture],
       metadata: {
@@ -147,5 +182,71 @@ export class MongoDBService {
         tags: [],
       },
     };
+  }
+
+  private mapSensorDataUpdateToSensorData(
+    data: SensorDataWithoutPictureDataUpdate,
+  ) {
+    if (!data) {
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: 'mongodb response not well formatted',
+      });
+    }
+    this.logger.log('Update data: ' + JSON.stringify(data));
+    const sensorData = {
+      pictures: [data.picture],
+      metadata: {
+        name: data.metadata?.name,
+        placeIdent: data.metadata?.placeIdent,
+        seqId: data.metadata?.seqId,
+        datetime: data.metadata?.datetime
+          ? new Date(data.metadata.datetime)
+          : undefined,
+        frameNum: data.metadata?.frameNum,
+        seqNumFrames: data.metadata?.seqNumFrames,
+        filename: data.metadata?.filename,
+        deviceID: data.metadata?.deviceID,
+        location: {
+          coordinates: [
+            data.metadata?.location?.longitude,
+            data.metadata?.location?.latitude,
+          ],
+        },
+        tags: data.metadata?.tagsWrapper?.tags,
+      },
+    };
+    const update = { $set: {}, $push: {} };
+
+    for (const [key, value] of Object.entries(sensorData)) {
+      if (key === 'pictures' && value[0]) {
+        const picture = {};
+        for (const [pictureKey, pictureValue] of Object.entries(value[0])) {
+          picture[pictureKey] = pictureValue;
+        }
+        update.$push[`${key}`] = picture;
+      }
+
+      if (key === 'metadata' && value) {
+        for (const [metadataKey, metadataValue] of Object.entries(value)) {
+          if (metadataKey === 'location') {
+            if (metadataValue.coordinates[0])
+              update.$set[`${key}.${metadataKey}.coordinates.0`] =
+                metadataValue.coordinates[0];
+            if (metadataValue.coordinates[1])
+              update.$set[`${key}.${metadataKey}.coordinates.1`] =
+                metadataValue.coordinates[1];
+          } else {
+            if (metadataValue)
+              update.$set[`${key}.${metadataKey}`] = metadataValue;
+          }
+        }
+      }
+      if (key === 'tags' && value) {
+        if (value) update.$set[`${key}`] = value;
+      }
+    }
+
+    return update;
   }
 }

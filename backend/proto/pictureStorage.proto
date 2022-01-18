@@ -5,7 +5,7 @@ import "shared.proto";
 package pictureStorage;
 
 service PictureStorageService {
-  rpc CreatePictureById (stream PictureCreationById) returns (Empty) {}
-  rpc GetPictureById (IdWithMimetype) returns (stream PictureData) {}
+  rpc CreatePictureById (PictureCreationById) returns (Empty) {}
+  rpc GetPictureById (IdWithMimetype) returns (PictureData) {}
   rpc RemovePictureById (IdWithMimetype) returns (Empty) {}
 }

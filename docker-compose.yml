@@ -46,7 +46,8 @@ services:
   gateway-service:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile.dev
+      target: development
+      dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=gateway-service
     hostname: gateway-service
@@ -70,7 +71,8 @@ services:
   dropbox-service:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile.dev
+      target: development
+      dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=dropbox-service
     hostname: dropbox-service
@@ -91,7 +93,8 @@ services:
   logger-service:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile.dev
+      target: development
+      dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=logger-service
     hostname: logger-service
@@ -112,7 +115,8 @@ services:
   minio-service:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile.dev
+      target: development
+      dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=minio-service
     hostname: minio-service
@@ -137,7 +141,8 @@ services:
   mongodb-service:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile.dev
+      target: development
+      dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=mongodb-service
     hostname: mongodb-service
@@ -159,7 +164,8 @@ services:
   sensordata-service:
     build:
       context: .
-      dockerfile: ./backend/Dockerfile.dev
+      target: development
+      dockerfile: ./backend/Dockerfile
       args:
         - BUILD_CONTEXT=sensordata-service
     hostname: sensordata-service
@@ -172,26 +178,20 @@ services:
       - rabbitmq
     environment:
       WAIT_HOSTS: rabbitmq:5672
-    # depends_on:
-    #   - rabbitmq
-    # environment:
-    #   WAIT_HOSTS: rabbitmq:5672
-    #   WAIT_TIMEOUT: 120
-    #   WAIT_SLEEP_INTERVAL: 5
     env_file:
       - ./.develop.env
     networks:
       - backend
   
-  # webclient:
-  #   build: ./frontend
-  #   volumes:
-  #       - ./frontend:/var/www/frontend
-  #       - /var/www/frontend/node_modules
-  #   ports:
-  #       - 4200:4200
-  #   networks:
-  #     - frontend
+  webclient:
+    build: ./frontend
+    volumes:
+        - ./frontend:/usr/src/app
+        - /usr/src/app/node_modules
+    ports:
+        - 8080:80
+    networks:
+      - frontend
 
 volumes:
   mongodb_data_container:

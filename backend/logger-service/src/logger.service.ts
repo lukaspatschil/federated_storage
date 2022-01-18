@@ -19,8 +19,6 @@ export class LoggerService implements OnModuleInit {
   writeToFile(logEntry: LogEntry) {
     const logMessage = `[${logEntry.serviceName}]    ${logEntry.date}    ${logEntry.level}    ${logEntry.message}\n`;
 
-    this.logger.log(`Logging message: "${logMessage}"`);
-
     fs.appendFileSync(this.filePath, logMessage);
   }
 

@@ -32,66 +32,62 @@ export class MinioService implements OnModuleInit {
     }
   }
 
-  getPictureById(request: Id): Observable<PictureData> {
-    const pictureSubject = new Subject<PictureData>();
-    const bufs = [];
-    this.minioClient.getObject(
-      this.bucketName,
-      request.id,
-      (err, dataStream) => {
+  getPictureById(request: Id): Promise<PictureData> {
+    return new Promise<PictureData>((resolve, reject) => {
+      const bufs : any = []
+      this.minioClient.getObject(
+          this.bucketName,
+          request.id,
+          (err, dataStream) => {
+            if (err) {
+              this.logger.error('Unable to get object: ' + err.message);
+              reject(new RpcException({
+                code: status.NOT_FOUND,
+                message: err.message,
+              }))
+              return
+            }
+            dataStream.on('data', (chunk) => {
+              bufs.push(chunk);
+            });
+            dataStream.on('end', () => {
+              this.logger.log(`Data of picture ${request.id} loaded completely.`);
+              const picture: PictureData = {
+                data: Buffer.concat(bufs),
+              };
+              resolve(picture)
+            });
+            dataStream.on('error', (err) => {
+              this.logger.error(err);
+              throw new RpcException({
+                code: status.INTERNAL,
+                message: err.message,
+              });
+            });
+          },
+      );
+    })
+  }
+
+  removePictureById(request: Id): Promise<Empty> {
+    return new Promise<Empty>((resolve) => {
+      this.minioClient.removeObject(this.bucketName, request.id, (err) => {
         if (err) {
-          this.logger.error('Unable to get object: ' + err.message);
-          throw new RpcException({
-            code: status.NOT_FOUND,
-            message: err.message,
-          });
-        }
-        dataStream.on('data', (chunk) => {
-          bufs.push(chunk);
-        });
-        dataStream.on('end', () => {
-          this.logger.log(`Data of picture ${request.id} loaded completely.`);
-          const picture: PictureData = {
-            data: Buffer.concat(bufs),
-          };
-          pictureSubject.next(picture);
-          pictureSubject.complete();
-        });
-        dataStream.on('error', (err) => {
-          this.logger.error(err);
+          this.logger.error('Unable to remove object: ' + err.message);
           throw new RpcException({
             code: status.INTERNAL,
             message: err.message,
           });
-        });
-      },
-    );
-    return pictureSubject.asObservable();
+        } else {
+          this.logger.log('Removed the object ' + request.id);
+        }
+        resolve({})
+      });
+    })
   }
 
-  removePictureById(request: Id): Observable<Empty> {
-    const removeSubject = new Subject<Empty>();
-    this.minioClient.removeObject(this.bucketName, request.id, (err) => {
-      if (err) {
-        this.logger.error('Unable to remove object: ' + err.message);
-        throw new RpcException({
-          code: status.INTERNAL,
-          message: err.message,
-        });
-      } else {
-        this.logger.log('Removed the object ' + request.id);
-      }
-      removeSubject.next({});
-      removeSubject.complete();
-    });
-    return removeSubject.asObservable();
-  }
-
-  createPictureById(
-    request: Observable<PictureCreationById>,
-  ): Observable<Empty> {
-    const pictureSubject = new Subject<Empty>();
-    request.subscribe((pictureCreation) => {
+  createPictureById(pictureCreation: PictureCreationById): Promise<Empty> {
+    return new Promise<Empty>((resolve) => {
       this.minioClient.putObject(
         this.bucketName,
         pictureCreation.id,
@@ -106,29 +102,33 @@ export class MinioService implements OnModuleInit {
               message: err.message,
             });
           }
-          pictureSubject.next({});
-          pictureSubject.complete();
+          resolve({});
           this.logger.log('Successfully added picture ' + pictureCreation.id);
         },
       );
     });
-    return pictureSubject.asObservable();
   }
 
   private connectToMinio(): Minio.Client {
     this.logger.log('Connecting to Minio');
     const minioClient = new Minio.Client({
-      endPoint: this.configService.get<string>('MINIO_ENDPOINT'),
+      endPoint: String(this.configService.get<string>('MINIO_ENDPOINT')),
       port: Number(this.configService.get<string>('MINIO_PORT')),
       useSSL: false,
-      accessKey: this.configService.get<string>('MINIO_ACCESSKEY'),
-      secretKey: this.configService.get<string>('MINIO_SECRETKEY'),
+      accessKey: String(this.configService.get<string>('MINIO_ACCESSKEY')),
+      secretKey: String(this.configService.get<string>('MINIO_SECRETKEY')),
     });
     return minioClient;
   }
 
   private createNewBucket(): Promise<void> {
     const region = this.configService.get<string>('MINIO_REGION');
+    if(region === undefined){
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: 'Could not create new bucket (region undefined)'
+      })
+    }
     return new Promise((resolve, reject) => {
       this.minioClient.makeBucket(this.bucketName, region, (err) => {
         if (err) {

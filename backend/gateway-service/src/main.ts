@@ -1,17 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AmqpLoggerService } from './amqp-logger/amqp-logger.service';
-import { AppModule } from './app.module';
+import { GatewayModule } from './gateway.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { RpcExcpetionInterceptor } from './interceptors/rpc-exception.intercepto';
+import { ExcpetionInterceptor } from './interceptors/exception.interceptor';
 import { json, urlencoded } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create(GatewayModule, {
     logger: false,
   });
 
-  app.useGlobalInterceptors(new RpcExcpetionInterceptor());
+  app.useGlobalInterceptors(new ExcpetionInterceptor());
 
   const config = new DocumentBuilder()
     .setTitle('Federated Storage Infrastructure for IoT Sensor Data')
@@ -34,6 +34,8 @@ async function bootstrap() {
   app.use(urlencoded({ limit: '1mb', extended: true }));
 
   app.useLogger(app.get(AmqpLoggerService));
+
+  app.enableCors();
 
   await app.listen(3000);
 }
