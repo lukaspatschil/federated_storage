@@ -33,6 +33,8 @@ export interface SensorDataStorageServiceClient {
   updateSensorDataById(
     request: SensorDataWithoutPictureDataUpdate
   ): Observable<SensorData>;
+
+  getNextPictureByIdAndTimestamp(request: Id): Observable<PictureWithoutData>;
 }
 
 export interface SensorDataStorageServiceController {
@@ -60,6 +62,13 @@ export interface SensorDataStorageServiceController {
   updateSensorDataById(
     request: SensorDataWithoutPictureDataUpdate
   ): Promise<SensorData> | Observable<SensorData> | SensorData;
+
+  getNextPictureByIdAndTimestamp(
+    request: Id
+  ):
+    | Promise<PictureWithoutData>
+    | Observable<PictureWithoutData>
+    | PictureWithoutData;
 }
 
 export function SensorDataStorageServiceControllerMethods() {
@@ -71,6 +80,7 @@ export function SensorDataStorageServiceControllerMethods() {
       "removeSensorDataById",
       "getPictureWithoutDataById",
       "updateSensorDataById",
+      "getNextPictureByIdAndTimestamp",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(

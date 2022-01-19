@@ -11,4 +11,5 @@ service SensorDataStorageService {
   rpc RemoveSensorDataById(Id) returns (Empty) {}
   rpc GetPictureWithoutDataById(Id) returns (PictureWithoutData) {}
   rpc UpdateSensorDataById(SensorDataWithoutPictureDataUpdate) returns (SensorData) {}
+  rpc GetNextPictureByIdAndTimestamp(Id) returns (PictureWithoutData) {}
 }

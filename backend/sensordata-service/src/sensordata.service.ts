@@ -22,7 +22,7 @@ import { status } from '@grpc/grpc-js';
 
 @Injectable()
 export class SensordataService {
-  private logger = new Logger('sensordata-service controller');
+  private logger = new Logger(SensordataService.name);
 
   private pictureStorageM: PictureStorageServiceClient;
   private pictureStorageD: PictureStorageServiceClient;
@@ -140,15 +140,26 @@ export class SensordataService {
       data: Buffer.from(''),
       replica: Replica.MISSING,
     };
+
     if (resultD.status === 'rejected' && resultM.status === 'rejected') {
       //both were rejected
       this.logger.log(
         'sensorDataService - get picturedata by id: Dropbox and MinIO were rejected - Throwing Error and leaving',
       );
-      throw new RpcException({
+      /*throw new RpcException({
         code: status.INTERNAL,
         message: 'error when fetching images',
-      });
+      });*/
+      const pictureData: PictureWithoutData = {
+        mimetype: pictureWithoutData.mimetype,
+        hash: pictureWithoutData.hash,
+        id: pictureWithoutData.id,
+        createdAt: pictureWithoutData.createdAt,
+      };
+      const [replicaStatus, data] = await this.tryToGetNextImage(pictureData);
+
+      picture.replica = replicaStatus;
+      picture.data = data;
     } else if (resultD.status === 'rejected' || resultM.status === 'rejected') {
       this.logger.log(
         'sensorDataService - get picturedata by id: Dropbox or MinIO were rejected - try to replicate data',
@@ -191,7 +202,7 @@ export class SensordataService {
       const pictureDataM = resultM.value;
       const pictureDataD = resultD.value;
 
-      const [replicaStatus, data] = this.replicate(
+      const [replicaStatus, data] = await this.replicate(
         pictureWithoutData,
         pictureDataM.data,
         pictureDataD.data,
@@ -278,11 +289,11 @@ export class SensordataService {
     return sensorData;
   }
 
-  private replicate(
+  private async replicate(
     pictureData: PictureWithoutData,
     pictureMinio: Buffer,
     pictureDropbox: Buffer,
-  ): [Replica, Buffer] {
+  ): Promise<[Replica, Buffer]> {
     const hashMinio = crypto
       .createHash('sha256')
       .update(pictureMinio)
@@ -323,14 +334,30 @@ export class SensordataService {
     } else {
       // not possible to determine the correct image
       this.logger.log(
-        'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty',
+        'sensorDataService - get picturedata by id: replicate(): Status MISSING: All files faulty of id: ' +
+          pictureData.id,
       );
-
-      throw new RpcException({
-        code: status.DATA_LOSS,
-        message: 'not possible to determine correct image data',
-      });
+      const [state, buf] = await this.tryToGetNextImage(pictureData);
+      return [state, buf];
     }
+  }
+
+  private async tryToGetNextImage(
+    pictureData: PictureWithoutData,
+  ): Promise<[Replica, Buffer]> {
+    this.logger.log(
+      'fetching next image of current image: ' + JSON.stringify(pictureData),
+    );
+    const nextPicture = await firstValueFrom(
+      this.sensorDataStorage.getNextPictureByIdAndTimestamp({
+        id: pictureData.id,
+      }),
+    );
+    this.logger.log(
+      'value of next picture data: ' + JSON.stringify(nextPicture),
+    );
+    const picture = await this.getPictureById({ id: nextPicture.id });
+    return [Replica.MISSING, picture.data];
   }
 
   private replicateData(
