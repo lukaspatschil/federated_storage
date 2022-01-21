@@ -348,11 +348,24 @@ export class SensordataService {
     this.logger.log(
       'fetching next image of current image: ' + JSON.stringify(pictureData),
     );
-    const nextPicture = await firstValueFrom(
-      this.sensorDataStorage.getNextPictureByIdAndTimestamp({
-        id: pictureData.id,
-      }),
-    );
+    let nextPicture
+    try{
+      nextPicture = await firstValueFrom(
+          this.sensorDataStorage.getNextPictureByIdAndTimestamp({
+            id: pictureData.id,
+          }),
+      );
+    } catch (e){
+      if(e?.code === status.NOT_FOUND && e.details){
+        throw new RpcException({
+          code: status.DATA_LOSS,
+          message: e.details
+        });
+      } else{
+        throw e;
+      }
+    }
+
     this.logger.log(
       'value of next picture data: ' + JSON.stringify(nextPicture),
     );
