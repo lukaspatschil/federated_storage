@@ -35,10 +35,14 @@ export class CreateMetadataDto {
     description: 'datetime of the captured image',
     example: '22-Apr-2019 (00:53:00.000000)',
   })
-  @Type(() => Date)
-  @IsDate()
   @IsNotEmpty()
-  @Transform(({ value }) => new Date(value))
+  @Transform((data) => {
+    const string = data.value.replace(/[(|)]/g, '').split('.');
+    const date = new Date(string[0]);
+    date.setMilliseconds(parseInt(string[1].substring(0,3)));
+    return date;
+  })
+  @IsDate()
   datetime: Date;
 
   @ApiProperty({ description: 'frame number', example: 1 })
@@ -76,4 +80,5 @@ export class CreateMetadataDto {
   @ValidateNested()
   @Type(() => LocationDto)
   location: LocationDto;
+
 }
