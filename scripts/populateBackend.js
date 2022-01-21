@@ -68,7 +68,7 @@ async function sendRequest(meta) {
     metadata: {
       name: meta.name,
       placeIdent: meta.place_ident,
-      seqID: meta.seq_id,
+      seqId: meta.seq_id,
       datetime: meta.datetime,
       frameNum: meta.frame_num,
       seqNumFrames: meta.seq_num_frames,
