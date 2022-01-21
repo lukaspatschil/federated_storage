@@ -25,6 +25,9 @@ DON'T USE IN PRODUCTION SINCE THERE ARE NO SECURITY FEATURES IMPLEMENTED!
 
 ## Components
 
+## Script
+Install dependencies with `npm install` then run the script with `npm run start -w testscript`. You can rebuild the script with `npm run build -w testscript`.
+
 ### Frontend app
 
 The frontend app is a web application that is used to interact with the backend. It is used to display the data on a map and lets the user use all CRUD operations.
