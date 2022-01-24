@@ -53,24 +53,23 @@ export class MongoDBService {
   }
 
   async findNextPictureOfPicture(id: string): Promise<PictureWithoutData> {
-
     this.logger.log(`Finding all pictures by picture id. ${id}`);
 
     // returns sensordataDocument
     const data = await this.sensorDataModel.findOne({
       pictures: {
-        $elemMatch: { _id: id}
+        $elemMatch: { _id: id },
       },
-    })
+    });
 
-    if(data === undefined || data === null){
+    if (data === undefined || data === null) {
       throw new RpcException({
         code: status.INTERNAL,
-        message: "Could not get sensordata entry"
-      })
+        message: 'Could not get sensordata entry',
+      });
     }
 
-    const sensordataObject = this.mapSensorDataDocumentToSensorData(data)
+    const sensordataObject = this.mapSensorDataDocumentToSensorData(data);
 
     const currentImage = await this.findOnePicture(id);
 
@@ -85,22 +84,23 @@ export class MongoDBService {
     )*/
 
     const latestPicture = sensordataObject.pictures
-      .sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-      .filter((a) => new Date(a.createdAt) < new Date(currentImage.createdAt))?.[0];
+      .sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
+      .filter(
+        (a) => new Date(a.createdAt) < new Date(currentImage.createdAt),
+      )?.[0];
 
+    this.logger.log('Upcoming id: ' + JSON.stringify(latestPicture));
 
-    this.logger.log("Upcoming id: " + JSON.stringify(latestPicture))
-
-    if(latestPicture === undefined){
+    if (latestPicture === undefined) {
       throw new RpcException({
         code: status.NOT_FOUND,
         message: 'not possible to determine former image data',
-      })
+      });
     }
     return latestPicture as any;
-
-
-
   }
 
   async findOnePicture(id: string): Promise<PictureWithoutData> {
@@ -214,7 +214,12 @@ export class MongoDBService {
       });
     }
     return {
-      pictures: [data.picture],
+      pictures: [
+        {
+          ...data.picture,
+          createdAt: new Date(),
+        },
+      ],
       metadata: {
         name: data.metadata.name,
         placeIdent: data.metadata.placeIdent,
@@ -247,7 +252,12 @@ export class MongoDBService {
     }
     this.logger.log('Update data: ' + JSON.stringify(data));
     const sensorData = {
-      pictures: [data.picture],
+      pictures: [
+        {
+          ...data.picture,
+          createdAt: new Date(),
+        },
+      ],
       metadata: {
         name: data.metadata?.name,
         placeIdent: data.metadata?.placeIdent,
