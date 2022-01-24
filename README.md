@@ -9,6 +9,33 @@
 - Lukas Spatschil (11810356)
 - Lukas Wieser (11809647)
 
+## Work Distribution
+
+- Sebastian Fürndraht (11741163)
+    - Image Storage Interface
+    - MinIO Service
+    - Update of Pictures and Metadata
+    - Bugfixing
+- Simon Hofbauer (11701818)
+    - Rest API Decleration
+    - Dropbox Service
+    - Picture Recovery
+    - Bugfixing
+- Lukas Spatschil (11810356)
+    - Initial Architecture Setup
+    - Logger Service
+    - MongoDB Service
+    - Frontend Angular App
+    - workflow and iotdummy scripts
+    - Docker files
+    - Bugfixing
+- Lukas Wieser (11809647)
+    - SensorData Storage Interface
+    - SensorData Service
+    - gRPC Error Handler
+    - Docker files
+    - Bugfixing
+
 ## Overview
 
 This is the second topic of the Advanced Internet Computing WS 2021 - Group 4. It implements a simple federated storage infrastructure for IoT devices.
@@ -19,29 +46,86 @@ Cors is disabled in order to allow IoT devices to access the server.
 
 DON'T USE IN PRODUCTION SINCE THERE ARE NO SECURITY FEATURES IMPLEMENTED!
 
-## Architecture
+## A basic usecase
 
-![Architecture](./docs/architecture.png)
+An IoT device in nature takes a picture of wildlife if the camera trap is triggered. The data consisting of a picture plus the metadata is sent by the IoT device via an API to the application. The application stores the metadata in a storage and the picture file in two different file storages. An AI tool can access the stored data via the API and perform updates on the stored data. For example, after tagging a picture with image recognition and adding the additional information by updating the data via the API. Users can view and interact with the data via a Web UI that allows to perform manual actions.
 
-## Components
+## How to run
 
-## Script
+In order to start all services of the application run `docker-compose up`.
 
+When running, our services can be reached at the following ports: 
+Frontend:               localhost:8080
+API:                    localhost:3000
+API Documentation:      localhost:3000/api
+
+### Configuration and environment variables
+
+In the file `./.develop.env` you can configure some options via the following variables 
+
+* LoggerService
+    *  LOG_FILE_PATH: where the log file should be saved
+* RabbitMQ
+    *  RABBITMQ_USERNAME: Username for the RabbitMQ
+    *  RABBITMQ_PASSWORD: Password for the RabbitMQ
+    *  RABBITMQ_URL: Connection URL to the RabbitMQ
+    *  RABBITMQ_PORT: Port for the RabbitMQ
+* Dropbox
+    *  DROPBOX_ACCESSTOKEN: Accesstoken for Dropbox API
+    *  DROPBOX_PATH: Path to the folder on the Dropbox where the pictures should be saved
+* MongoDB
+    *  MONGO_USER: Username for MongoDB user
+    *  MONGO_PASSWORD: Password for MongoDB user
+    *  MONGO_HOST: Host of the MongoDB
+    *  MONGO_PORT: Port for the MongoDB
+* MinIO
+    *  MINIO_ACCESSKEY: Accesskey for MinIO Server
+    *  MINIO_SECRETKEY: Secretkey for MinIO Server
+    *  MINIO_ENDPOINT: Endpoint of the MinIO Server
+    *  MINIO_PORT: Port for the MinIO Server
+    *  MINIO_REGION: Region where the MinIO Server is hosted
+
+## Scripts
 Install all dependencies with `pip install -r ./scripts/requirements.txt`.
 
 There are two scripts:
 
 ### Iot device dummy
-
 This script simulates an IoT device. It is used to populate the backend with data.
 
 Run it with `python3 ./scripts/iotdummy.py`.
 
 ### Worklow script
-
 This script simulates a possible workflow by using all CRUD operations.
 
 Run it with `python3 ./scripts/workflow.py`.
+
+## Technologys used
+
+### Docker
+Docker is a virtualization tool that allows you to package and run applications in isolated environments called container. We run each of our applications services in a seperate Docker container. You can find out more in the [Docker documentation](https://docs.docker.com/).
+
+### gRPC
+gRPC is a framework for Remote Procedure Calls that allows you to specify programming language independet interfaces, which can later be generated into Stubs via a Protocol-Buffer-Compiler (protoc). We use it to define interfaces for the communication across our Services. You can find out more in the [gRPC documentation](https://www.grpc.io/).
+
+### MongoDB
+MongoDB is a document oriented NoSQL Database System that we use to store our data. You can find out more in the [MongoDB documentation](https://docs.mongodb.com/).
+
+### MinIO
+MinIO is an high performance object storage which we use to store our picture files. You can find out more in the [MinIO documentation](https://docs.min.io/docs/).
+
+### Dropbox
+Dropbox is a filehosting service that offers an API which we use to store our picture files. You can find out more in the [Dropbox documentation](https://www.dropbox.com/developers/documentation).
+
+### RabbitMQ
+RabbitMq is a messaging broker which is used to communicate between the different services.
+In our special case it is only used to queue log messages which are then forwarded to the logger service and written to the log file. You can find out more in the [RabbitMQ documentation](https://www.rabbitmq.com/documentation.html).
+
+## Architecture
+
+![Architecture](./docs/architecture.png)
+
+## Components
 
 ### Frontend app
 
@@ -88,7 +172,6 @@ The MongoDB service is the connection to the MongoDB. It provides the possibilit
 
 It is used to connect and to store picture data on a Minio Server. It provides the same possibilities as the Dropbox service, to upload, delete and get image data from the Minio Server.
 
-## How to run
 
 ### Development
 
@@ -97,7 +180,7 @@ It is used to connect and to store picture data on a Minio Server. It provides t
 In order to develop on the application make sure you have `npm 7` or higher installed.
 Then run `npm install` in the main directory. This will automatically install all node modules.
 
-When installing a new dependency use the command `npm install dependency -w service`.
+When installing a new dependency for a specific service use the command `npm install dependency -w service`.
 
 #### Docker
 
@@ -140,3 +223,5 @@ The application will log everything to the central logger which writes it into a
 The frontend can be debugged with the Chrome DevTools.
 
 You can also debug manually by setting break points in the code and executing it on your local machine instead of docker. This is not recommended or supported.
+
+The frontend container which relies on nginx can be started started locally with `ng serve` to make it easier to debug.
