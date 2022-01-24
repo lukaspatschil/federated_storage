@@ -71,7 +71,9 @@ export class MapComponent implements OnInit {
         layerFilter: (layer) => layer === this.points
       });
 
-      this.open(String(metadata[0].get('name')));
+      if (metadata[0]?.get('name')) {
+        this.open(String(metadata[0].get('name')));
+      }
     });
   }
 
