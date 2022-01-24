@@ -54,10 +54,11 @@ An IoT device in nature takes a picture of wildlife if the camera trap is trigge
 
 In order to start all services of the application run `docker-compose up`.
 
-When running, our services can be reached at the following ports: 
-Frontend:               localhost:8080
-API:                    localhost:3000
-API Documentation:      localhost:3000/api
+When running, our services can be reached here: 
+
+* Frontend:               `localhost:8080`
+* API:                    `localhost:3000`
+* API Documentation:      `localhost:3000/api`
 
 ### Configuration and environment variables
 
