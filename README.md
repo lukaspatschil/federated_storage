@@ -26,7 +26,20 @@ DON'T USE IN PRODUCTION SINCE THERE ARE NO SECURITY FEATURES IMPLEMENTED!
 ## Components
 
 ## Script
-Install dependencies with `npm install` then run the script with `npm run start -w testscript`. You can rebuild the script with `npm run build -w testscript`.
+
+There are two scripts:
+
+### Iot device dummy
+
+This script simulates an IoT device. It is used to populate the backend with data.
+
+Run it with `python3 ./scripts/iotdummy.py`.
+
+### Worklow script
+
+This script simulates a possible workflow by using all CRUD operations.
+
+Run it with `python3 ./scripts/workflow.py`.
 
 ### Frontend app
 
