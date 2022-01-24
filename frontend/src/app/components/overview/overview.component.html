@@ -1,14 +1,19 @@
 <div class="list-group">
   <div class="d-flex" *ngFor="let entry of data">
     <button
-      class="list-group-item list-group-item-action"
+    class="list-group-item list-group-item-action d-flex justify-content-between"
       type="button"
       (click)="open(entry.id)"
     >
-      <span>{{ entry.metadata.name }}</span>
-    </button>
-    <button class="btn btn-danger float-right" (click)="delete(entry.id)">
-      X
+      <div>
+        <div class="text-truncate">{{ entry.metadata.name }}</div>
+        <div><small class="text-truncate">{{ entry.id }}</small></div>
+      </div>
+      <div class="d-flex align-items-center">
+        <button class="btn btn-danger float-right" (click)="delete($event, entry.id)">
+          X
+        </button>
+      </div>
     </button>
   </div>
   <div class="h-100 d-flex justify-content-center" *ngIf="!data?.length">There are no entries</div>

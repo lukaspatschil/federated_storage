@@ -7,6 +7,7 @@ import { SensorDataService } from './services/sensorData.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CreateComponent } from './components/create/create.component';
 import { SettingsComponent } from './modules/settings/settings/settings.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-root',
@@ -20,10 +21,13 @@ export class AppComponent implements OnInit {
 
   constructor(
     private readonly sensorDataService: SensorDataService,
-    private readonly modalService: NgbModal
+    private readonly modalService: NgbModal,
+    private readonly titleService: Title
   ) {}
 
   ngOnInit() {
+    this.titleService.setTitle('G4T2 | Federated Storage Infrastructure for IoT Sensor Data');
+
     this.map = new Map({
       layers: [
         new TileLayer({

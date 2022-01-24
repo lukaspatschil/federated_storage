@@ -127,9 +127,8 @@ export class CreateComponent implements OnInit {
 
       this.sensorDataService
         .createSensorData(createSensorDataDto)
-        .subscribe(() => {
-          this.close();
-        });
+
+      this.close();
     }
   }
 

@@ -86,11 +86,11 @@ When installing a new dependency use the command `npm install dependency -w serv
 
 #### Docker
 
-In order to start all services run `docker-compose up` in order to start the application in development mode (expect for the frontend container which relies on nginx and production mode and needs to be rebuild or started with `ng serve`).
+In order to start all services run `docker-compose -f docker-develop.yml up` in order to start the application in development mode (expect for the frontend container which relies on nginx and production mode and needs to be rebuild or started with `ng serve`).
 
 To stop the containers run `docker-compose stop` or delete them by running `docker-compose down`.
 
-When installing a new dependency you will need to rebuild the docker container with `docker-compose build container-name`.
+When installing a new dependency you will need to rebuild the docker container with `docker-compose -f docker-develop.yml build container-name`.
 
 #### Generating code
 
@@ -112,7 +112,7 @@ This is a special mode which is used to present the application to the students.
 
 All containers are started in production mode. Any changes made after building will not affect the containers.
 
-The containers are started / build with `docker-compose -f docker-presentation.yml up`.
+The containers are started / build with `docker-compose up`.
 
 ### Production
 

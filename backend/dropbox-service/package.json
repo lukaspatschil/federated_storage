@@ -29,6 +29,8 @@
     "@nestjs/microservices": "^8.1.2",
     "@nestjs/platform-express": "^8.1.2",
     "@types/mime-types": "^2.1.1",
+    "amqp-connection-manager": "^4.0.1",
+    "amqplib": "^0.8.0",
     "atob": "^2.1.2",
     "dropbox": "^10.20.0",
     "jest-automock": "^1.0.2",
