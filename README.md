@@ -27,6 +27,8 @@ DON'T USE IN PRODUCTION SINCE THERE ARE NO SECURITY FEATURES IMPLEMENTED!
 
 ## Script
 
+Install all dependencies with `pip install -r requirements.txt`.
+
 There are two scripts:
 
 ### Iot device dummy
