@@ -25,6 +25,7 @@ import { PictureDto } from './dto/picture/Picture.dto';
 import { UpdateSensorDataDto } from './dto/sensordata/UpdateSensorData.dto';
 import { GatewayService } from './gateway.service';
 import { EmptyDto } from './dto/Empty.dto';
+import { idDto } from './dto/id.dto';
 
 @Controller('api/v1/sensordata')
 export class GatewayController {
@@ -84,7 +85,7 @@ export class GatewayController {
     description: 'ID not found',
     type: String,
   })
-  readOneSensorDataById(@Param() params) {
+  readOneSensorDataById(@Param() params: idDto) {
     this.myLogger(
       'readOneSensorDataById',
       'start - Params: ' + JSON.stringify(params),
@@ -143,7 +144,7 @@ export class GatewayController {
     description: 'ID not found',
     type: String,
   })
-  async readPictureEndpointById(@Param() params) {
+  async readPictureEndpointById(@Param() params: idDto) {
     this.myLogger(
       'readPictureEndpointById',
       'start - Params: ' + JSON.stringify(params),
@@ -180,7 +181,7 @@ export class GatewayController {
     description: 'ID not found',
     type: String,
   })
-  deleteOnePictureById(@Param() params) {
+  deleteOnePictureById(@Param() params: idDto) {
     this.myLogger(
       'deleteOnePictureById',
       'start - Params: ' + JSON.stringify(params),
@@ -221,7 +222,10 @@ export class GatewayController {
     description: 'ID not found',
     type: String,
   })
-  updateSensorDataById(@Param() params, @Body() metadata: UpdateSensorDataDto) {
+  updateSensorDataById(
+    @Param() params: idDto,
+    @Body() metadata: UpdateSensorDataDto,
+  ) {
     this.myLogger(
       'updateSensorDataById',
       'start - Params: ' +
