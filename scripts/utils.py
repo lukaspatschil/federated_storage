@@ -3,7 +3,7 @@ import base64
 import time
 
 BASE_URL="http://localhost:3000/api/v1/sensordata"
-INPUT_FOLDER = "C:/Users/lukas/Downloads/iwildcam_synthesized_idaho"
+INPUT_FOLDER = "/aic/g2/"
 
 class Timer:
   def __init__(self):

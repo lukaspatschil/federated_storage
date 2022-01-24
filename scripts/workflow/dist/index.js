@@ -3,7 +3,7 @@ import * as path from 'path';
 import fetch from 'node-fetch';
 import * as mime from 'mime-types';
 import readline from 'readline';
-const INPUT_FOLDER = 'C:/Users/lukas/Downloads/iwildcam_synthesized_idaho';
+const INPUT_FOLDER = '/aic/g2/';
 const BASE_URL = 'http://localhost:3000/api/v1/sensordata';
 (async function main() {
     const data = await fs.promises.readFile(`${INPUT_FOLDER}/metadata.json`, { encoding: 'utf8' });

@@ -6,7 +6,7 @@ import readline from 'readline';
 
 import { ISensorData } from './interface/sensorData';
 
-const INPUT_FOLDER = 'C:/Users/lukas/Downloads/iwildcam_synthesized_idaho';
+const INPUT_FOLDER = '/aic/g2/';
 const BASE_URL = 'http://localhost:3000/api/v1/sensordata';
 
 (async function main() {
