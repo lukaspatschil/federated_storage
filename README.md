@@ -109,10 +109,13 @@ n ... specifies how many sensor data should be send if left empty the whole file
 ## Technologies used
 
 ### Nest.js
+Is a framework for building Node.js web applications. We use it to implement our backend services. You can find out more in the [Nest.js documentation](https://docs.nestjs.com/).
 
 ### Angular
+Is a framework for building front-end web applications. We use it to implement our fronted application. You can find out more in the [Angular documentation](https://angular.io/docs).
 
 ### REST
+REST is a software architecture style that is used to guide the development of software architectecture for the WWW. We use REST for our API as and interface for the frontend and the backend to communicate. If you want to learn more about REST services you can read for example [the little book on rest services](https://www.kennethlange.com/books/The-Little-Book-on-REST-Services.pdf).
 
 ### Docker
 Docker is a virtualization tool that allows you to package and run applications in isolated environments called container. We run each of our applications services in a separate Docker container. You can find out more in the [Docker documentation](https://docs.docker.com/).
