@@ -233,7 +233,9 @@ export class SensordataService {
         firstValueFrom(this.pictureStorageM.removePictureById(picture)),
       );
     }
-    await Promise.all(requests);
+
+    await Promise.allSettled(requests);
+
 
     await firstValueFrom(this.sensorDataStorage.removeSensorDataById(request));
     return {};

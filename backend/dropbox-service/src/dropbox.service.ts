@@ -116,12 +116,14 @@ export class DropboxService {
     this.dbx
       .filesDeleteV2({ path: path })
       .then((response: any) => {
-        this.logger.log(response);
+        this.logger.log(JSON.stringify(response));
         subject.next({});
         subject.complete();
       })
       .catch((deleteErr: Error) => {
-        this.logger.log(deleteErr);
+        this.logger.error(deleteErr);
+        subject.error(deleteErr);
+        subject.complete();
 
         throw new RpcException({
           code: status.NOT_FOUND,
