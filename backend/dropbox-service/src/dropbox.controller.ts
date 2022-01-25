@@ -1,20 +1,12 @@
-import { Controller, Logger, OnModuleInit } from '@nestjs/common';
-import { Dropbox } from 'dropbox';
-import * as mime from 'mime-types';
+import { Controller, Logger } from '@nestjs/common';
 import {
   PictureStorageServiceController,
   PictureStorageServiceControllerMethods,
 } from './service-types/types/proto/pictureStorage';
-import { Observable, Subject } from 'rxjs';
 import {
-  Empty,
   IdWithMimetype,
   PictureCreationById,
-  PictureData,
 } from './service-types/types/proto/shared';
-import { RpcException } from '@nestjs/microservices';
-import { status } from '@grpc/grpc-js';
-import { ConfigService } from '@nestjs/config';
 import { DropboxService } from './dropbox.service';
 
 @Controller()

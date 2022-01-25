@@ -1,21 +1,15 @@
-import { Controller, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Dropbox } from 'dropbox';
 import * as mime from 'mime-types';
-import {
-  PictureStorageServiceController,
-  PictureStorageServiceControllerMethods,
-} from './service-types/types/proto/pictureStorage';
 import { Observable, Subject } from 'rxjs';
 import {
   Empty,
   IdWithMimetype,
   PictureCreationById,
-  PictureData,
 } from './service-types/types/proto/shared';
 import { RpcException } from '@nestjs/microservices';
 import { status } from '@grpc/grpc-js';
 import { ConfigService } from '@nestjs/config';
-import { DropboxController } from './dropbox.controller';
 
 @Injectable()
 export class DropboxService {
@@ -55,7 +49,7 @@ export class DropboxService {
         })
         .then((response: any) => {
           this.logger.log(
-            'DropboxService createPictureById(): request to dropbox sent sucessfully',
+            'DropboxService createPictureById(): request to dropbox sent successfully',
           );
           this.logger.log(response);
           resolve({});
@@ -85,7 +79,6 @@ export class DropboxService {
     } catch (e) {
       this.logger.error(JSON.stringify(e));
 
-      // TODO: maybe make more specific
       if (e?.status && e.status === 409) {
         throw new RpcException({
           code: status.NOT_FOUND,

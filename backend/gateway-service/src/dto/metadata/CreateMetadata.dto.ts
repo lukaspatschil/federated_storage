@@ -39,7 +39,7 @@ export class CreateMetadataDto {
   @Transform((data) => {
     const string = data.value.replace(/[(|)]/g, '').split('.');
     const date = new Date(string[0]);
-    if(string.length > 1){
+    if (string.length > 1) {
       date.setMilliseconds(parseInt(string[1].substring(0, 3)));
     }
     return date;
