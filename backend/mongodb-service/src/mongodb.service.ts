@@ -253,10 +253,12 @@ export class MongoDBService {
     this.logger.log('Update data: ' + JSON.stringify(data));
     const sensorData = {
       pictures: [
-        {
-          ...data.picture,
-          createdAt: new Date(),
-        },
+        data.picture
+          ? {
+              ...data.picture,
+              createdAt: new Date(),
+            }
+          : undefined,
       ],
       metadata: {
         name: data.metadata?.name,
