@@ -10,7 +10,6 @@ import {
   SensorDataCreation,
   SensorDataUpdate,
 } from './service-types/types/proto/shared';
-import { Metadata } from '@grpc/grpc-js';
 
 @Injectable()
 export class GatewayService {
