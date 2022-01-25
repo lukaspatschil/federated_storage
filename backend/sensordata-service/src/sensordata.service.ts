@@ -243,8 +243,7 @@ export class SensordataService {
 
   async updateSensorDataById(sensorDataUpdate: SensorDataUpdate) {
     this.logger.log('updateSensorData(): started');
-    // TODO: implement update Method in SensorDataStorage
-
+    
     let pictureCreationWithoutData: PictureCreationWithoutData | undefined;
 
     if (sensorDataUpdate.picture !== undefined) {
