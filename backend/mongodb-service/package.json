@@ -29,6 +29,8 @@
     "@nestjs/microservices": "^8.1.2",
     "@nestjs/mongoose": "^9.0.1",
     "@nestjs/platform-express": "^8.1.2",
+    "amqp-connection-manager": "^4.0.1",
+    "amqplib": "^0.8.0",
     "mongoose": "^6.0.14",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

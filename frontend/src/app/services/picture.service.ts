@@ -29,7 +29,6 @@ export class PictureService {
   }
 
   private async getPictureRequest(id: string): Promise<PictureDto> {
-    // TODO: Not found?
     const picture = await firstValueFrom(
       this.http
         .get<PictureDto>(this.API_URL + '/' + id)

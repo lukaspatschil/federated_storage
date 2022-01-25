@@ -1,10 +1,11 @@
 {
   "name": "g4t2",
   "private": true,
-  "version": "1.5.0",
+  "version": "2.0.0",
   "description": "",
   "workspaces": [
-    "backend/*"
+    "backend/*",
+    "scripts/*"
   ],
   "directories": {
     "doc": "docs"
@@ -36,8 +37,8 @@
     "generate:protoc": "cd backend/proto && protoc --plugin=../../node_modules/ts-proto/protoc-gen-ts_proto --ts_proto_opt=env=node --ts_proto_opt=nestJs=true --ts_proto_out=../service-types/types/proto *.proto",
     "generate:types": "node ./scripts/generateTypes.js",
     "pregenerate:protoc": "rimraf backend/service-types/types/proto/*",
-    "fill:10": "node ./scripts/populateBackend.js 10",
-    "fill": "node ./scripts/populateBackend.js"
+    "fill": "python3 ./scripts/iotdummy.py",
+    "workflow": "python3 ./scripts/workflow.py"
   },
   "repository": {
     "type": "git",

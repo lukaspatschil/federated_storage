@@ -1,6 +1,7 @@
 import {
   CallHandler,
   ExecutionContext,
+  HttpException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -21,6 +22,10 @@ export class ExcpetionInterceptor implements NestInterceptor {
 
         logger.error('An error was caught by interceptor: ' + err);
         logger.error(JSON.stringify(err));
+
+        if (err instanceof HttpException) {
+          throw err;
+        }
 
         if (err?.code === status.NOT_FOUND) {
           throw new NotFoundException();

@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import {
   Empty,
   PictureWithoutData,
+  PictureWithoutDataArray,
   SensorData,
   SensorDataArray,
   SensorDataCreationWithoutPictureData,
@@ -49,6 +50,57 @@ export class MongoDBService {
     }
 
     return this.mapSensorDataDocumentToSensorData(data) as any;
+  }
+
+  async findNextPictureOfPicture(id: string): Promise<PictureWithoutData> {
+    this.logger.log(`Finding all pictures by picture id. ${id}`);
+
+    // returns sensordataDocument
+    const data = await this.sensorDataModel.findOne({
+      pictures: {
+        $elemMatch: { _id: id },
+      },
+    });
+
+    if (data === undefined || data === null) {
+      throw new RpcException({
+        code: status.INTERNAL,
+        message: 'Could not get sensordata entry',
+      });
+    }
+
+    const sensordataObject = this.mapSensorDataDocumentToSensorData(data);
+
+    const currentImage = await this.findOnePicture(id);
+
+    /*let latestPicture
+    sensordataObject.then(
+        (result) => {
+          // sort data by timestamp otherwise
+          latestPicture = data?.pictures
+              .sort((a,b) => a.createdAt.getTime() - b.createdAt.getTime())
+              .filter((a) => a.createdAt < new Date(result.createdAt))?.[0];
+        }
+    )*/
+
+    const latestPicture = sensordataObject.pictures
+      .sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
+      .filter(
+        (a) => new Date(a.createdAt) < new Date(currentImage.createdAt),
+      )?.[0];
+
+    this.logger.log('Upcoming id: ' + JSON.stringify(latestPicture));
+
+    if (latestPicture === undefined) {
+      throw new RpcException({
+        code: status.NOT_FOUND,
+        message: 'not possible to determine former image data',
+      });
+    }
+    return latestPicture as any;
   }
 
   async findOnePicture(id: string): Promise<PictureWithoutData> {
@@ -162,7 +214,12 @@ export class MongoDBService {
       });
     }
     return {
-      pictures: [data.picture],
+      pictures: [
+        {
+          ...data.picture,
+          createdAt: new Date(),
+        },
+      ],
       metadata: {
         name: data.metadata.name,
         placeIdent: data.metadata.placeIdent,
@@ -195,7 +252,14 @@ export class MongoDBService {
     }
     this.logger.log('Update data: ' + JSON.stringify(data));
     const sensorData = {
-      pictures: [data.picture],
+      pictures: [
+        data.picture
+          ? {
+              ...data.picture,
+              createdAt: new Date(),
+            }
+          : undefined,
+      ],
       metadata: {
         name: data.metadata?.name,
         placeIdent: data.metadata?.placeIdent,

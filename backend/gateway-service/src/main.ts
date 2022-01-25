@@ -25,6 +25,7 @@ async function bootstrap() {
     new ValidationPipe({
       enableDebugMessages: true,
       disableErrorMessages: false,
+      transform: true,
     }),
   );
   const document = SwaggerModule.createDocument(app, config);

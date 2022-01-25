@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const mime = require('mime-types');
 
 const BASE_URL = 'http://localhost:3000/api/v1/sensordata';
-const INPUT_FOLDER = 'C:/Users/lukas/Downloads/iwildcam_synthesized_idaho';
+const INPUT_FOLDER = '/aic/g2/';
 // Dropbox has a very small parallel request limit
 //? Maybe change the backend to use a queue or something different for dropbox?
 const CHUNK_SIZE = 1;
@@ -68,7 +68,7 @@ async function sendRequest(meta) {
     metadata: {
       name: meta.name,
       placeIdent: meta.place_ident,
-      seqID: meta.seq_id,
+      seqId: meta.seq_id,
       datetime: meta.datetime,
       frameNum: meta.frame_num,
       seqNumFrames: meta.seq_num_frames,

@@ -35,7 +35,8 @@ export class OverviewComponent implements OnInit {
     modalRef.componentInstance.closeModal.subscribe(() => modalRef.close());
   }
 
-  delete(id: string) {
+  delete($event: MouseEvent, id: string) {
+    $event.stopPropagation();
     this.sensorDataService.deleteSensorData(id);
   }
 }
