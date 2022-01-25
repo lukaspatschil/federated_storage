@@ -91,15 +91,17 @@ Install all dependencies with `pip install -r ./scripts/requirements.txt`.
 
 There are two scripts:
 
-### Iot device dummy
-This script simulates an IoT device. It is used to populate the backend with data.
-
-Run it with `python3 ./scripts/iotdummy.py`.
-
 ### Worklow script
 This script simulates a possible workflow by using all CRUD operations.
 
 Run it with `python3 ./scripts/workflow.py`.
+
+### Iot device dummy
+This script simulates an IoT device. It is used to populate the backend with data.
+
+Run it with `python3 ./scripts/iotdummy.py [n]`.
+
+n ... specifies how many sensor data should be send if left empty the whole file will be sent.
 
 ## Technologys used
 
